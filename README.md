@@ -45,7 +45,7 @@ Why two fall short:
 
 With `n_action_steps` set to 5, 10 and 50, π0 reaches 76%, 70% and 68% (100 episodes each), all within noise of each other.
 
-Per-task results are on the [dashboard](https://chaoshengsc.github.io/robot-policy-sim-repro/dashboard/). Replay videos are too large to publish; the dashboard plays them when the files are present locally. Sources and debugging history are in [`docs/NOTES.md`](docs/NOTES.md) (Chinese).
+Per-task results are on the [dashboard](https://chaoshengsc.github.io/robot-policy-sim-repro/dashboard/). Replay videos are too large to publish; the dashboard plays them when the files are present locally. Sources and debugging history are in [`docs/NOTES.md`](docs/NOTES.md).
 
 ## 2. Do the policies use the camera?
 
@@ -138,9 +138,9 @@ python3 dashboard/build.py && python3 scripts/analysis/make_figures.py
 
 | Document | Content |
 |---|---|
-| [`docs/INSTALL.md`](docs/INSTALL.md) | Step-by-step setup of the three conda environments, checkpoints, tokenizer ([中文](docs/INSTALL_CN.md)) |
-| [`docs/TROUBLESHOOTING.md`](docs/TROUBLESHOOTING.md) | Every problem hit during setup and evaluation, with cause and fix (Chinese) |
-| [`scripts/README.md`](scripts/README.md) | Which entry script and which summary script produce each result (Chinese) |
+| [`docs/INSTALL.md`](docs/INSTALL.md) | Step-by-step setup of the three conda environments, checkpoints, tokenizer |
+| [`docs/TROUBLESHOOTING.md`](docs/TROUBLESHOOTING.md) | Every problem hit during setup and evaluation, with cause and fix |
+| [`scripts/README.md`](scripts/README.md) | Which entry script and which summary script produce each result |
 | [`env/lock/`](env/lock/) | Full package lists exported from the environments that produced the results |
 
 ## Repository layout

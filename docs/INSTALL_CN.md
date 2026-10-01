@@ -114,6 +114,6 @@ bash $REPO/scripts/eval/run_libero.sh pi05_spatial_500 50 <权重目录> 1 --pol
 python3 $REPO/scripts/analysis/summarize_eval.py pi05_spatial_500      # 成功率与 95% 置信区间
 ```
 
-输出在 `$EMB_ROOT/logs/eval/<run_name>/`;`stdout.log` 最后一行 `exit=0` 表示正常结束。各实验的入口见 `scripts/README.md`。
+输出在 `$EMB_ROOT/logs/eval/<run_name>/`;`stdout.log` 最后一行 `exit=0` 表示正常结束。各实验的入口见 `scripts/README_CN.md`。
 
 要让新结果进入看板和图表:把 `eval_info.json` 复制到 `dashboard/data/<run_name>/`,再运行 `python3 dashboard/build.py && python3 scripts/analysis/make_figures.py`。

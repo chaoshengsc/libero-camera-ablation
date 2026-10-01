@@ -45,7 +45,7 @@
 
 π0 的 `n_action_steps` 取 5、10、50 时,成功率分别是 76%、70%、68%(各 100 回合),差异在误差内。
 
-各任务明细在[看板](https://chaoshengsc.github.io/robot-policy-sim-repro/dashboard/?lang=zh)上(回放视频体积大,没有发布;本地有视频文件时看板可以播放);基准出处与排查过程见 [`docs/NOTES.md`](docs/NOTES.md)。
+各任务明细在[看板](https://chaoshengsc.github.io/robot-policy-sim-repro/dashboard/?lang=zh)上(回放视频体积大,没有发布;本地有视频文件时看板可以播放);基准出处与排查过程见 [`docs/NOTES_CN.md`](docs/NOTES_CN.md)。
 
 ## 2. 策略有没有在用相机?
 
@@ -139,8 +139,8 @@ python3 dashboard/build.py && python3 scripts/analysis/make_figures.py
 | 文档 | 内容 |
 |---|---|
 | [`docs/INSTALL_CN.md`](docs/INSTALL_CN.md) | 三个 conda 环境、权重、分词器的逐步安装 |
-| [`docs/TROUBLESHOOTING.md`](docs/TROUBLESHOOTING.md) | 安装和评测中遇到的每个问题:现象、原因、解决 |
-| [`scripts/README.md`](scripts/README.md) | 每个结果对应哪个入口脚本和汇总脚本 |
+| [`docs/TROUBLESHOOTING_CN.md`](docs/TROUBLESHOOTING_CN.md) | 安装和评测中遇到的每个问题:现象、原因、解决 |
+| [`scripts/README_CN.md`](scripts/README_CN.md) | 每个结果对应哪个入口脚本和汇总脚本 |
 | [`env/lock/`](env/lock/) | 从实际跑出结果的环境导出的完整包清单 |
 
 ## 仓库结构

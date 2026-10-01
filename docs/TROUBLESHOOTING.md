@@ -1,45 +1,42 @@
-# 踩坑与解决办法
+# Troubleshooting
 
-按"现象 → 原因 → 解决"整理,都是这次复现里实际遇到的。
+English | [中文](TROUBLESHOOTING_CN.md)
 
-## 安装
+Organised as symptom → cause → fix. Everything here was actually hit during this reproduction.
 
-| 现象 | 原因 | 解决 |
+## Installation
+
+| Symptom | Cause | Fix |
 |---|---|---|
-| torch 装好后 `cuda.is_available()` 为 False 或报 CUDA 版本错 | PyPI 默认的 torch 是 CUDA 13 版,驱动 570 不支持 | 从 `https://download.pytorch.org/whl/cu128` 装,并用约束文件锁住 torch |
-| 视频解码报错(torchcodec) | torchcodec 0.11 不支持 ffmpeg 9 | conda 里固定 `ffmpeg=7.1.1` |
-| `flash-attn` 安装要求 `CUDA_HOME` | 源码编译需要完整 CUDA 工具链 | 直接装官方 Release 里的预编译 wheel |
-| LIBERO `pip install -e .` 后 `import libero` 失败 | 新版 setuptools 的可编辑安装方式与它的包结构不兼容 | `pip install -e . --config-settings editable_mode=compat` |
-| OpenVLA 环境 `pip check` 报 protobuf 冲突 | tensorflow-metadata 与 protobuf 版本互相限制 | `protobuf==4.21.12` + `tensorflow-metadata==1.17.1` |
-| `egl_probe` 编译失败(CMake 报最低版本) | 新版 CMake 不再接受它声明的旧策略版本 | 安装时加 `CMAKE_POLICY_VERSION_MINIMUM=3.5` |
-| `gym-pusht` 把 `opencv-python-headless` 换成了带界面的版本 | 它的依赖声明 | 用 `--no-deps` 装,再手动补 pymunk、pygame、scikit-image、shapely |
-| ACT 与 LIBERO 装不进同一个环境 | ACT 用的 dm_control 要求 mujoco ≥ 3.8.1,LIBERO 需要 3.3.2 | 分成两个环境 |
+| After installing torch, `cuda.is_available()` is False or a CUDA version error appears | The default torch on PyPI is built for CUDA 13, which driver 570 does not support | Install from `https://download.pytorch.org/whl/cu128` and pin torch with a constraints file |
+| Video decoding errors (torchcodec) | torchcodec 0.11 does not support ffmpeg 9 | Pin `ffmpeg=7.1.1` in conda |
+| Installing `flash-attn` asks for `CUDA_HOME` | Building from source needs the full CUDA toolchain | Install the prebuilt wheel from the official releases |
+| `import libero` fails after `pip install -e .` in LIBERO | The editable install mode of recent setuptools is incompatible with its package layout | `pip install -e . --config-settings editable_mode=compat` |
+| `pip check` reports a protobuf conflict in the OpenVLA environment | tensorflow-metadata and protobuf constrain each other's versions | `protobuf==4.21.12` + `tensorflow-metadata==1.17.1` |
+| `egl_probe` fails to build (CMake complains about the minimum version) | Recent CMake no longer accepts the old policy version it declares | Install with `CMAKE_POLICY_VERSION_MINIMUM=3.5` |
+| `gym-pusht` replaces `opencv-python-headless` with the GUI build | Its declared dependencies | Install with `--no-deps`, then add pymunk, pygame, scikit-image and shapely by hand |
+| ACT and LIBERO cannot share one environment | The dm_control used by ACT requires mujoco ≥ 3.8.1, LIBERO needs 3.3.2 | Use two environments |
 
-## 渲染
+## Rendering
 
-| 现象 | 原因 | 解决 |
+| Symptom | Cause | Fix |
 |---|---|---|
-| 无显示器的机器上 MuJoCo 找不到 EGL | conda 里的 libglvnd 找不到系统的 NVIDIA 驱动 | `MUJOCO_GL=egl`,并设 `__EGL_VENDOR_LIBRARY_FILENAMES=/usr/share/glvnd/egl_vendor.d/10_nvidia.json` |
-| LIBERO 画面明显偏暗 | MuJoCo ≥ 3.3.3 改了渲染(LIBERO issue #88) | LIBERO 相关环境固定 `mujoco==3.3.2` |
+| MuJoCo cannot find EGL on a headless machine | The libglvnd from conda cannot find the system NVIDIA driver | `MUJOCO_GL=egl`, and set `__EGL_VENDOR_LIBRARY_FILENAMES=/usr/share/glvnd/egl_vendor.d/10_nvidia.json` |
+| LIBERO images are clearly too dark | MuJoCo ≥ 3.3.3 changed rendering (LIBERO issue #88) | Pin `mujoco==3.3.2` in the LIBERO environments |
 
-## 评测
+## Evaluation
 
-| 现象 | 原因 | 解决 |
+| Symptom | Cause | Fix |
 |---|---|---|
-| `gym_aloha` 命名空间在评测时找不到 | 异步子进程里没有注册环境 | `--eval.use_async_envs=false` |
-| ACT、Diffusion Policy 的公开权重加载失败 | 权重是旧格式 | 先用 LeRobot 的 `migrate_policy_normalization.py` 迁移 |
-| Diffusion Policy 迁移报 `Couldn't encode 84` | 配置里声明为 tuple 的字段,JSON 里存的是 list | 用 `scripts/eval/migrate_tuplefix.py` 包一层 |
-| π0、π0.5 加载时要联网取分词器并被拒绝 | 分词器在受限仓库 `google/paligemma-3b-pt-224` | 自己申请授权下载分词器,把 `policy_preprocessor.json` 的 `tokenizer_name` 改成本地路径 |
-| 两个评测同时启动,其中一个加载权重时报 `CUDA invalid argument` | 两个进程同时加载大权重 | 第二个进程错开几分钟启动 |
+| The `gym_aloha` namespace is not found during evaluation | The environment is not registered in the async subprocesses | `--eval.use_async_envs=false` |
+| The public ACT and Diffusion Policy checkpoints fail to load | They are in the old format | Migrate them first with LeRobot's `migrate_policy_normalization.py` |
+| Diffusion Policy migration fails with `Couldn't encode 84` | Fields declared as tuple in the config are stored as list in the JSON | Wrap the migration with `scripts/eval/migrate_tuplefix.py` |
+| Loading π0 or π0.5 tries to fetch the tokenizer online and is refused | The tokenizer lives in the gated repository `google/paligemma-3b-pt-224` | Request access and download the tokenizer yourself, then set `tokenizer_name` in `policy_preprocessor.json` to the local path |
+| Two evaluations started together; one fails with `CUDA invalid argument` while loading the checkpoint | Two processes loading large checkpoints at the same time | Start the second one a few minutes later |
 
-## 训练
+## Training
 
-| 现象 | 原因 | 解决 |
+| Symptom | Cause | Fix |
 |---|---|---|
-| 训练一启动内存暴涨、进程被杀 | 包装脚本没有 `if __name__ == "__main__":`,DataLoader 以 spawn 方式启动的每个子进程都重新执行了一遍训练 | 所有包装脚本加入口保护;排队前先用很少的步数实跑一次 |
-| π0 全量微调显存不够(24 GB) | 模型太大 | 只训动作专家、开梯度检查点、bfloat16;batch 16 时峰值约 15.5 GB,每步约 4.2 秒 |
-
-## 其他
-
-| 现象 | 原因 | 解决 |
-|---|---|---|
+| Memory explodes right after training starts and the process is killed | The wrapper script had no `if __name__ == "__main__":`, so every DataLoader worker started with spawn re-ran the whole training | Guard the entry point in every wrapper; do a real run with very few steps before queueing |
+| Full fine-tuning of π0 does not fit in 24 GB | The model is too large | Train only the action expert, enable gradient checkpointing and bfloat16; at batch 16 the peak is about 15.5 GB and each step takes about 4.2 s |
