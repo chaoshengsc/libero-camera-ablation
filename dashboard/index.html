@@ -487,11 +487,17 @@ function drawVideos() {
   $("videos").innerHTML = `<div class="grid">` + (r?.videos || []).map(v => `<div class="vid"><video src="${v.src}#t=0.1" controls muted loop playsinline preload="metadata"></video>
     <div class="meta"><span>${v.task !== r.task ? v.task + " · " : ""}第 ${v.ep} 回合${v.reward != null ? " · 奖励 " + v.reward : ""}</span><span class="st ${v.success ? "ok" : "fail"}"><i>${v.success ? "✓" : "✗"}</i>${v.success ? "成功" : "失败"}</span></div></div>`).join("") + `</div>`;
 }
-// 视频不随仓库发布:加载不到时整块换成一句说明,而不是一排空播放器
+// 视频不随仓库发布:加载不到时整块换成一句说明,而不是一排空播放器。
+// 404 时浏览器不一定触发 <video> 的 error 事件,所以先探测一次,error 事件只作兜底。
+function noVideos() {
+  $("replayBody").innerHTML = `<p class="pending">回放视频体积大,没有随仓库发布。在本地把评测输出的 videos/ 放到 dashboard/data/&lt;run&gt;/ 下,就能在这里播放。</p>`;
+}
 addEventListener("error", e => {
-  if (e.target.tagName === "VIDEO" && $("replayBody").contains(e.target))
-    $("replayBody").innerHTML = `<p class="pending">回放视频体积大,没有随仓库发布。在本地把评测输出的 videos/ 放到 dashboard/data/&lt;run&gt;/ 下,就能在这里播放。</p>`;
+  if (e.target.tagName === "VIDEO" && $("replayBody").contains(e.target)) noVideos();
 }, true);
+const probe = RUNS[0]?.videos?.[0]?.src;
+if (probe && location.protocol !== "file:")
+  fetch(probe, { method: "HEAD" }).then(r => { if (!r.ok) noVideos(); }).catch(() => {});
 
 drawChart(); drawMatrix(); drawBlackout(); drawFollowup(); drawVideos();
 addEventListener("resize", () => { drawChart(); drawBlackout(); drawFollowup(); });
