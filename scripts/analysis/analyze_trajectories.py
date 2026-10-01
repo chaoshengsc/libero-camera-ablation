@@ -1,4 +1,4 @@
-"""方向 1:用末端执行器轨迹检验 π0 看不见时是否执行"平均解法"。
+"""用末端执行器轨迹检验 π0 看不见时是否执行"平均解法"。
 轨迹来自 eval_probe.py(每回合 eef[T,3]、grip[T,2]),回合顺序 = 任务0回合0..9, 任务1…,同种子同初始状态。
 指标(单位 cm):
   DTW  —— 动态时间规整后的平均点距,消除快慢差异,只比路线
@@ -12,7 +12,7 @@ import numpy as np
 
 from metrics import dtw, grasp, spread
 
-EMB = os.environ.get("EMB_ROOT", "/path/to/emb")
+EMB = os.environ["EMB_ROOT"]
 E = EMB + "/logs/eval"
 
 
@@ -20,6 +20,7 @@ def load(run):
     z = np.load(f"{E}/{run}/traj.npz")
     per = json.load(open(glob.glob(f"{E}/{run}/out/**/eval_info.json", recursive=True)[0]))["per_task"]
     succ = [s for t in per for s in t["metrics"]["successes"]]
+    assert int(z["n"]) == len(succ), f"{run}: 轨迹 {int(z['n'])} 条,评测 {len(succ)} 回合,无法按下标配对"
     return [(z[f"eef_{i}"] * 100, z[f"grip_{i}"], bool(succ[i])) for i in range(int(z["n"]))]
 
 
@@ -31,10 +32,12 @@ if __name__ == "__main__":
     res = {}
     for name, (a, b) in pairs.items():
         ds = [dtw(runs[a][i][0], runs[b][i][0]) for i in range(100)]
-        gd = [np.linalg.norm(ga - gb) for i in range(100)
-              for ga, gb in [(grasp(*runs[a][i][:2]), grasp(*runs[b][i][:2]))] if ga is not None and gb is not None]
+        gt = [[np.linalg.norm(ga - gb) for i in range(t * 10, (t + 1) * 10)
+               for ga, gb in [(grasp(*runs[a][i][:2]), grasp(*runs[b][i][:2]))] if ga is not None and gb is not None] for t in range(10)]
+        gd = [x for g in gt for x in g]
         res[name] = {"dtw_mean": float(np.mean(ds)), "grasp_dist_mean": float(np.mean(gd)), "n_grasp_pairs": len(gd),
-                     "dtw_by_task": [float(np.mean(ds[t * 10:(t + 1) * 10])) for t in range(10)]}
+                     "dtw_by_task": [float(np.mean(ds[t * 10:(t + 1) * 10])) for t in range(10)],
+                     "grasp_dist_by_task": [float(np.mean(g)) if g else None for g in gt]}
         print(f"{name:34} DTW {np.mean(ds):5.2f} cm   抓取点距离 {np.mean(gd):5.2f} cm (n={len(gd)})")
 
     print("\n抓取点离散度(同任务 10 回合,cm;看画面应随碗位置分散,看不见则聚拢):")
@@ -43,4 +46,5 @@ if __name__ == "__main__":
         s = [spread([grasp(*runs[r][t * 10 + k][:2]) for k in range(10)]) for t in range(10)]
         sp[r] = s
         print(f"  {r:18} 平均 {np.nanmean(s):4.2f}   各任务 {[round(x, 1) for x in s]}")
-    json.dump({"pairs": res, "grasp_spread": sp}, open(f"{E}/traj_analyze.json", "w"), ensure_ascii=False)
+    succ = {r: [sum(e[2] for e in runs[r][t * 10:(t + 1) * 10]) for t in range(10)] for r in runs}
+    json.dump({"pairs": res, "grasp_spread": sp, "successes_by_task": succ}, open(f"{E}/traj_analyze.json", "w"), ensure_ascii=False)

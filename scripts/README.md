@@ -15,8 +15,8 @@
 | 录像逐帧比较 | | `analysis/compare_videos.py` |
 | 末端轨迹、只涂黑一路相机 | `eval/run_trajectory_and_single_camera.sh` | `analysis/analyze_trajectories.py`、`analysis/summarize_single_camera.py` |
 | 温和扰动:加噪声、冻结画面 | `eval/run_perturbation.sh` | `dashboard/build.py` |
-| 状态置零继续微调 | `train/run_statedrop_pipeline.sh`(内部调 `train/run_train.sh`) | `analysis/summarize_statedrop.py` |
-| 轨迹图的数据 | | `analysis/export_trajectories.py` |
+| 状态置零继续微调 | `train/run_statedrop_pipeline.sh [步数,默认 3000]`(内部调 `train/run_train.sh`) | `analysis/summarize_statedrop.py` |
+| 轨迹图的数据 | | `analysis/export_trajectories.py 4 7` |
 | README 的图与 `results/*.csv` | | `analysis/make_figures.py` |
 
 `eval/run_libero.sh` 的 `WRAP` 开关:
@@ -24,8 +24,12 @@
 | `WRAP` | 实际运行 | 额外环境变量 |
 |---|---|---|
 | `none`(默认) | `lerobot-eval` | |
-| `blackout` | `eval/eval_blackout.py` | `BLACKOUT=all\|agent\|wrist` |
+| `blackout` | `eval/eval_blackout.py` | `BLACKOUT=all\|agent\|wrist`(其他取值直接报错) |
 | `probe` | `eval/eval_probe.py`,轨迹存到 `<输出目录>/traj.npz` | `BLACKOUT=none\|all\|agent\|wrist\|noise\|freeze` |
+
+入口脚本可以从任意目录调用(相对路径或绝对路径都行);缺少位置参数时会打印用法并退出,不会动已有结果。
+
+新评测的结果要进看板和图表:把输出目录里的 `eval_info.json` 放到 `dashboard/data/<run>/`,再运行 `python3 dashboard/build.py && python3 scripts/analysis/make_figures.py`。
 
 `checks/` 下三个脚本用于装完环境后的自检:GPU 与 torch、EGL 无头渲染、视频解码。
 

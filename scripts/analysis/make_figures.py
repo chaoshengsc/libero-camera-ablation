@@ -5,6 +5,7 @@
 """
 import csv
 import json
+import math
 import re
 from pathlib import Path
 
@@ -12,45 +13,58 @@ ROOT = Path(__file__).resolve().parents[2]
 RES, MEDIA = ROOT / "results", ROOT / "media"
 FONT = "-apple-system,'Segoe UI','PingFang SC','Microsoft YaHei','Noto Sans CJK SC',sans-serif"
 INK, MUTED, GRID = "#1f2933", "#6b7280", "#e5e7eb"
-BLUE, RED, ORANGE, VIOLET = "#2563eb", "#dc2626", "#ea580c", "#7c3aed"
+BLUE, RED, ORANGE, VIOLET, ERR = "#2563eb", "#dc2626", "#ea580c", "#7c3aed", "#6b7280"
 MODEL = {"pi0": "π0", "pi0.5": "π0.5"}
 
 TXT = {
     "en": {
-        "rep_title": "Public checkpoints: success rate on this machine vs. reference",
-        "rep_ours": "This machine (500 episodes, 95% CI)", "rep_ref": "Reference", "rep_fail": "Not reproduced (intervals do not overlap)",
-        "pert_title": "Success rate when the camera input is perturbed (LIBERO-Spatial, 100 episodes each)",
+        "rep_title": "Public checkpoints: success rate in this repo vs. reference",
+        "rep_ours": "This repo (500 episodes, 95% CI)", "rep_ref": "Reference", "rep_fail": "Not reproduced (intervals do not overlap)",
+        "pert_title": "Success rate when the camera input is perturbed (LIBERO-Spatial, 100 episodes each, 95% CI)",
         "conds": ["Normal", "Gaussian noise", "Frozen first frame", "Agent-view black", "Wrist black", "All black"],
-        "pending": "running",
-        "traj_title": "π0 end-effector paths, top view: one task, 10 episodes, identical initial states",
+        "traj_title": "π0 end-effector paths, top view: 10 episodes per task, identical initial states",
         "traj_a": "Normal vs. normal re-run (noise floor)", "traj_b": "Normal vs. all cameras black",
+        "traj_row": "Task {i}: bowl {name}. Blind π0 succeeds in {k} of 10 episodes.",
+        "traj_task": {4: "in the top drawer of the cabinet", 7: "on the stove"},
         "traj_normal": "normal", "traj_rerun": "normal, re-run", "traj_black": "all cameras black", "traj_grasp": "dots = grasp points",
         "traj_start": "start", "traj_scale": "10 cm",
         "in_title": "What the policy receives, and what each experiment changes",
         "in_agent": "Agent-view camera", "in_wrist": "Wrist camera", "in_state": "Robot state", "in_lang": "Instruction",
         "in_policy": "Policy", "in_action": "Action",
         "in_img_note": "evaluation: black / noise / frozen", "in_state_note": "training: zeroed for 50% of samples",
-        "in_lang_note": "unchanged", "in_sub_state": "joint and gripper positions", "in_sub_lang": "“pick up the black bowl …”",
+        "in_lang_note": "unchanged", "in_sub_state": "end-effector pose and gripper opening", "in_sub_lang": "“pick up the black bowl …”",
     },
     "zh": {
         "rep_title": "公开权重复现:本机成功率 vs 基准",
         "rep_ours": "本机(500 回合,95% 置信区间)", "rep_ref": "基准", "rep_fail": "未复现(区间不重叠)",
-        "pert_title": "扰动相机输入后的成功率(LIBERO-Spatial,每组 100 回合)",
+        "pert_title": "扰动相机输入后的成功率(LIBERO-Spatial,每组 100 回合,95% 置信区间)",
         "conds": ["正常", "加高斯噪声", "冻结首帧", "只涂主视角", "只涂腕部", "全涂黑"],
-        "pending": "在跑",
-        "traj_title": "π0 末端执行器路线(俯视):同一任务,10 个回合,初始状态相同",
+        "traj_title": "π0 末端执行器路线(俯视):每个任务 10 个回合,初始状态相同",
         "traj_a": "正常 vs 正常重跑(噪声底线)", "traj_b": "正常 vs 相机全涂黑",
+        "traj_row": "任务 {i}:碗在{name}。全涂黑时 10 回合成功 {k} 次。",
+        "traj_task": {4: "木柜上层抽屉里", 7: "灶台上"},
         "traj_normal": "正常", "traj_rerun": "正常(重跑)", "traj_black": "相机全涂黑", "traj_grasp": "圆点 = 抓取点",
         "traj_start": "起点", "traj_scale": "10 cm",
         "in_title": "策略收到什么输入,各实验改了哪一项",
         "in_agent": "主视角相机", "in_wrist": "腕部相机", "in_state": "机械臂状态", "in_lang": "任务指令",
         "in_policy": "策略", "in_action": "动作",
         "in_img_note": "评测时:涂黑 / 加噪声 / 冻结", "in_state_note": "训练时:50% 样本置零",
-        "in_lang_note": "不改", "in_sub_state": "关节与夹爪位置", "in_sub_lang": "“把黑碗拿起来放到……”",
+        "in_lang_note": "不改", "in_sub_state": "末端位姿与夹爪开合", "in_sub_lang": "“把黑碗拿起来放到……”",
     },
 }
 COND_KEYS = ["normal", "noise", "freeze", "agent_black", "wrist_black", "all_black"]
 COND_COL = ["#9ca3af", "#86efac", "#14b8a6", "#60a5fa", "#f59e0b", "#111827"]
+TRAJ_TASKS = [4, 7]  # 轨迹图展示的任务:一个全涂黑仍成功的,一个全涂黑后失败的
+PAIR_IDS = ["pi0_normal_vs_rerun", "pi0_all_black_vs_normal", "pi05_vs_pi0_normal"]  # 与 traj_analyze.json 里 pairs 的顺序一致
+FT_IDS = ["original", "finetuned_control", "finetuned_state_zeroing"]
+SRC_EN = {"ACT": "eval_info.json shipped in the Hugging Face repo (500 episodes)", "OpenVLA": "openvla README (3 seeds x 500 episodes)",
+          "SmolVLA": "SmolVLA paper, Table 2 (10 episodes per task)", "π0.5": "OpenPI LIBERO README",
+          "π0": "OpenPI LIBERO README at commit c015073f (π0 @30k)", "Diffusion Policy": "LeRobot model card (500 episodes)"}
+
+
+def ci95(pc, n):
+    """二项分布正态近似的 95% 置信区间半宽(百分点);与 metrics.ci95 相同,这里重写一份以保持本脚本零依赖。"""
+    return 196 * math.sqrt(pc / 100 * (1 - pc / 100) / n)
 
 
 def load_dashboard():
@@ -132,57 +146,63 @@ def fig_perturbations(rows, t):
         x0 = left + gw * g + (gw - bw * 6 - gap * 5) / 2
         for i, (key, col) in enumerate(zip(COND_KEYS, COND_COL, strict=True)):
             v, bx = m[key], x0 + i * (bw + gap)
-            if v is None:
-                out.append(f'<text x="{bx + bw / 2:.1f}" y="{y(0) - 6:.1f}" text-anchor="middle" font-size="10" fill="{MUTED}">{t["pending"]}</text>')
-                continue
+            e = ci95(v, 100)
+            hi, lo, cx = min(100, v + e), max(0, v - e), bx + bw / 2
             out.append(f'<rect x="{bx:.1f}" y="{y(max(v, 0.8)):.1f}" width="{bw}" height="{ph - (y(max(v, 0.8)) - top):.1f}" rx="2" fill="{col}"/>')
-            out.append(f'<text x="{bx + bw / 2:.1f}" y="{y(v) - 5:.1f}" text-anchor="middle" font-size="12" font-weight="600">{v}</text>')
+            if e:
+                out.append(f'<path d="M{cx:.1f} {y(lo):.1f} V{y(hi):.1f} M{cx - 4:.1f} {y(hi):.1f} h8 M{cx - 4:.1f} {y(lo):.1f} h8" stroke="{ERR}" stroke-width="1.2"/>')
+            out.append(f'<text x="{cx:.1f}" y="{y(hi) - 5:.1f}" text-anchor="middle" font-size="12" font-weight="600">{v}</text>')
         out.append(f'<text x="{left + gw * (g + 0.5):.1f}" y="{h - 16}" text-anchor="middle" font-weight="600">{MODEL.get(m["model"], m["model"])}</text>')
     return svg(w, h, out)
 
 
-def fig_trajectory(traj, t):
-    """两幅俯视图:左 = 正常两次(噪声底线),右 = 正常 vs 全涂黑。坐标为机器人基座系 XY(cm)。"""
-    runs = traj["runs"]
-    pts = [p for eps in runs.values() for e in eps for p in e["xy"]]
-    x0, x1 = min(p[0] for p in pts) - 2, max(p[0] for p in pts) + 2
-    y0, y1 = min(p[1] for p in pts) - 2, max(p[1] for p in pts) + 2
-    pw, top, pad = 340, 92, 26
-    s = (pw - 20) / (y1 - y0)  # 画面横向 = 机器人 Y,纵向 = 机器人 X
-    phh = s * (x1 - x0) + 20
-    w, h = pad * 2 + pw * 2 + 28, top + phh + 26
+def fig_trajectory(trajs, t):
+    """每个任务一行、两幅俯视图:左 = 正常两次(噪声底线),右 = 正常 vs 全涂黑。坐标为机器人基座系 XY(cm),各行同一比例尺。"""
+    pw, pad, top = 340, 26, 104
+    box = []
+    for tr in trajs:
+        pts = [p for eps in tr["runs"].values() for e in eps for p in e["xy"]]
+        box.append((min(p[0] for p in pts) - 2, max(p[0] for p in pts) + 2, min(p[1] for p in pts) - 2, max(p[1] for p in pts) + 2))
+    s = (pw - 20) / max(b[3] - b[2] for b in box)  # 画面横向 = 机器人 Y,纵向 = 机器人 X
+    w = pad * 2 + pw * 2 + 28
     out = [title(t["traj_title"])]
+    lx = pad
+    for lab, col in ((t["traj_normal"], BLUE), (t["traj_rerun"], VIOLET), (t["traj_black"], ORANGE)):
+        out.append(f'<line x1="{lx:.0f}" y1="46" x2="{lx + 18:.0f}" y2="46" stroke="{col}" stroke-width="2.5"/><text x="{lx + 23:.0f}" y="50" fill="{MUTED}">{lab}</text>')
+        lx += 23 + tw(lab) + 18
+    out.append(f'<text x="{lx:.0f}" y="50" fill="{MUTED}">{t["traj_grasp"]}</text>')
+    for ox, name in ((pad, t["traj_a"]), (pad + pw + 28, t["traj_b"])):
+        out.append(f'<text x="{ox}" y="76" font-weight="600">{name}</text>')
 
-    def panel(ox, name, a, b, ca, cb, la, lb):
-        X = lambda p: ox + 10 + s * (p[1] - y0)
-        Y = lambda p: top + 10 + s * (p[0] - x0)
-        lx = ox + 23 + tw(la) + 16
-        o = [f'<rect x="{ox}" y="{top}" width="{pw}" height="{phh:.1f}" rx="6" fill="#f9fafb" stroke="{GRID}"/>',
-             f'<text x="{ox}" y="{top - 34}" font-weight="600">{name}</text>',
-             f'<line x1="{ox}" y1="{top - 16}" x2="{ox + 18}" y2="{top - 16}" stroke="{ca}" stroke-width="2.5"/>'
-             f'<text x="{ox + 23}" y="{top - 12}" fill="{MUTED}">{la}</text>',
-             f'<line x1="{lx:.0f}" y1="{top - 16}" x2="{lx + 18:.0f}" y2="{top - 16}" stroke="{cb}" stroke-width="2.5"/>'
-             f'<text x="{lx + 23:.0f}" y="{top - 12}" fill="{MUTED}">{lb}</text>']
-        for run, col in ((a, ca), (b, cb)):
+    def panel(runs, b, ox, oy, phh, a, c, ca, cc):
+        X = lambda p: ox + 10 + (pw - 20 - s * (b[3] - b[2])) / 2 + s * (p[1] - b[2])
+        Y = lambda p: oy + 10 + s * (p[0] - b[0])
+        o = [f'<rect x="{ox}" y="{oy:.1f}" width="{pw}" height="{phh:.1f}" rx="6" fill="#f9fafb" stroke="{GRID}"/>']
+        for run, col in ((a, ca), (c, cc)):
             for e in runs[run]:
                 d = " ".join(f"{X(p):.1f},{Y(p):.1f}" for p in e["xy"])
                 o.append(f'<polyline points="{d}" fill="none" stroke="{col}" stroke-width="1.3" opacity="0.55" stroke-linejoin="round"/>')
-        for run, col in ((a, ca), (b, cb)):
+        for run, col in ((a, ca), (c, cc)):
             for e in runs[run]:
                 if e["grasp"]:
                     o.append(f'<circle cx="{X(e["grasp"]):.1f}" cy="{Y(e["grasp"]):.1f}" r="3.6" fill="{col}" stroke="#ffffff" stroke-width="1"/>')
         st = runs[a][0]["xy"][0]
         o.append(f'<circle cx="{X(st):.1f}" cy="{Y(st):.1f}" r="4.5" fill="none" stroke="{INK}" stroke-width="1.5"/>'
                  f'<text x="{X(st):.1f}" y="{Y(st) - 9:.1f}" text-anchor="middle" font-size="11" fill="{INK}">{t["traj_start"]}</text>')
-        bx, by = ox + pw - 14 - 10 * s, top + phh - 12
+        bx, by = ox + pw - 14 - 10 * s, oy + phh - 12
         o.append(f'<line x1="{bx:.1f}" y1="{by:.1f}" x2="{bx + 10 * s:.1f}" y2="{by:.1f}" stroke="{INK}" stroke-width="2"/>'
                  f'<text x="{bx + 5 * s:.1f}" y="{by - 5:.1f}" text-anchor="middle" font-size="11" fill="{MUTED}">{t["traj_scale"]}</text>')
         return o
 
-    out += panel(pad, t["traj_a"], "traj_pi0_normal", "traj_pi0_normal2", BLUE, VIOLET, t["traj_normal"], t["traj_rerun"])
-    out += panel(pad + pw + 28, t["traj_b"], "traj_pi0_normal", "traj_pi0_black", BLUE, ORANGE, t["traj_normal"], t["traj_black"])
-    out.append(f'<text x="{w - pad:.0f}" y="{h - 8:.0f}" text-anchor="end" font-size="11" fill="{MUTED}">{t["traj_grasp"]}</text>')
-    return svg(w, h, out)
+    oy = top
+    for tr, b in zip(trajs, box, strict=True):
+        runs, phh = tr["runs"], s * (b[1] - b[0]) + 20
+        k = sum(e["success"] for e in runs["traj_pi0_black"])
+        out.append(f'<text x="{pad}" y="{oy - 8:.1f}" font-size="12" fill="{MUTED}">{t["traj_row"].format(i=tr["task"], name=t["traj_task"][tr["task"]], k=k)}</text>')
+        out += panel(runs, b, pad, oy, phh, "traj_pi0_normal", "traj_pi0_normal2", BLUE, VIOLET)
+        out += panel(runs, b, pad + pw + 28, oy, phh, "traj_pi0_normal", "traj_pi0_black", BLUE, ORANGE)
+        oy += phh + 34
+    return svg(w, oy - 16, out)
 
 
 def fig_inputs(t):
@@ -214,16 +234,19 @@ if __name__ == "__main__":
     runs = [r for r in d["RESULTS"] if r["status"] == "done"]
     fu = d["FOLLOWUP"]
     write_csv("reproduction.csv", ["model", "task", "checkpoint", "episodes", "success_pc", "ci95", "baseline_pc", "baseline_source", "reproduced"],
-              [[r["model"], r["task"], r["checkpoint"], r["n"], r["pc"], r["ci"], r["baseline_pc"], r["baseline_src"], int(reproduced(r))] for r in runs])
+              [[r["model"], r["task"], r["checkpoint"], r["n"], r["pc"], r["ci"], r["baseline_pc"], SRC_EN[r["model"]], int(reproduced(r))] for r in runs])
     write_csv("blackout_per_task.csv", ["model", "condition"] + [f"task{i}" for i in range(10)] + ["total"],
-              [[m["model"], c] + m[c] + [sum(m[c])] for m in d["BLACKOUT"]["summary"] for c in ("normal", "black")])
+              [[MODEL.get(m["model"], m["model"]), c] + m[c] + [sum(m[c])] for m in d["BLACKOUT"]["summary"] for c in ("normal", "black")])
     cam = {m["model"]: m for m in fu["cam"]}
     pert = [{**p, "agent_black": cam[p["model"]]["agent_black"], "wrist_black": cam[p["model"]]["wrist_black"]} for p in fu["perturb"]]
-    write_csv("perturbations.csv", ["model"] + COND_KEYS, [[m["model"]] + ["" if m[k] is None else m[k] for k in COND_KEYS] for m in pert])
-    write_csv("trajectory.csv", ["pair", "dtw_mean_cm", "grasp_dist_mean_cm", "n_grasp_pairs"],
-              [[k, round(v["dtw_mean"], 2), round(v["grasp_dist_mean"], 2), v["n_grasp_pairs"]] for k, v in fu["traj"]["pairs"].items()])
-    write_csv("finetune_statedrop.csv", ["model", "normal", "all_black", "note"], [[f["name"], f["normal"], f["black"], f["note"]] for f in fu["finetune"]])
-    traj = json.loads((RES / "trajectories_task1.json").read_text())
+    write_csv("perturbations.csv", ["model"] + COND_KEYS, [[MODEL.get(m["model"], m["model"])] + [m[k] for k in COND_KEYS] for m in pert])
+    tasks = [f"task{i}" for i in range(10)]
+    rows = [["successes", "pi0_all_black"] + fu["traj"]["successes_by_task"]["traj_pi0_black"] + [sum(fu["traj"]["successes_by_task"]["traj_pi0_black"])]]
+    for metric, by, mean in (("path_dtw_cm", "dtw_by_task", "dtw_mean"), ("grasp_distance_cm", "grasp_dist_by_task", "grasp_dist_mean")):
+        rows += [[metric, pid] + [round(x, 2) for x in v[by]] + [round(v[mean], 2)] for pid, v in zip(PAIR_IDS, fu["traj"]["pairs"].values(), strict=True)]
+    write_csv("trajectory.csv", ["metric", "pair"] + tasks + ["all"], rows)
+    write_csv("finetune_statedrop.csv", ["model", "normal", "all_black"], [[i, f["normal"], f["black"]] for i, f in zip(FT_IDS, fu["finetune"], strict=True)])
+    traj = [json.loads((RES / f"trajectories_task{i}.json").read_text()) for i in TRAJ_TASKS]
     for lang, out in (("en", MEDIA), ("zh", MEDIA / "zh")):
         t = TXT[lang]
         (out / "reproduction.svg").write_text(fig_reproduction(runs, t))

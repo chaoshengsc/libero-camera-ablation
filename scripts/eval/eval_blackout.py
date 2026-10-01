@@ -7,6 +7,7 @@ import lerobot.scripts.lerobot_eval as E
 import torch
 
 MODE = os.environ.get("BLACKOUT", "all")
+assert MODE in {"all", "agent", "wrist"}, f"未知 BLACKOUT={MODE}"
 _orig, _shown = E.preprocess_observation, False
 
 def _hit(k):

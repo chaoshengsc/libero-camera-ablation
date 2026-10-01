@@ -15,7 +15,7 @@ def test_ci95_matches_published_numbers():
 
 
 def test_two_prop_z_matches_published_numbers():
-    # 方向 3:全涂黑 61 vs 40 → z≈3.0;正常 78 vs 68 → z≈1.6
+    # 状态置零微调:全涂黑 61 vs 40 → z≈3.0;正常 78 vs 68 → z≈1.6
     assert two_prop_z(61, 40) == pytest.approx(3.04, abs=0.01)
     assert two_prop_z(78, 68) == pytest.approx(1.60, abs=0.01)
     assert two_prop_z(50, 50) == 0

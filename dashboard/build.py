@@ -66,10 +66,7 @@ def pick(videos, per_task):
 
 def load(run):
     d = ROOT / "data" / run["id"]
-    f = d / "eval_info.json"
-    if not f.exists():
-        return {"status": "pending"}
-    info = json.loads(f.read_text())
+    info = json.loads((d / "eval_info.json").read_text())  # 缺文件直接报错,不静默留空
     tasks = info["per_task"]
     multi = len(tasks) > 1
     out = {"status": "done", "pc": round(info["overall"]["pc_success"], 1), "n": info["overall"]["n_episodes"],
@@ -105,29 +102,22 @@ for run in RUNS:
         row["baseline_ci"] = ci95(row["baseline_pc"], row["baseline_n"])
     rows.append(row)
 
-# 实验 B:视觉依赖测试(相机全涂黑)。OpenVLA 的录像保存的是送进模型的黑图,无观看价值,不收录视频。
+# 视觉依赖测试(相机全涂黑)。OpenVLA 的录像保存的是送进模型的黑图,无观看价值,不收录视频。
 BLACKOUT_RUNS = [
     {"id": "pi0_black_all", "model": "π0", "task": "LIBERO-Spatial"},
     {"id": "pi05_black_all", "model": "π0.5", "task": "LIBERO-Spatial"},
     {"id": "smolvla_black_all", "model": "SmolVLA", "task": "LIBERO-Spatial"},
 ]
-bsum = ROOT / "data" / "B_summary.json"
-blackout = {"summary": json.loads(bsum.read_text()) if bsum.exists() else [],
+blackout = {"summary": json.loads((ROOT / "data" / "B_summary.json").read_text()),
             "runs": [dict(r, **load(r)) for r in BLACKOUT_RUNS]}
 
-# 后续实验:方向 1 末端轨迹、方向 2 单路涂黑、方向 3 状态置零继续微调
-def _pc(run):
-    f = ROOT / "data" / run / "eval_info.json"
-    return json.loads(f.read_text())["overall"]["pc_success"] if f.exists() else None
-
+# 后续实验:末端轨迹、单路涂黑、温和扰动、状态置零继续微调(缺文件直接报错)
 def _json(name):
-    f = ROOT / "data" / name
-    return json.loads(f.read_text()) if f.exists() else None
+    return json.loads((ROOT / "data" / name).read_text())
 
 def _n(run, first=None):
     """成功次数(first:只数每任务前几回合,用于从 500 回合评测里取同初始状态的 100 回合)。"""
-    f = ROOT / "data" / run / "eval_info.json"
-    return sum(sum(t["metrics"]["successes"][:first]) for t in json.loads(f.read_text())["per_task"]) if f.exists() else None
+    return sum(sum(t["metrics"]["successes"][:first]) for t in _json(f"{run}/eval_info.json")["per_task"])
 
 
 # 温和扰动:加噪声 / 冻结画面(每组 100 回合,与正常、全涂黑同种子同初始状态)
@@ -140,9 +130,9 @@ followup = {
     "traj": _json("traj_analyze.json"),
     "cam": _json("cam_summary.json"),
     "finetune": [
-        {"name": "原始 π0", "normal": 76, "black": 56, "note": "实验 B 同协议"},
-        {"name": "继续微调 · 对照(p=0)", "normal": _pc("eval_ft_p0_normal"), "black": _pc("eval_ft_p0_black"), "note": "3000 步,batch 16,只训动作专家"},
-        {"name": "继续微调 · 状态置零(p=0.5)", "normal": _pc("eval_ft_p05_normal"), "black": _pc("eval_ft_p05_black"), "note": "同上,训练时按样本 50% 置零 observation.state"},
+        {"name": "原始 π0", "normal": _n("pi0_spatial_500", 10), "black": _n("pi0_black_all"), "note": "同一评测协议"},
+        {"name": "继续微调 · 对照(p=0)", "normal": _n("eval_ft_p0_normal"), "black": _n("eval_ft_p0_black"), "note": "3000 步,batch 16,只训动作专家"},
+        {"name": "继续微调 · 状态置零(p=0.5)", "normal": _n("eval_ft_p05_normal"), "black": _n("eval_ft_p05_black"), "note": "同上,训练时按样本 50% 置零 observation.state"},
     ],
 }
 

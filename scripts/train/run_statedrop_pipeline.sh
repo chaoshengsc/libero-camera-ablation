@@ -1,11 +1,15 @@
 #!/bin/bash
-# 方向 3 全自动流水线:测速 → 自动定步数 → 两组训练(对照 p=0 / 状态置零 p=0.5)→ 各评测正常与全涂黑
+# 状态置零微调的全流程:测速定 batch → 两组训练(对照 p=0 / 状态置零 p=0.5)→ 各评测正常与全涂黑
+# 用法: bash run_statedrop_pipeline.sh [steps]   (默认 3000,即 README 2.4 节的设置)
+# 前置:lerobot/libero 数据集已在 ${EMB_ROOT}/cache/lerobot/lerobot/libero@<commit>(见 docs/INSTALL.md 第 4 节)
 source "$(dirname "$0")/../common.sh"
+N=${1:-3000}
 L=${EMB_ROOT}/logs; T=$L/train; RT=$SCRIPTS/train/run_train.sh; RE=$SCRIPTS/eval/run_libero.sh; mkdir -p $T; REP=$T/pipeline.log
 log() { echo "$(date '+%F %T') $*" >> $REP; }
-log "流水线已排队,等待方向 1/2 完成与数据集下载"
-until [ -f $L/eval/C_done.flag ] && grep -q "^DONE" $L/dl_libero_ds.log; do sleep 60; done
-log "前置条件满足,开始测速"
+if ! ls -d ${EMB_ROOT}/cache/lerobot/lerobot/libero@* >/dev/null 2>&1; then
+  log "找不到 lerobot/libero 数据集,流水线停止"; echo FAIL > $T/pipeline_done.flag; exit 1
+fi
+log "开始测速"
 
 STATE_DROP_P=0 bash $RT probe_bs16 150 16 --save_freq=100000
 if grep -q "^exit=0" $T/probe_bs16/stdout.log; then B=16; PR=probe_bs16
@@ -19,7 +23,6 @@ else
   B=8; PR=probe_bs8
 fi
 SPS=$(grep -a "\[timing\]" $T/$PR/stdout.log | tail -1 | sed -E 's/.*avg ([0-9.]+)s.*/\1/')
-N=$(python3 -c "s=float('$SPS'); n=int(3.5*3600/s)//100*100; print(max(500, min(10000, n)))")
 WU=$(( N / 10 < 1000 ? N / 10 : 1000 ))
 log "测速结果:bs=$B,每步 ${SPS}s,$(grep -a peak_gpu $T/$PR/stdout.log) → 每组训练 $N 步(预热 $WU)"
 

@@ -24,4 +24,5 @@ jobs:
         run: |
           python dashboard/build.py
           python scripts/analysis/make_figures.py
-          git diff --exit-code -- dashboard/results.js results media
+          git status --porcelain -- dashboard/results.js results media
+          test -z "$(git status --porcelain -- dashboard/results.js results media)"

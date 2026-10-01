@@ -1,7 +1,7 @@
 [project]
 name = "robot-policy-sim-repro"
 version = "1.0.0"
-description = "Reproducing public checkpoints of six robot policies in MuJoCo, plus vision-dependence experiments"
+description = "Reproducing public checkpoints of six robot policies in simulation, plus vision-dependence experiments"
 requires-python = ">=3.10"
 license = { text = "MIT" }
 
@@ -17,8 +17,8 @@ ignore = ["E701", "E702", "E731", "E741"]  # 分析脚本里的单行写法与�
 "scripts/checks/*" = ["E402"]  # 自检脚本按"先打印环境、再导入"的顺序写
 
 [tool.ruff.lint.isort]
-known-first-party = ["metrics"]
+known-first-party = ["metrics", "analyze_trajectories"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-pythonpath = ["scripts/analysis", "dashboard"]
+pythonpath = ["scripts/analysis"]

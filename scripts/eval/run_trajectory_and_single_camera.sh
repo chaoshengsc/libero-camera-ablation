@@ -1,5 +1,5 @@
 #!/bin/bash
-# 方向 1、2:记录末端轨迹 + 只涂黑一路相机,两条线并行
+# 记录末端轨迹 + 只涂黑一路相机,两条线并行
 source "$(dirname "$0")/../common.sh"; R=$SCRIPTS/eval/run_libero.sh
 export WRAP=probe
 lane1() {
@@ -18,4 +18,4 @@ lane2() {
   BLACKOUT=agent bash $R traj_smol_agent  10 $CK_SMOL 1
 }
 lane1 & lane2 & wait
-echo CDONE > ${EMB_ROOT}/logs/eval/C_done.flag
+echo DONE > ${EMB_ROOT}/logs/eval/trajectory_done.flag

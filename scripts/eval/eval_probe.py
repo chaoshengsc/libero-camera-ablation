@@ -12,6 +12,7 @@ import numpy as np
 import torch
 
 MODE = os.environ.get("BLACKOUT", "none")
+assert MODE in {"none", "all", "agent", "wrist", "noise", "freeze"}, f"未知 BLACKOUT={MODE}"
 TRAJ_OUT = os.environ.get("TRAJ_OUT")
 NOISE_STD = float(os.environ.get("NOISE_STD", "0.1"))
 _first = {}
@@ -30,6 +31,7 @@ def pre(obs):
     global _shown
     st = obs.get("robot_state") if isinstance(obs, dict) else None
     if st is not None and episodes:
+        assert len(st["eef"]["pos"]) == 1, "轨迹记录只支持 --eval.batch_size=1"
         episodes[-1]["eef"].append(np.asarray(st["eef"]["pos"])[0].copy())
         episodes[-1]["grip"].append(np.asarray(st["gripper"]["qpos"])[0].copy())
     out = _pre(obs)
@@ -38,8 +40,8 @@ def pre(obs):
         for k in keys:
             out[k] = (out[k] + NOISE_STD * torch.randn_like(out[k])).clamp(0, 1)
     elif MODE == "freeze":
-        if episodes and len(episodes[-1]["eef"]) <= 1:  # 本回合第 1 步:记下画面
-            _first.clear(); _first.update({k: out[k].clone() for k in keys})
+        if not _first:  # 本回合第 1 步:记下画面(roll() 在每回合开始时清空)
+            _first.update({k: out[k].clone() for k in keys})
         for k in keys:
             out[k] = _first[k].clone()
     elif MODE != "none":
@@ -55,6 +57,7 @@ def pre(obs):
 
 def roll(*a, **k):
     episodes.append({"eef": [], "grip": []})
+    _first.clear()
     return _roll(*a, **k)
 
 

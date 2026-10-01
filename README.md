@@ -1,6 +1,6 @@
 # Do robot policies look at the camera?
 
-**Reproducing six open-source robot policies in MuJoCo, then testing how much each one relies on vision.**
+**Reproducing six open-source robot policies in simulation (five in MuJoCo, Diffusion Policy on 2-D PushT), then testing how much each one relies on vision.**
 
 [![CI](https://github.com/chaoshengsc/robot-policy-sim-repro/actions/workflows/ci.yml/badge.svg)](https://github.com/chaoshengsc/robot-policy-sim-repro/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
@@ -13,9 +13,9 @@ English | [中文](README_CN.md)
   <br><sub>Same task, same initial state. The videos show what happened in the simulator; in the two right-hand runs the policy itself received black images.</sub>
 </p>
 
-- **Reproduction.** ACT, OpenVLA, π0.5 and Diffusion Policy reproduce their reference success rates within error. The public π0 and SmolVLA checkpoints do not (73% vs. 97%, 75% vs. 90%).
+- **Reproduction.** ACT, OpenVLA, π0.5 and Diffusion Policy reproduce their reference success rates within sampling error. The public π0 and SmolVLA checkpoints do not (73% vs. 97%, 75% vs. 90%).
 - **Vision dependence.** With every camera image replaced by black frames, π0.5, OpenVLA and SmolVLA drop to 0%. π0 still succeeds 56% of the time.
-- **Why.** π0 ignores the main camera, is unaffected by a frozen image, and leans on the robot-state input. Zeroing that input during fine-tuning makes it depend on vision more.
+- **Why.** π0 shows no measurable dependence on the agent-view camera and loses little when the image is frozen. On the tasks it still solves blind, its path is as close to the sighted path as two sighted runs are to each other. Fine-tuning with the robot state randomly zeroed lowers its blind success from 61% to 40%.
 
 Everything runs on one workstation (RTX A5000 24 GB, Ubuntu 24.04, headless EGL rendering), with public checkpoints and wrapper scripts that leave upstream source untouched.
 
@@ -23,37 +23,39 @@ Everything runs on one workstation (RTX A5000 24 GB, Ubuntu 24.04, headless EGL 
 
 ## 1. Reproduction
 
-![Success rate on this machine vs. reference](media/reproduction.svg)
+![Success rate in this repo vs. reference](media/reproduction.svg)
 
-| Model | Task | This machine (500 episodes) | Reference | Reproduced |
+| Model | Task | This repo (500 episodes) | Reference | Reproduced |
 |---|---|---|---|---|
 | ACT | ALOHA Transfer Cube | **83.2%** | 83.0% (Hugging Face repo) | ✅ |
 | OpenVLA | LIBERO-Spatial | **86.2%** | 84.7 ± 0.9% (official README) | ✅ |
 | π0.5 | LIBERO-Spatial | **98.0%** | 98.8% (OpenPI), 97.0% (LeRobot) | ✅ |
-| Diffusion Policy | PushT | **63.0%** | 65.4% (LeRobot model card) | ✅ |
+| Diffusion Policy | PushT (2-D, not MuJoCo) | **63.0%** | 65.4% (LeRobot model card) | ✅ |
 | SmolVLA | LIBERO-Spatial | 75.2% | 90% (paper) | ❌ |
 | π0 | LIBERO-Spatial | 73.4% | 96.8% (OpenPI) | ❌ |
 
-The 95% confidence interval at 500 episodes is about ±3–4 points. "Reproduced" means the intervals overlap.
+The 95% confidence interval at 500 episodes is ±1–4 points. "Reproduced" means the intervals overlap.
 
 <p align="center"><img src="media/act_transfer_cube_success.gif" width="320" alt="A successful ACT episode"><br><sub>ACT on ALOHA Transfer Cube: the right arm picks up the cube and hands it to the left arm.</sub></p>
 
-Why two fail:
+Why two fall short:
 
 - **π0.** The reference number is for OpenPI's own checkpoint. A LeRobot maintainer has confirmed that the LeRobot checkpoint used here is under-trained, and the community reports 73% for it.
-- **SmolVLA.** The public checkpoint has a different architecture from the paper (expert width 0.5 and 32 VLM layers, vs. 0.75 and 16). The community reports about 82% for it; this machine is still 7 points below that, and the cause is not found. Batch size and `n_action_steps` were ruled out.
+- **SmolVLA.** The public checkpoint has a different architecture from the paper (expert width 0.5 and 32 VLM layers, vs. 0.75 and 16). The community reports about 82% for it; the result here is still 7 points below that, and the cause has not been found. Batch size and `n_action_steps` were ruled out.
 
-Changing π0's `n_action_steps` from 5 to 10 or 50 gives 76%, 70% and 68% (100 episodes each), which is within noise.
+With `n_action_steps` set to 5, 10 and 50, π0 reaches 76%, 70% and 68% (100 episodes each), all within noise of each other.
 
-Per-task results and replays are on the [dashboard](https://chaoshengsc.github.io/robot-policy-sim-repro/dashboard/). Sources and debugging history are in [`docs/NOTES.md`](docs/NOTES.md) (Chinese).
+Per-task results are on the [dashboard](https://chaoshengsc.github.io/robot-policy-sim-repro/dashboard/). Replay videos are too large to publish; the dashboard plays them when the files are present locally. Sources and debugging history are in [`docs/NOTES.md`](docs/NOTES.md) (Chinese).
 
 ## 2. Do the policies use the camera?
 
-A LIBERO policy receives two camera images, the robot state and a language instruction. Each experiment below changes one of these.
+A LIBERO policy receives two camera images, the robot state (end-effector pose and gripper opening) and a language instruction. OpenVLA is the exception: it uses only the agent-view image and the instruction. Each experiment below changes one of these inputs.
 
 ![What the policy receives and what each experiment changes](media/inputs.svg)
 
-All numbers in this section are success rates over 100 episodes (10 tasks × 10 initial states, same seed for every condition). The 95% confidence interval is about ±9 points.
+All numbers in this section are success rates over 100 episodes (10 tasks × 10 initial states, same seed for every condition). The 95% confidence interval of a single number is up to ±10 points, so two conditions have to differ by about 13 points before the difference means anything. Episodes of one task are correlated, which makes these intervals optimistic.
+
+The Normal column is the first 10 episodes per task of the 500-episode runs in section 1, which is why it differs slightly from that table. Two more normal π0 runs, made for section 2.3, gave 73% and 76%.
 
 ### 2.1 Black out every camera
 
@@ -64,7 +66,7 @@ All numbers in this section are success rates over 100 episodes (10 tasks × 10 
 | SmolVLA | 72% | 0% |
 | **π0** | 76% | **56%** |
 
-Three models cannot act without images. π0 completes more than half of the tasks blind, which matches the report in lerobot issue #3591.
+Three models cannot act without images. π0 succeeds in 56% of episodes blind: 6 to 9 out of 10 on seven tasks, and 0 or 1 out of 10 on the other three. This matches the report in lerobot issue #3591.
 
 ### 2.2 Which camera, and what kind of perturbation?
 
@@ -74,29 +76,36 @@ Three models cannot act without images. π0 completes more than half of the task
 |---|---|---|---|---|---|---|
 | π0 | 76% | 79% | 71% | 78% | 59% | 56% |
 | π0.5 | 99% | 99% | 0% | 51% | 0% | 0% |
-| SmolVLA | 72% | 32% | running | 2% | 5% | 0% |
+| SmolVLA | 72% | 32% | 0% | 2% | 5% | 0% |
 
-- **π0** does not use the agent-view camera at all (78% with it black) and barely needs a live image: showing it only the first frame for the whole episode costs 5 points.
+- **π0** shows no measurable dependence on the agent-view camera (78% with it black, 76% normal) and barely needs a live image: with only the first frame for the whole episode it reaches 71%, within noise of normal. Losing the wrist camera (59%) costs about as much as losing both (56%).
 - **π0.5** is closed-loop on vision. Noise does nothing, but a frozen image or a black wrist camera takes it to 0%.
-- **SmolVLA** breaks under every perturbation, including mild noise, which points to sensitivity to out-of-distribution input.
+- **SmolVLA** also needs a live image: a frozen first frame, which is a real, in-distribution image, takes it to 0%. It is sensitive to image quality as well. The noise that leaves π0 and π0.5 unchanged takes it to 32%.
 
 Noise is Gaussian with standard deviation 0.1 on pixels in [0, 1].
 
 ### 2.3 Is blind π0 replaying a memorised trajectory?
 
-No. The end-effector position was logged at every step and paths were compared with dynamic time warping, which removes speed differences.
+The trajectories cannot tell, because on this benchmark sighted π0 moves almost the same way. The end-effector position was logged at every step and paths were compared with dynamic time warping, which removes speed differences.
 
 ![End-effector paths of pi0 with and without camera input](media/trajectory.svg)
 
-| Comparison | Path difference | Grasp-point distance |
-|---|---|---|
-| π0 normal vs. π0 normal re-run (noise floor) | 2.12 cm | 1.51 cm |
-| **π0 all black vs. π0 normal** | **4.44 cm** | **5.03 cm** |
-| π0.5 vs. π0, both normal | 3.28 cm | 2.65 cm |
+Path difference per task, in cm (mean over 10 episodes with identical initial states). The success counts in the first row are from the blind run that logged these trajectories (54% overall), which is a separate run from the one in 2.1 (56%):
 
-Blind π0 takes a different path from sighted π0, about twice the noise floor. Its grasp points do not collapse onto one spot either, so it is not executing one fixed "average" motion.
+| | T0 | T1 | T2 | T3 | T4 | T5 | T6 | T7 | T8 | T9 |
+|---|---|---|---|---|---|---|---|---|---|---|
+| Blind π0 successes (of 10) | 7 | 8 | 9 | 7 | 9 | **3** | 6 | **0** | 5 | **0** |
+| Normal vs. normal re-run | 0.3 | 0.2 | 0.1 | 0.0 | 2.1 | 6.6 | 3.1 | 2.6 | 3.0 | 3.3 |
+| All black vs. normal | 2.6 | 2.7 | 2.7 | 2.5 | 2.3 | **6.0** | 3.1 | **10.9** | 3.8 | **7.8** |
+| π0.5 vs. π0, both normal | 3.7 | 2.4 | 2.6 | 2.1 | 2.9 | 6.3 | 3.1 | 2.5 | 3.8 | 3.3 |
 
-The likelier explanation is the benchmark. Within a LIBERO-Spatial task the grasp point varies by only about 1.8 cm across initial states, the same order as the model's own run-to-run noise. A policy that misses by 5 cm still succeeds about half the time.
+- **Where blind π0 succeeds, it moves like sighted π0.** On the seven tasks it solves at least half the time, its path differs from the sighted path by 2.8 cm and its grasp point by 2.4 cm. Two different models differ by 2.9 cm and 2.6 cm. Two runs of the same model differ by 3.4 cm and 2.4 cm (tasks 4–9).
+- **Where it fails, it goes somewhere else.** On tasks 5, 7 and 9 the path differs by 6 to 11 cm.
+- **The noise floor comes from tasks 4–9 only.** Re-runs of tasks 0–3 are almost identical because both runs use the same seed and had not yet diverged, so they say nothing about noise.
+
+Averaged over all ten tasks, blind π0 looks twice as far from sighted π0 as the re-run does (4.4 cm vs. 2.1 cm). That average mixes the three failed tasks with four re-runs that are not independent, so it should not be read as "a different path".
+
+What the data do show is how little the benchmark asks. Within a LIBERO-Spatial task, sighted π0's grasp point varies by about 1.8 cm across initial states, the same order as its run-to-run noise. A policy that tracks the bowl and a policy that repeats one motion per task would look alike here. Full per-task numbers are in [`results/trajectory.csv`](results/trajectory.csv).
 
 ### 2.4 Can training make π0 look?
 
@@ -108,9 +117,9 @@ The public π0 checkpoint was fine-tuned for 3000 more steps (batch 16, action e
 | Fine-tuned, control | 78% | 61% |
 | Fine-tuned, state zeroing | 68% | **40%** |
 
-Blind success falls from 61% to 40% (z ≈ 3.0, p ≈ 0.003), so the model now relies on vision more. Normal success falls from 78% to 68%, which is not significant (p ≈ 0.11). The training loss jumps from 0.145 to 0.835 the first time the state is removed, which shows how much the original π0 depended on it.
+State zeroing lowers blind success from 61% to 40% (z ≈ 3.0, p ≈ 0.003). Normal success also falls, from 78% to 68% (p ≈ 0.11, not significant). The extra drop when blind is 11 points (17 for the control, 28 with state zeroing), which is borderline at this sample size (paired by task, t ≈ 2.2, p ≈ 0.06). Each arm was trained once.
 
-A 10,000-step version of this experiment is running; results will be added here.
+This is consistent with a shift toward vision but does not establish it. The training loss jumps from 0.145 to 0.835 the first time the state is removed, which suggests the original π0 leaned heavily on that input.
 
 ## Quick start
 
@@ -121,7 +130,7 @@ bash scripts/eval/run_act.sh          # ACT, 500 episodes, about 17 minutes on a
 python3 scripts/analysis/summarize_eval.py act_cube_500
 ```
 
-To regenerate the figures and tables in this README from the raw evaluation files, with no GPU and no dependencies:
+To regenerate the figures and tables in this README from the evaluation files in `dashboard/data/`, with no GPU and no dependencies:
 
 ```bash
 python3 dashboard/build.py && python3 scripts/analysis/make_figures.py
@@ -141,7 +150,7 @@ scripts/eval/      evaluation entry scripts; blackout, perturbation and trajecto
 scripts/train/     π0 fine-tuning with state zeroing, and the automated pipeline
 scripts/analysis/  metrics, summaries, figure generation
 scripts/checks/    self-checks for GPU, headless EGL rendering and video decoding
-results/           result tables (CSV) and trajectory data, generated from dashboard/data
+results/           result tables (CSV) generated from dashboard/data, and the trajectories plotted in 2.3
 dashboard/         results dashboard and the raw eval_info.json of every run
 media/             figures and demos used in this README (Chinese versions in media/zh/)
 docs/              installation, troubleshooting, reproduction notes
@@ -153,10 +162,11 @@ viewer/            replay a policy trajectory locally in the interactive MuJoCo 
 ## Limitations
 
 - One benchmark suite (LIBERO-Spatial) and one seed. The scene varies little within a task, which is itself part of the finding in 2.3.
-- The vision-dependence experiments use 100 episodes per condition, so differences under about 10 points are not meaningful.
+- The vision-dependence experiments use 100 episodes per condition, so differences under about 13 points are not meaningful.
 - The π0 checkpoint is under-trained. A properly trained π0 may behave differently.
 - The SmolVLA gap to the community number is unexplained.
-- Fine-tuning in 2.4 was short and trained the action expert only.
+- Fine-tuning in 2.4 was short, trained the action expert only, and was run once per arm.
+- Diffusion Policy was evaluated on PushT (2-D physics), not in MuJoCo.
 
 ## Acknowledgements and licenses
 

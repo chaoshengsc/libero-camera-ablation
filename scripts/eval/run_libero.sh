@@ -1,13 +1,14 @@
 #!/bin/bash
 # 用法: [WRAP=none|blackout|probe] [BLACKOUT=...] bash run_libero.sh <run_name> <n_episodes_per_task> <ckpt_dir> <batch_size> [额外 lerobot-eval 参数...]
 #   WRAP=none(默认)  直接跑 lerobot-eval
-#   WRAP=blackout    经 eval_blackout.py 涂黑相机画面(BLACKOUT=all|agent|wrist;实验 B 用)
-#   WRAP=probe       经 eval_probe.py 涂黑并记录末端轨迹到 <输出目录>/traj.npz(BLACKOUT=none|all|agent|wrist)
+#   WRAP=blackout    经 eval_blackout.py 涂黑相机画面(BLACKOUT=all|agent|wrist)
+#   WRAP=probe       经 eval_probe.py 扰动相机画面并记录末端轨迹到 <输出目录>/traj.npz(BLACKOUT=none|all|agent|wrist|noise|freeze)
 source "$(dirname "$0")/../common.sh"
 conda activate smolvla
 export HF_HUB_OFFLINE=1   # 权重、分词器、LIBERO 素材都已在本地
-RUN=$1; N=$2; C=$3; B=$4; shift 4
-W=${EMB_ROOT}/logs/eval/$RUN; rm -rf $W; mkdir -p $W; cd $W
+U="用法: run_libero.sh <run_name> <n_episodes_per_task> <ckpt_dir> <batch_size> [额外参数...]"
+RUN=${1:?$U}; N=${2:?$U}; C=${3:?$U}; B=${4:?$U}; shift 4
+W=${EMB_ROOT}/logs/eval/$RUN; rm -rf "$W"; mkdir -p "$W"; cd "$W" || exit 1
 case "${WRAP:-none}" in
   none)     CMD=(lerobot-eval) ;;
   blackout) CMD=(python $SCRIPTS/eval/eval_blackout.py) ;;
