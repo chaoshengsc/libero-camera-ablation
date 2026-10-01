@@ -1,4 +1,4 @@
-# Do robot policies look at the camera?
+# Do robot policies actually use their cameras?
 
 **Reproducing six open-source robot policies in simulation (five in MuJoCo, Diffusion Policy on 2-D PushT), then testing how much each one relies on vision.**
 
