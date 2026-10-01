@@ -25,6 +25,6 @@ rows = [("OpenVLA", openvla("openvla_spatial_500", 10), openvla("openvla_black_a
         ("pi0.5", lerobot("pi05_spatial_500", 10), lerobot("pi05_black_all"))]
 out = []
 for m, a, b in rows:
-    print(f"{m:8} 正常 {sum(a):3}/100  涂黑 {sum(b):3}/100  下降 {sum(a) - sum(b):+d} 个百分点 | 正常 {a} | 涂黑 {b}")
+    print(f"{m:8} normal {sum(a):3}/100  black {sum(b):3}/100  drop {sum(a) - sum(b):+d} points | normal {a} | black {b}")
     out.append({"model": m, "normal": a, "black": b})
 json.dump(out, open(f"{E}/B_summary.json", "w"), ensure_ascii=False)

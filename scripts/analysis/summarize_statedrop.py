@@ -17,12 +17,12 @@ def rate(run):
     return sum(s), s
 
 
-print(f"{'模型':22} {'正常':>6} {'全涂黑':>6}  下降   | 正常各任务 / 涂黑各任务")
-print(f"{'原始 π0(参照)':22} {76:>6} {56:>6}  {20:+d}")
-for name, label in [("ft_p0", "继续微调·对照 p=0"), ("ft_p05", "继续微调·状态置零 p=0.5")]:
+print(f"{'model':26} {'normal':>6} {'black':>6}  drop   | per task, normal / black")
+print(f"{'original π0 (reference)':26} {76:>6} {56:>6}  {20:+d}")
+for name, label in [("ft_p0", "fine-tuned, control p=0"), ("ft_p05", "fine-tuned, zeroing p=0.5")]:
     a, sa = rate(f"eval_{name}_normal")
     b, sb = rate(f"eval_{name}_black")
     if a is None or b is None:
-        print(f"{label:22} 结果缺失(正常 {a},涂黑 {b})")
+        print(f"{label:26} missing results (normal {a}, black {b})")
         continue
     print(f"{label:22} {a:>6} {b:>6}  {a - b:+d}   | {sa} / {sb}")

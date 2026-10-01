@@ -36,7 +36,7 @@ with mujoco.viewer.launch_passive(model, data, key_callback=on_key) as v:
             time.sleep(1 / 60)
     else:
         qpos, dt = traj["qpos"], float(traj["dt"])
-        print(f"回放 {len(qpos)} 步,dt={dt}s,success={bool(traj['success'])},seed={int(traj['seed'])};循环播放")
+        print(f"replaying {len(qpos)} steps, dt={dt}s, success={bool(traj['success'])}, seed={int(traj['seed'])}; looping")
         i = 0
         while v.is_running():
             t0 = time.time()

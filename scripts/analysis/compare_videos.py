@@ -20,7 +20,7 @@ def frames(path):
         for f in c.decode(video=0):
             g = f.to_ndarray(format="gray")
             h, w = g.shape
-            assert h % 90 == 0 and w % 90 == 0, f"{path}: {w}×{h} 不能整除 90,下面的分块平均会裁掉边缘"
+            assert h % 90 == 0 and w % 90 == 0, f"{path}: {w}×{h} is not divisible by 90; the block average below would crop the edges"
             out.append(g[: h - h % 90, : w - w % 90].reshape(90, (h - h % 90) // 90, 90, (w - w % 90) // 90).mean((1, 3)))
     return np.stack(out)
 
@@ -48,11 +48,11 @@ for task in range(10):
 json.dump(rows, open(f"{E}/traj_compare.json", "w"))
 
 f = lambda k, key, sel=lambda r: True: np.mean([r[k][key] for r in rows if sel(r)])
-print(f"自检 第0帧差异:  π0黑vsπ0正常 {f('bn','first'):.2f}   π0.5vsπ0 {f('ctl','first'):.2f}  (应接近 0)")
-print(f"全程平均差异:    π0黑vsπ0正常 {f('bn','mean'):.2f}   π0.5vsπ0(对照) {f('ctl','mean'):.2f}")
-print(f"  仅看涂黑仍成功的回合: {f('bn','mean', lambda r: r['black_ok']):.2f}  (n={sum(r['black_ok'] for r in rows)})")
-print(f"  仅看涂黑失败的回合:   {f('bn','mean', lambda r: not r['black_ok']):.2f}  (n={sum(not r['black_ok'] for r in rows)})")
-print("各任务 全程平均差异 [π0黑vsπ0正常 / 对照] 与涂黑成功数:")
+print(f"sanity check, frame 0:  blind π0 vs normal π0 {f('bn','first'):.2f}   π0.5 vs π0 {f('ctl','first'):.2f}  (should be near 0)")
+print(f"mean over episode:      blind π0 vs normal π0 {f('bn','mean'):.2f}   π0.5 vs π0 (control) {f('ctl','mean'):.2f}")
+print(f"  blind episodes that succeed: {f('bn','mean', lambda r: r['black_ok']):.2f}  (n={sum(r['black_ok'] for r in rows)})")
+print(f"  blind episodes that fail:    {f('bn','mean', lambda r: not r['black_ok']):.2f}  (n={sum(not r['black_ok'] for r in rows)})")
+print("per task, mean difference [blind π0 vs normal π0 / control] and blind successes:")
 for t in range(10):
     sel = lambda r, t=t: r["task"] == t
-    print(f"  task {t}: {f('bn','mean',sel):5.2f} / {f('ctl','mean',sel):5.2f}   黑成功 {sum(r['black_ok'] for r in rows if r['task']==t)}/10")
+    print(f"  task {t}: {f('bn','mean',sel):5.2f} / {f('ctl','mean',sel):5.2f}   blind successes {sum(r['black_ok'] for r in rows if r['task']==t)}/10")

@@ -1,5 +1,5 @@
 # 各入口脚本共用:加载环境、定位仓库脚本目录、公开权重在 ${EMB_ROOT}/ckpt 下的位置(目录名 = 仓库名@commit)。
-: "${EMB_ROOT:?请先 export EMB_ROOT=<工作目录>}"
+: "${EMB_ROOT:?set it first: export EMB_ROOT=<working directory>}"
 # 先定位脚本目录,再加载 env.sh(后者可能改变工作目录)
 SCRIPTS=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd) || exit 1
 source "${EMB_ROOT}/env.sh" >/dev/null || exit 1

@@ -18,7 +18,7 @@ def forward(self, batch, *a, **k):
         batch = dict(batch); batch[OBS_STATE] = torch.where(m, torch.zeros_like(s), s)
         _seen[0] += int(m.sum()); _seen[1] += s.shape[0]
         if _seen[1] == s.shape[0]:
-            print(f"[statedrop] p={P} 首个 batch 置零 {int(m.sum())}/{s.shape[0]},state 形状 {tuple(s.shape)}", flush=True)
+            print(f"[statedrop] p={P} first batch: zeroed {int(m.sum())}/{s.shape[0]}, state shape {tuple(s.shape)}", flush=True)
     return _orig(self, batch, *a, **k)
 
 

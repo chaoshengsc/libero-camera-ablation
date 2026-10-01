@@ -3,11 +3,11 @@
 source "$(dirname "$0")/../common.sh"
 conda activate smolvla
 export HF_HUB_OFFLINE=1
-U="用法: run_train.sh <run_name> <steps> <batch_size> [额外参数...]"
+U="usage: run_train.sh <run_name> <steps> <batch_size> [extra args...]"
 RUN=${1:?$U}; N=${2:?$U}; B=${3:?$U}; shift 3
 W=${EMB_ROOT}/logs/train/$RUN; rm -rf "$W"; mkdir -p "$W"; cd "$W" || exit 1
 DS=$(ls -d ${EMB_ROOT}/cache/lerobot/lerobot/libero@* 2>/dev/null | head -1)
-[ -n "$DS" ] || { echo "找不到 lerobot/libero 数据集(见 docs/INSTALL.md 第 4 节)" > $W/stdout.log; echo "exit=1" >> $W/stdout.log; exit 1; }
+[ -n "$DS" ] || { echo "lerobot/libero dataset not found (see docs/INSTALL.md, section 4)" > $W/stdout.log; echo "exit=1" >> $W/stdout.log; exit 1; }
 ( while true; do nvidia-smi --query-gpu=memory.used --format=csv,noheader,nounits >> $W/gpu_mem.log; sleep 2; done ) & MON=$!
 python $SCRIPTS/train/train_statedrop.py --policy.path=$CK_PI0 \
   --dataset.repo_id=lerobot/libero --dataset.root=$DS --dataset.video_backend=torchcodec \

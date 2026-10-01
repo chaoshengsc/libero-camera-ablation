@@ -12,7 +12,7 @@ import numpy as np
 import torch
 
 MODE = os.environ.get("BLACKOUT", "none")
-assert MODE in {"none", "all", "agent", "wrist", "noise", "freeze"}, f"未知 BLACKOUT={MODE}"
+assert MODE in {"none", "all", "agent", "wrist", "noise", "freeze"}, f"unknown BLACKOUT={MODE}"
 TRAJ_OUT = os.environ.get("TRAJ_OUT")
 NOISE_STD = float(os.environ.get("NOISE_STD", "0.1"))
 _first = {}
@@ -31,7 +31,7 @@ def pre(obs):
     global _shown
     st = obs.get("robot_state") if isinstance(obs, dict) else None
     if st is not None and episodes:
-        assert len(st["eef"]["pos"]) == 1, "轨迹记录只支持 --eval.batch_size=1"
+        assert len(st["eef"]["pos"]) == 1, "trajectory logging requires --eval.batch_size=1"
         episodes[-1]["eef"].append(np.asarray(st["eef"]["pos"])[0].copy())
         episodes[-1]["grip"].append(np.asarray(st["gripper"]["qpos"])[0].copy())
     out = _pre(obs)

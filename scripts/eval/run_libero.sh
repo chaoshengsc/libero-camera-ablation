@@ -6,14 +6,14 @@
 source "$(dirname "$0")/../common.sh"
 conda activate smolvla
 export HF_HUB_OFFLINE=1   # 权重、分词器、LIBERO 素材都已在本地
-U="用法: run_libero.sh <run_name> <n_episodes_per_task> <ckpt_dir> <batch_size> [额外参数...]"
+U="usage: run_libero.sh <run_name> <n_episodes_per_task> <ckpt_dir> <batch_size> [extra args...]"
 RUN=${1:?$U}; N=${2:?$U}; C=${3:?$U}; B=${4:?$U}; shift 4
 W=${EMB_ROOT}/logs/eval/$RUN; rm -rf "$W"; mkdir -p "$W"; cd "$W" || exit 1
 case "${WRAP:-none}" in
   none)     CMD=(lerobot-eval) ;;
   blackout) CMD=(python $SCRIPTS/eval/eval_blackout.py) ;;
   probe)    CMD=(python $SCRIPTS/eval/eval_probe.py); export TRAJ_OUT=$W/traj.npz ;;
-  *) echo "未知 WRAP=$WRAP" >&2; exit 2 ;;
+  *) echo "unknown WRAP=$WRAP" >&2; exit 2 ;;
 esac
 echo "args: $*" > $W/stdout.log
 "${CMD[@]}" --policy.path=$C --policy.device=cuda --env.type=libero --env.task=libero_spatial \

@@ -38,7 +38,7 @@ def test_common_sh_finds_scripts_dir_from_any_cwd(emb, cwd, src):
 @pytest.mark.parametrize("script,kind", [("eval/run_libero.sh", "eval"), ("eval/run_ovla.sh", "eval"), ("train/run_train.sh", "train")])
 def test_missing_args_do_not_delete_results(emb, script, kind):
     r = run(f"bash scripts/{script}", emb)
-    assert r.returncode != 0 and "用法" in r.stderr
+    assert r.returncode != 0 and "usage" in r.stderr
     assert (emb / "logs" / kind / "old_run").is_dir()
 
 
