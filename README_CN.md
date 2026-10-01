@@ -125,7 +125,7 @@ LIBERO 上的策略收到两路相机画面、机械臂状态(末端位姿与夹
 
 ```bash
 export EMB_ROOT=/path/to/workdir      # 环境、缓存、权重、日志都放这里
-# 按 docs/INSTALL.md 装好环境并下载权重后:
+# 按 docs/INSTALL_CN.md 装好环境并下载权重后:
 bash scripts/eval/run_act.sh          # ACT,500 回合,RTX A5000 上约 17 分钟
 python3 scripts/analysis/summarize_eval.py act_cube_500
 ```
@@ -138,7 +138,7 @@ python3 dashboard/build.py && python3 scripts/analysis/make_figures.py
 
 | 文档 | 内容 |
 |---|---|
-| [`docs/INSTALL.md`](docs/INSTALL.md) | 三个 conda 环境、权重、分词器的逐步安装 |
+| [`docs/INSTALL_CN.md`](docs/INSTALL_CN.md) | 三个 conda 环境、权重、分词器的逐步安装 |
 | [`docs/TROUBLESHOOTING.md`](docs/TROUBLESHOOTING.md) | 安装和评测中遇到的每个问题:现象、原因、解决 |
 | [`scripts/README.md`](scripts/README.md) | 每个结果对应哪个入口脚本和汇总脚本 |
 | [`env/lock/`](env/lock/) | 从实际跑出结果的环境导出的完整包清单 |

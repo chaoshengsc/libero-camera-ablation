@@ -138,7 +138,7 @@ python3 dashboard/build.py && python3 scripts/analysis/make_figures.py
 
 | Document | Content |
 |---|---|
-| [`docs/INSTALL.md`](docs/INSTALL.md) | Step-by-step setup of the three conda environments, checkpoints, tokenizer (Chinese) |
+| [`docs/INSTALL.md`](docs/INSTALL.md) | Step-by-step setup of the three conda environments, checkpoints, tokenizer ([中文](docs/INSTALL_CN.md)) |
 | [`docs/TROUBLESHOOTING.md`](docs/TROUBLESHOOTING.md) | Every problem hit during setup and evaluation, with cause and fix (Chinese) |
 | [`scripts/README.md`](scripts/README.md) | Which entry script and which summary script produce each result (Chinese) |
 | [`env/lock/`](env/lock/) | Full package lists exported from the environments that produced the results |
