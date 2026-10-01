@@ -1,7 +1,7 @@
 """π0 是否"背轨迹":逐帧比较同任务、同回合编号(同初始状态)的录像。
 D_bn  = π0 全涂黑 vs π0 正常      —— 小:说明看不看画面动作都差不多
 D_ctl = π0.5 正常 vs π0 正常(对照)—— 两个都看得见的不同策略,作为"真正不同的轨迹"的尺度
-指标:缩小到 90×90 灰度后逐帧平均绝对差(0–255),按时间步对齐,只比两段共同长度内的帧。
+指标:分块平均缩小到 90×90 灰度(LIBERO 录像为 360×360)后逐帧平均绝对差(0–255),按时间步对齐,只比两段共同长度内的帧。
 自检:第 0 帧应几乎相同(同初始场景),否则回合没对齐。"""
 import json
 import os
@@ -9,7 +9,7 @@ import os
 import av
 import numpy as np
 
-EMB = os.environ.get("EMB_ROOT", "/path/to/emb")
+EMB = os.environ["EMB_ROOT"]
 
 E = EMB + "/logs/eval"
 
@@ -20,6 +20,7 @@ def frames(path):
         for f in c.decode(video=0):
             g = f.to_ndarray(format="gray")
             h, w = g.shape
+            assert h % 90 == 0 and w % 90 == 0, f"{path}: {w}×{h} 不能整除 90,下面的分块平均会裁掉边缘"
             out.append(g[: h - h % 90, : w - w % 90].reshape(90, (h - h % 90) // 90, 90, (w - w % 90) // 90).mean((1, 3)))
     return np.stack(out)
 

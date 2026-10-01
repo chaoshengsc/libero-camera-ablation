@@ -37,6 +37,14 @@ def test_reproduction_csv_matches_raw_eval_info():
         assert all(f"{float(r['success_pc']):.1f}%" in md for md in READMES)
 
 
+def test_act_baseline_matches_file_shipped_with_checkpoint():
+    """ACT 的基准 83.0% 取自权重仓库自带的 eval_info.json(收录为 baseline_eval_info.json)。"""
+    shipped = json.loads((DATA / "act_cube_500" / "baseline_eval_info.json").read_text())
+    act = next(r for r in rows("reproduction.csv") if r["model"] == "ACT")
+    assert shipped["aggregated"]["pc_success"] == float(act["baseline_pc"]) == 83.0
+    assert len(shipped["per_episode"]) == 500
+
+
 def test_blackout_csv_matches_raw_eval_info():
     raw = {("OpenVLA", "normal"): per_task("openvla_spatial_500", 10), ("SmolVLA", "normal"): per_task("smolvla_hfvla_500", 10),
            ("SmolVLA", "black"): per_task("smolvla_black_all"), ("π0", "normal"): per_task("pi0_spatial_500", 10),

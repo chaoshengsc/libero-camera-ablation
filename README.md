@@ -155,7 +155,7 @@ dashboard/         results dashboard and the raw eval_info.json of every run
 media/             figures and demos used in this README (Chinese versions in media/zh/)
 docs/              installation, troubleshooting, reproduction notes
 env/               environment file, pip constraints, exported package lists
-tests/             unit tests for the metrics and consistency checks on the published numbers
+tests/             unit tests for the metrics, consistency checks on the published numbers, entry-script regression tests
 viewer/            replay a policy trajectory locally in the interactive MuJoCo viewer
 ```
 

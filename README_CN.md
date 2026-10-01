@@ -155,7 +155,7 @@ dashboard/         结果看板,以及每次评测的原始 eval_info.json
 media/             本页用的图与演示(中文版在 media/zh/)
 docs/              安装、排查、复现笔记
 env/               环境文件、pip 约束、导出的包清单
-tests/             指标的单元测试,以及对已发布数字的一致性检查
+tests/             指标的单元测试、已发布数字的一致性检查、入口脚本的回归测试
 viewer/            在本地用 MuJoCo 交互查看器回放策略轨迹
 ```
 

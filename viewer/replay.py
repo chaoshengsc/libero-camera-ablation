@@ -1,4 +1,7 @@
-"""在 Mac 上用 MuJoCo 交互查看器回放工作站录下的策略轨迹。
+"""在本地用 MuJoCo 交互查看器回放策略轨迹。
+
+准备:场景(.mjb)和轨迹(.npz)由 viewer/export_act.py 在 GPU 机器上生成,拷到 viewer/scenes/(这两类文件不入库)。
+本地只需要 mujoco:  python3 -m venv .venv-viewer && .venv-viewer/bin/pip install mujoco
 
 用法(macOS 必须用 mjpython 启动被动查看器):
   .venv-viewer/bin/mjpython viewer/replay.py viewer/scenes/aloha_transfer_cube.mjb viewer/scenes/act_transfer_cube_seed1001.npz

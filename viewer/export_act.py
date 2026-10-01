@@ -1,4 +1,5 @@
-"""导出 ALOHA 场景为 .mjb,并用 ACT 跑一回合,记录每步 qpos 供 Mac 端回放。"""
+"""导出 ALOHA 场景为 .mjb,并用 ACT 跑一回合,记录每步 qpos 供本地回放。
+在装好 lerobot 环境的 GPU 机器上运行;输出在 $EMB_ROOT/logs/viewer/,拷到本地的 viewer/scenes/ 后用 replay.py 打开。"""
 import os
 
 import gym_aloha  # noqa: F401
@@ -11,7 +12,7 @@ from lerobot.envs.configs import AlohaEnv
 from lerobot.envs.utils import preprocess_observation
 from lerobot.policies.factory import make_policy, make_pre_post_processors
 
-EMB = os.environ.get("EMB_ROOT", "/path/to/emb")
+EMB = os.environ["EMB_ROOT"]
 
 OUT = EMB + "/logs/viewer"; os.makedirs(OUT, exist_ok=True)
 CKPT = EMB + "/ckpt/act_aloha_sim_transfer_cube_human@ba73b276_migrated"
@@ -26,7 +27,6 @@ pre, post = make_pre_post_processors(cfg, pretrained_path=CKPT)
 for seed in range(1000, 1010):
     obs, _ = env.reset(seed=seed); policy.reset(); qpos = [phys.data.qpos.copy()]; ok = False
     for _t in range(400):
-        o = {k: (v[None] if isinstance(v, np.ndarray) else v) for k, v in obs.items()}
         o = {k: {kk: vv[None] for kk, vv in v.items()} if isinstance(v, dict) else v for k, v in obs.items()}
         batch = pre(preprocess_observation(o))
         with torch.inference_mode():
