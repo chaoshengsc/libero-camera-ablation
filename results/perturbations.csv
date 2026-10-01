@@ -1,0 +1,4 @@
+model,normal,noise,freeze,agent_black,wrist_black,all_black
+pi0,76,79,71,78,59,56
+pi0.5,99,99,0,51,0,0
+SmolVLA,72,32,,2,5,0

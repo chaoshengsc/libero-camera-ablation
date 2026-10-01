@@ -1,0 +1,4 @@
+torch==2.11.0+cu128
+torchvision==0.26.0+cu128
+triton==3.6.0
+mujoco==3.3.2

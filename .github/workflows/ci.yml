@@ -1,0 +1,27 @@
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install ruff pytest numpy
+      - name: Lint
+        run: ruff check .
+      - name: Shell syntax
+        run: for f in scripts/*.sh scripts/*/*.sh; do bash -n "$f"; done
+      - name: Tests
+        run: pytest -q
+      - name: Dashboard data and figures are up to date
+        run: |
+          python dashboard/build.py
+          python scripts/analysis/make_figures.py
+          git diff --exit-code -- dashboard/results.js results media

@@ -1,0 +1,11 @@
+channels:
+  - conda-forge
+channel_priority: strict
+auto_activate_base: false
+envs_dirs:
+  - ${EMB_ROOT}/envs
+pkgs_dirs:
+  - ${EMB_ROOT}/cache/conda-pkgs
+mirrored_channels:
+  conda-forge:
+    - https://conda.anaconda.org/conda-forge

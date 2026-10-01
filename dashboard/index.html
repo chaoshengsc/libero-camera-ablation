@@ -1,0 +1,421 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>仿真复现看板</title>
+<style>
+:root {
+  color-scheme: light;
+  --surface-0: #f5f4f1; --surface-1: #fcfcfb; --border: #e3e2dd; --grid: #ecebe7;
+  --text-primary: #0b0b0b; --text-secondary: #52514e; --text-muted: #7a7973;
+  --series-1: #2a78d6; --series-2: #eb6834;
+  --good: #0ca30c; --critical: #d03b3b;
+}
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme="light"])) {
+    color-scheme: dark;
+    --surface-0: #111110; --surface-1: #1a1a19; --border: #33332f; --grid: #2a2a27;
+    --text-primary: #ffffff; --text-secondary: #c3c2b7; --text-muted: #8f8e86;
+    --series-1: #3987e5; --series-2: #d95926;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --surface-0: #111110; --surface-1: #1a1a19; --border: #33332f; --grid: #2a2a27;
+  --text-primary: #ffffff; --text-secondary: #c3c2b7; --text-muted: #8f8e86;
+  --series-1: #3987e5; --series-2: #d95926;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--surface-0); color: var(--text-primary);
+  font: 15px/1.55 -apple-system, "PingFang SC", "Noto Sans SC", system-ui, sans-serif; }
+main { max-width: 1080px; margin: 0 auto; padding: 28px 16px 64px; }
+h1 { font-size: 24px; margin: 0 0 4px; letter-spacing: -0.01em; }
+h2 { font-size: 17px; margin: 0 0 12px; }
+.sub { color: var(--text-secondary); margin: 0 0 24px; }
+.card { background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 20px; }
+.tile { background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; }
+.tile .k { color: var(--text-secondary); font-size: 13px; }
+.tile .v { font-size: 28px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.tile .d { color: var(--text-muted); font-size: 12.5px; }
+.row-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 8px; }
+.legend { display: flex; gap: 16px; color: var(--text-secondary); font-size: 13px; flex-wrap: wrap; }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.toggle { font: inherit; font-size: 13px; color: var(--text-secondary); background: none; border: 1px solid var(--border);
+  border-radius: 8px; padding: 4px 10px; cursor: pointer; }
+.toggle:hover { color: var(--text-primary); }
+svg text { fill: var(--text-secondary); font-size: 12px; }
+svg .lbl { fill: var(--text-primary); font-size: 13px; }
+svg .val { fill: var(--text-primary); font-size: 12px; font-variant-numeric: tabular-nums; }
+.chart-wrap { position: relative; }
+.tip { position: absolute; pointer-events: none; background: var(--surface-1); border: 1px solid var(--border);
+  border-radius: 8px; padding: 8px 10px; font-size: 12.5px; box-shadow: 0 4px 16px rgba(0,0,0,.12); opacity: 0;
+  transition: opacity .1s; white-space: nowrap; z-index: 2; }
+.tip b { font-weight: 600; }
+table { width: 100%; border-collapse: collapse; font-size: 13.5px; font-variant-numeric: tabular-nums; }
+th, td { text-align: left; padding: 7px 8px; border-bottom: 1px solid var(--border); }
+th { color: var(--text-secondary); font-weight: 500; }
+.hidden { display: none; }
+.filters { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+.chip { font: inherit; font-size: 13px; border: 1px solid var(--border); background: none; color: var(--text-secondary);
+  border-radius: 999px; padding: 3px 12px; cursor: pointer; }
+.chip[aria-pressed="true"] { color: var(--text-primary); border-color: var(--text-secondary); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; }
+.vid { border: 1px solid var(--border); border-radius: 10px; overflow: hidden; background: #000; }
+.vid video { display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: contain; }
+.vid .meta { background: var(--surface-1); padding: 6px 10px; font-size: 12.5px; display: flex; justify-content: space-between; color: var(--text-secondary); }
+.st { display: inline-flex; align-items: center; gap: 4px; color: var(--text-primary); }
+.st i { font-style: normal; font-weight: 700; }
+.st.ok i { color: var(--good); } .st.fail i { color: var(--critical); }
+.pending { color: var(--text-muted); font-size: 13.5px; }
+.foot { color: var(--text-muted); font-size: 12.5px; }
+.mx-wrap { overflow-x: auto; }
+.mx { border-collapse: separate; border-spacing: 2px; font-size: 12.5px; min-width: 640px; }
+.mx th { font-weight: 500; color: var(--text-secondary); padding: 4px 6px; text-align: center; border: 0; vertical-align: bottom; }
+.mx th.row { text-align: left; white-space: nowrap; color: var(--text-primary); }
+.mx td { text-align: center; padding: 7px 4px; border: 0; border-radius: 4px; font-variant-numeric: tabular-nums; cursor: default; }
+.mx td.na { color: var(--text-muted); background: var(--grid); }
+.mx .colh { writing-mode: vertical-rl; white-space: nowrap; max-height: 130px; margin: 0 auto; letter-spacing: 1px; }
+html[lang="en"] .mx .colh { writing-mode: horizontal-tb; white-space: normal; max-width: 76px; max-height: none; font-size: 11px; letter-spacing: 0; line-height: 1.25; }
+.mx-legend { display: flex; align-items: center; gap: 8px; color: var(--text-secondary); font-size: 12.5px; margin-top: 10px; }
+.mx-legend .bar { width: 160px; height: 10px; border-radius: 3px;
+  background: linear-gradient(90deg, #cde2fb, #86b6ef, #3987e5, #1c5cab, #0d366b); }
+code { font-size: 12.5px; }
+</style>
+</head>
+<body>
+<main>
+  <div class="row-head"><h1>仿真复现看板</h1><button class="toggle" id="langBtn">English</button></div>
+  <p class="sub">单卡工作站 · RTX A5000 24GB · MuJoCo 无头渲染(NVIDIA EGL)· 所有结果均为公开权重评测</p>
+
+  <div class="tiles" id="tiles"></div>
+
+  <section class="card">
+    <div class="row-head">
+      <h2>成功率:本机复现 vs 原作者基准</h2>
+      <button class="toggle" id="tblBtn" aria-pressed="false">表格视图</button>
+    </div>
+    <div class="legend" id="legend">
+      <span><svg width="14" height="14"><circle cx="7" cy="7" r="5" fill="var(--series-1)"/></svg>本机复现(横线 = 95% 置信区间)</span>
+      <span><svg width="14" height="14"><rect x="2.5" y="2.5" width="9" height="9" transform="rotate(45 7 7)" fill="var(--series-2)"/></svg>原作者基准</span>
+    </div>
+    <div class="chart-wrap" id="chartWrap"><svg id="chart" role="img" aria-label="各模型成功率对比"></svg><div class="tip" id="tip"></div></div>
+    <div id="tbl" class="hidden"></div>
+  </section>
+
+  <section class="card">
+    <h2>LIBERO-Spatial 各任务成功率</h2>
+    <p class="sub" style="margin:-6px 0 12px">每格 = 该任务上的成功次数 / 回合数;颜色越深成功率越高。列标题是"拿起黑碗并放到盘子上"里碗的位置。</p>
+    <div class="mx-wrap"><table class="mx" id="matrix"></table></div>
+    <div class="mx-legend"><span>50%</span><span class="bar"></span><span>100%</span><span style="margin-left:8px">低于 50% 按 50% 着色</span></div>
+  </section>
+
+  <section class="card">
+    <h2>视觉依赖测试(相机全涂黑)</h2>
+    <p class="sub" style="margin:-6px 0 12px">把送进模型的相机画面换成全黑,其余不变。每组 10 任务 × 10 次;正常组取各自 500 回合评测里每任务前 10 次(同种子、同初始状态)。95% CI 约 ±9 个百分点。</p>
+    <div class="legend">
+      <span><svg width="14" height="14"><circle cx="7" cy="7" r="5" fill="var(--series-1)"/></svg>正常画面</span>
+      <span><svg width="14" height="14"><circle cx="7" cy="7" r="4" fill="none" stroke="var(--series-2)" stroke-width="2"/></svg>全涂黑</span>
+    </div>
+    <div class="chart-wrap"><svg id="bchart" role="img" aria-label="正常与全涂黑成功率对比"></svg></div>
+    <h3 style="font-size:15px;margin:18px 0 8px">π0 各任务:正常 vs 全涂黑(成功次数 / 10)</h3>
+    <div class="mx-wrap"><table class="mx" id="bmatrix"></table></div>
+    <h3 style="font-size:15px;margin:18px 0 8px">全涂黑时的回放</h3>
+    <p class="sub" style="margin:0 0 10px">视频是环境的真实渲染;模型当时收到的是全黑图像。LIBERO 的原始渲染是旋转 180° 的(机械臂在画面上方),送进模型前会被转正,不影响评测。录制帧率较高,播放偏快,可在播放器菜单里调慢。OpenVLA 的录像保存的是送进模型的黑图,没有观看价值,未收录。</p>
+    <div class="filters" id="bfilters"></div>
+    <div id="bvideos"></div>
+  </section>
+
+  <section class="card">
+    <h2>视觉依赖:进一步实验</h2>
+    <h3 style="font-size:15px;margin:4px 0 6px">哪一路相机、什么样的扰动(成功次数 / 100)</h3>
+    <div class="mx-wrap"><table class="mx" id="cammatrix" style="min-width:520px"></table></div>
+    <p class="sub" style="margin:6px 0 18px">π0 主视角涂黑后毫无下降,整个回合只给第一帧画面也只掉 5 个百分点;π0.5 加噪声没有影响,但画面冻结或腕部相机涂黑都会归零;SmolVLA 在任何扰动下都崩溃,更像是对分布外输入敏感。噪声为标准差 0.1 的高斯噪声。</p>
+
+    <h3 style="font-size:15px;margin:4px 0 6px">末端执行器轨迹(同种子同初始状态,单位 cm)</h3>
+    <div id="trajtbl"></div>
+    <p class="sub" style="margin:6px 0 18px">π0 看不见时走的是另一条路线(约为噪声的 2 倍),但抓取点并未聚拢;LIBERO-Spatial 场景变化(约 1.8 cm)与模型自身噪声同量级,碗宽十余厘米,这是 π0 看不见也能成功一半的主要原因。</p>
+
+    <h3 style="font-size:15px;margin:4px 0 6px">继续微调 π0:训练时随机置零状态输入</h3>
+    <p class="sub" style="margin:0 0 8px">从 LeRobot 公开 π0 权重继续训练 3000 步(batch 16,只训动作专家,约为原训练量的 15%)。改动组训练时按样本 50% 把机械臂状态置零,逼模型看画面。每项 100 回合。</p>
+    <div class="legend">
+      <span><svg width="14" height="14"><circle cx="7" cy="7" r="5" fill="var(--series-1)"/></svg>正常画面</span>
+      <span><svg width="14" height="14"><circle cx="7" cy="7" r="4" fill="none" stroke="var(--series-2)" stroke-width="2"/></svg>全涂黑</span>
+    </div>
+    <div class="chart-wrap"><svg id="ftchart" role="img" aria-label="继续微调前后正常与全涂黑成功率"></svg></div>
+    <p class="sub" style="margin:6px 0 0">全涂黑:置零组 40% vs 对照 61%,差 21 个百分点,z≈3.0(p≈0.003),显著 —— 更依赖视觉了。正常:68% vs 78%,p≈0.11,不显著。
+      训练损失佐证 π0 原本强烈依赖状态:首次去掉状态时损失从 0.145 跳到 0.835。</p>
+  </section>
+
+  <section class="card">
+    <h2>评测回放</h2>
+    <div class="filters" id="filters"></div>
+    <div id="videos"></div>
+  </section>
+
+  <p class="foot">数据由 <code>build.py</code> 从 <code>data/</code> 生成;每次评测完成后同步输出目录并重新运行即可更新。置信区间为二项分布正态近似;OpenVLA 基准的 ± 取自 README 原文。</p>
+</main>
+<script src="results.js"></script>
+<script>
+const R = window.RESULTS || [];
+const $ = (id) => document.getElementById(id);
+const fmt = (x) => x == null ? "—" : x.toFixed(1) + "%";
+
+// ---- 语言:默认跟随浏览器,?lang=zh|en 或右上角按钮切换。英文版在渲染后按词典替换文本。
+const LANG = new URLSearchParams(location.search).get("lang") || ((navigator.language || "").toLowerCase().startsWith("zh") ? "zh" : "en");
+const DICT = [
+  ["把送进模型的相机画面换成全黑,其余不变。每组 10 任务 × 10 次;正常组取各自 500 回合评测里每任务前 10 次(同种子、同初始状态)。95% CI 约 ±9 个百分点。", "The camera images fed to the model are replaced by black frames; nothing else changes. Each group is 10 tasks × 10 episodes; the normal group takes the first 10 episodes per task from each model's 500-episode run (same seed, same initial states). The 95% CI is about ±9 points."],
+  ["视频是环境的真实渲染;模型当时收到的是全黑图像。LIBERO 的原始渲染是旋转 180° 的(机械臂在画面上方),送进模型前会被转正,不影响评测。录制帧率较高,播放偏快,可在播放器菜单里调慢。OpenVLA 的录像保存的是送进模型的黑图,没有观看价值,未收录。", "The videos show the simulator's real rendering; the model received black images. LIBERO renders upside down (arm at the top) and the image is flipped before it reaches the model, which does not affect evaluation. The recordings play fast; slow them down in the player menu. OpenVLA's recordings save the black frames fed to the model and are not included."],
+  ["π0 主视角涂黑后毫无下降,整个回合只给第一帧画面也只掉 5 个百分点;π0.5 加噪声没有影响,但画面冻结或腕部相机涂黑都会归零;SmolVLA 在任何扰动下都崩溃,更像是对分布外输入敏感。噪声为标准差 0.1 的高斯噪声。", "π0 loses nothing with the agent-view camera black and only 5 points when shown just the first frame for the whole episode. π0.5 is unaffected by noise but drops to zero with a frozen image or a black wrist camera. SmolVLA breaks under every perturbation, which points to sensitivity to out-of-distribution input. Noise is Gaussian with standard deviation 0.1."],
+  ["π0 看不见时走的是另一条路线(约为噪声的 2 倍),但抓取点并未聚拢;LIBERO-Spatial 场景变化(约 1.8 cm)与模型自身噪声同量级,碗宽十余厘米,这是 π0 看不见也能成功一半的主要原因。", "Blind π0 takes a different path (about twice the noise floor), but its grasp points do not cluster. The scene variation in LIBERO-Spatial (about 1.8 cm) is of the same order as the model's own noise and the bowl is over ten centimetres wide, which is the main reason π0 succeeds half the time without seeing."],
+  ["从 LeRobot 公开 π0 权重继续训练 3000 步(batch 16,只训动作专家,约为原训练量的 15%)。改动组训练时按样本 50% 把机械臂状态置零,逼模型看画面。每项 100 回合。", "The public LeRobot π0 checkpoint is trained for 3000 more steps (batch 16, action expert only, about 15% of the original training). The treatment group zeroes the robot state for 50% of samples, forcing the model to look. 100 episodes per entry."],
+  ["全涂黑:置零组 40% vs 对照 61%,差 21 个百分点,z≈3.0(p≈0.003),显著 —— 更依赖视觉了。正常:68% vs 78%,p≈0.11,不显著。", "All black: 40% with state zeroing vs. 61% for the control, a 21-point gap, z≈3.0 (p≈0.003), significant: the model relies on vision more. Normal: 68% vs. 78%, p≈0.11, not significant."],
+  ["训练损失佐证 π0 原本强烈依赖状态:首次去掉状态时损失从 0.145 跳到 0.835。", "The training loss confirms that π0 relied heavily on the state: it jumps from 0.145 to 0.835 the first time the state is removed."],
+  ["每格 = 该任务上的成功次数 / 回合数;颜色越深成功率越高。列标题是\"拿起黑碗并放到盘子上\"里碗的位置。", "Each cell is successes / episodes on that task; darker means higher. Column headers give where the bowl starts in \"pick up the black bowl and place it on the plate\"."],
+  ["回放视频未随仓库发布(体积大)。在本地把评测输出的 videos/ 放到 dashboard/data/<run>/ 下即可在此播放。", "Replay videos are not published with the repository (too large). Put each run's videos/ folder under dashboard/data/<run>/ locally to play them here."],
+  ["置信区间为二项分布正态近似;OpenVLA 基准的 ± 取自 README 原文。", "Confidence intervals use the normal approximation to the binomial; the ± on the OpenVLA reference is quoted from its README."],
+  [";每次评测完成后同步输出目录并重新运行即可更新。", ". Sync a run's output folder and re-run it to update. "],
+  ["单卡工作站 · RTX A5000 24GB · MuJoCo 无头渲染(NVIDIA EGL)· 所有结果均为公开权重评测", "Single-GPU workstation · RTX A5000 24GB · headless MuJoCo rendering (NVIDIA EGL) · all results are evaluations of public checkpoints"],
+  ["SmolVLA 论文 Table 2(每任务 10 次);公开权重与论文结构不同,社区同权重实测约 82%", "SmolVLA paper, Table 2 (10 episodes per task); the public checkpoint differs in architecture from the paper, and the community reports about 82% for it"],
+  ["OpenPI LIBERO README 旧版(commit c015073f,π0 @30k)", "OpenPI LIBERO README, older version (commit c015073f, π0 @30k)"],
+  ["OpenPI LIBERO README(LeRobot 文档复现为 97.0%)", "OpenPI LIBERO README (the LeRobot docs report 97.0%)"],
+  ["openvla README(3 种子 × 500 回合,A100)", "openvla README (3 seeds × 500 episodes, A100)"],
+  ["LeRobot 模型卡(500 回合;原版 DP 仓库同等模型 64.2%)", "LeRobot model card (500 episodes; the equivalent model in the original DP repo scores 64.2%)"],
+  ["HF 仓库自带 eval_info.json(500 回合)", "eval_info.json shipped in the HF repo (500 episodes)"],
+  ["同上,训练时按样本 50% 置零 observation.state", "same, with observation.state zeroed for 50% of training samples"],
+  ["3000 步,batch 16,只训动作专家", "3000 steps, batch 16, action expert only"], ["实验 B 同协议", "same protocol as the blackout test"],
+  ["继续微调 · 状态置零(p=0.5)", "Fine-tuned · state zeroing (p=0.5)"], ["继续微调 · 对照(p=0)", "Fine-tuned · control (p=0)"], ["原始 π0", "Original π0"],
+  ["噪声底线 π0正常 vs π0正常(重跑)", "Noise floor: π0 normal vs. π0 normal (re-run)"], ["不同模型 π0.5 vs π0(都正常)", "Different models: π0.5 vs. π0 (both normal)"], ["π0 全涂黑 vs π0 正常", "π0 all black vs. π0 normal"],
+  ["π0 各任务:正常 vs 全涂黑(成功次数 / 10)", "π0 per task: normal vs. all black (successes / 10)"],
+  ["哪一路相机、什么样的扰动(成功次数 / 100)", "Which camera, what kind of perturbation (successes / 100)"],
+  ["末端执行器轨迹(同种子同初始状态,单位 cm)", "End-effector trajectories (same seed and initial states, cm)"],
+  ["继续微调 π0:训练时随机置零状态输入", "Fine-tuning π0 with the state input randomly zeroed"],
+  ["抓取点离散度(同任务 10 回合)", "Grasp-point spread (10 episodes of one task)"],
+  ["视觉依赖测试(相机全涂黑)", "Vision-dependence test (all cameras black)"], ["视觉依赖:进一步实验", "Vision dependence: further experiments"],
+  ["成功率:本机复现 vs 原作者基准", "Success rate: this machine vs. the authors' reference"], ["LIBERO-Spatial 各任务成功率", "LIBERO-Spatial success rate per task"],
+  ["本机复现(横线 = 95% 置信区间)", "This machine (bar = 95% confidence interval)"], ["继续微调前后正常与全涂黑成功率", "Normal and all-black success before and after fine-tuning"],
+  ["正常与全涂黑成功率对比", "Normal vs. all-black success rate"], ["各模型成功率对比", "Success rate by model"],
+  ["这组评测还没有回放视频。", "No replay videos for this run yet."], ["没有回放视频。", "No replay videos."],
+  ["低于 50% 按 50% 着色", "below 50% is coloured as 50%"], ["全涂黑时的回放", "Replays with all cameras black"],
+  ["复现成功 / 已评测", "Reproduced / evaluated"], ["路线差异(DTW)", "Path difference (DTW)"], ["抓取点距离", "Grasp-point distance"],
+  ["盘子与小烤碗之间", "between plate and ramekin"], ["木柜上层抽屉里", "in top drawer of cabinet"], ["小烤碗旁", "next to ramekin"], ["小烤碗上", "on ramekin"],
+  ["桌子中央", "table centre"], ["饼干盒上", "on cookie box"], ["饼干盒旁", "next to cookie box"], ["灶台上", "on stove"], ["盘子旁", "next to plate"], ["木柜顶上", "on top of cabinet"],
+  ["π0 正常(重跑)", "π0 normal (re-run)"], ["π0.5 正常", "π0.5 normal"], ["π0 正常", "π0 normal"], ["π0 全涂黑", "π0 all black"],
+  [/第 (\d+) 回合/g, "episode $1"], [/(\d+) 回合/g, "$1 episodes"], [/差 ([+\-\d.]+) 个百分点/g, "Δ $1 pts"],
+  [" …评测中", " …running"], [" ✗未达基准", " ✗ below reference"], ["区间不重叠", "intervals do not overlap"], ["基准 ", "reference "],
+  ["本机复现:", "This machine: "], ["原作者基准:", "Authors' reference: "], ["本机复现", "This machine"], ["原作者基准", "Authors' reference"],
+  ["仿真复现看板", "Reproduction dashboard"], ["评测回放", "Evaluation replays"], ["表格视图", "Table view"], ["图表视图", "Chart view"],
+  ["加高斯噪声", "Gaussian noise"], ["冻结首帧", "Frozen first frame"], ["只涂主视角", "Agent-view black"], ["只涂腕部", "Wrist black"],
+  ["正常画面", "Normal"], ["全涂黑", "All black"], ["正常", "Normal"], ["待评测", "pending"], ["评测中", "running"], ["在跑", "running"],
+  ["数据由 ", "Data is generated by "], [" 从 ", " from "], [" 生成", ""], ["回合数", "Episodes"], ["仿真器", "Simulator"], ["模型", "Model"], ["任务", "Task"], ["权重", "Checkpoint"],
+  ["对比", "Comparison"], ["平均", "Mean"], ["总体", "Overall"], ["奖励 ", "reward "], ["成功", "success"], ["失败", "fail"],
+];
+function trStr(t) { for (const [a, b] of DICT) t = typeof a === "string" ? t.split(a).join(b) : t.replace(a, b); return t; }
+function trNode(n) {
+  if (n.nodeType === 3) { const t = trStr(n.nodeValue); if (t !== n.nodeValue) n.nodeValue = t; return; }  // 只在有变化时写回,否则会反复触发观察器
+  if (n.nodeType !== 1 || n.tagName === "SCRIPT" || n.tagName === "STYLE") return;
+  for (const a of ["title", "aria-label"]) if (n.hasAttribute(a)) n.setAttribute(a, trStr(n.getAttribute(a)));
+  n.childNodes.forEach(trNode);
+}
+$("langBtn").textContent = LANG === "en" ? "中文" : "English";
+$("langBtn").onclick = () => { location.search = "?lang=" + (LANG === "en" ? "zh" : "en"); };
+if (LANG === "en") {
+  document.documentElement.lang = "en"; document.title = "Reproduction dashboard";
+  new MutationObserver(ms => ms.forEach(m => m.type === "characterData" ? trNode(m.target) : m.addedNodes.forEach(trNode)))
+    .observe(document.body, { childList: true, subtree: true, characterData: true });
+  trNode(document.body);
+}
+
+// ---- tiles
+const done = R.filter(r => r.status === "done");
+// 复现判定:本机 95% 区间与基准区间(± 或其 95% CI,没有则视为一个点)有重叠
+const reproduced = (r) => { const b = r.baseline_pm ?? r.baseline_ci ?? 0; return Math.abs(r.pc - r.baseline_pc) <= r.ci + b; };
+const ok = done.filter(reproduced);
+$("tiles").innerHTML = [
+  ["复现成功 / 已评测", `${ok.length} / ${done.length}`, R.map(r => `${r.model}${r.status !== "done" ? " …评测中" : reproduced(r) ? " ✓" : " ✗未达基准"}`).join(" · ")],
+  ...done.map(r => [`${r.model} · ${r.task}`, fmt(r.pc), `基准 ${fmt(r.baseline_pc)} · ${r.n} 回合 · 差 ${(r.pc - r.baseline_pc >= 0 ? "+" : "") + (r.pc - r.baseline_pc).toFixed(1)} 个百分点${reproduced(r) ? "" : " · 区间不重叠"}`]),
+].map(([k, v, d]) => `<div class="tile"><div class="k">${k}</div><div class="v">${v}</div><div class="d">${d}</div></div>`).join("");
+
+// ---- dot plot
+function drawChart() {
+  const svg = $("chart"), wrap = $("chartWrap");
+  const W = wrap.clientWidth, labelW = Math.min(190, W * 0.34), padR = 24, rowH = 64, top = 8, axisH = 28;
+  const H = top + rowH * R.length + axisH;
+  svg.setAttribute("width", W); svg.setAttribute("height", H);
+  const x = (v) => labelW + (W - labelW - padR) * v / 100;
+  let s = "";
+  for (let t = 0; t <= 100; t += 20) {
+    s += `<line x1="${x(t)}" x2="${x(t)}" y1="${top}" y2="${H - axisH}" stroke="var(--grid)"/>`;
+    s += `<text x="${x(t)}" y="${H - 8}" text-anchor="middle">${t}%</text>`;
+  }
+  R.forEach((r, i) => {
+    const cy = top + rowH * i + rowH / 2;
+    s += `<text class="lbl" x="0" y="${cy - 4}">${r.model}</text><text x="0" y="${cy + 13}">${r.task} · ${r.sim}</text>`;
+    if (r.baseline_pc != null) {
+      const bx = x(r.baseline_pc), pm = r.baseline_pm ?? r.baseline_ci;
+      if (pm) s += `<line x1="${x(r.baseline_pc - pm)}" x2="${x(r.baseline_pc + pm)}" y1="${cy + 9}" y2="${cy + 9}" stroke="var(--series-2)" stroke-width="2" stroke-linecap="round"/>`;
+      s += `<rect x="${bx - 5}" y="${cy + 4}" width="10" height="10" transform="rotate(45 ${bx} ${cy + 9})" fill="var(--series-2)" stroke="var(--surface-1)" stroke-width="2"/>`;
+    }
+    if (r.pc != null) {
+      const px = x(r.pc);
+      s += `<line x1="${x(r.pc - r.ci)}" x2="${x(r.pc + r.ci)}" y1="${cy - 7}" y2="${cy - 7}" stroke="var(--series-1)" stroke-width="2" stroke-linecap="round"/>`;
+      s += `<circle cx="${px}" cy="${cy - 7}" r="6" fill="var(--series-1)" stroke="var(--surface-1)" stroke-width="2"/>`;
+      s += `<text class="val" x="${px}" y="${cy - 17}" text-anchor="middle">${fmt(r.pc)}</text>`;
+    } else {
+      s += `<text x="${x(2)}" y="${cy - 3}">待评测</text>`;
+    }
+    s += `<rect class="hit" data-i="${i}" x="0" y="${cy - rowH / 2}" width="${W}" height="${rowH}" fill="transparent"/>`;
+  });
+  svg.innerHTML = s;
+  svg.querySelectorAll(".hit").forEach(el => {
+    el.addEventListener("mousemove", (e) => showTip(R[+el.dataset.i], e));
+    el.addEventListener("mouseleave", () => $("tip").style.opacity = 0);
+  });
+}
+function showTip(r, e) {
+  const tip = $("tip"), b = $("chartWrap").getBoundingClientRect();
+  const pm = r.baseline_pm != null ? `± ${r.baseline_pm}` : (r.baseline_ci ? `± ${r.baseline_ci}(95% CI)` : "");
+  tip.innerHTML = `<b>${r.model} · ${r.task}</b><br>本机复现:${r.pc != null ? `${fmt(r.pc)} ± ${r.ci}(95% CI,${r.n} 回合)` : "待评测"}` +
+    `<br>原作者基准:${fmt(r.baseline_pc)} ${pm}<br><span style="color:var(--text-muted)">${r.baseline_src}</span>`;
+  tip.style.opacity = 1;
+  const tx = Math.min(e.clientX - b.left + 14, b.width - tip.offsetWidth - 4);
+  tip.style.left = Math.max(4, tx) + "px"; tip.style.top = (e.clientY - b.top + 14) + "px";
+}
+
+// ---- table view
+$("tbl").innerHTML = `<table><thead><tr><th>模型</th><th>任务</th><th>仿真器</th><th>本机复现</th><th>95% CI</th><th>回合数</th><th>原作者基准</th><th>权重</th></tr></thead><tbody>` +
+  R.map(r => `<tr><td>${r.model}</td><td>${r.task}</td><td>${r.sim}</td><td>${fmt(r.pc)}</td><td>${r.ci != null ? "± " + r.ci : "—"}</td><td>${r.n ?? "—"}</td><td>${fmt(r.baseline_pc)}${r.baseline_pm != null ? " ± " + r.baseline_pm : ""}</td><td><code>${r.checkpoint}</code></td></tr>`).join("") + `</tbody></table>`;
+$("tblBtn").addEventListener("click", (e) => {
+  const on = e.currentTarget.getAttribute("aria-pressed") !== "true";
+  e.currentTarget.setAttribute("aria-pressed", on);
+  e.currentTarget.textContent = on ? "图表视图" : "表格视图";
+  $("tbl").classList.toggle("hidden", !on); $("chartWrap").classList.toggle("hidden", on); $("legend").classList.toggle("hidden", on);
+});
+
+// ---- videos
+let cur = done[0]?.id;
+function drawVideos() {
+  $("filters").innerHTML = R.map(r => `<button class="chip" data-id="${r.id}" aria-pressed="${r.id === cur}">${r.model} · ${r.task}</button>`).join("");
+  $("filters").querySelectorAll(".chip").forEach(b => b.onclick = () => { cur = b.dataset.id; drawVideos(); });
+  const r = R.find(x => x.id === cur);
+  if (!r || !r.videos?.length) { $("videos").innerHTML = `<p class="pending">这组评测还没有回放视频。</p>`; return; }
+  $("videos").innerHTML = `<div class="grid">` + r.videos.map(v => `<div class="vid"><video src="${v.src}#t=0.1" controls muted loop playsinline preload="auto"></video>
+    <div class="meta"><span>${v.task !== r.task ? v.task + " · " : ""}第 ${v.ep} 回合${v.reward != null ? " · 奖励 " + v.reward : ""}</span><span class="st ${v.success ? "ok" : "fail"}"><i>${v.success ? "✓" : "✗"}</i>${v.success ? "成功" : "失败"}</span></div></div>`).join("") + `</div>`;
+}
+
+
+// ---- per-task matrix (LIBERO-Spatial)
+const RAMP = ["#cde2fb", "#b7d3f6", "#9ec5f4", "#86b6ef", "#6da7ec", "#5598e7", "#3987e5", "#2a78d6", "#256abf", "#1c5cab", "#184f95", "#104281", "#0d366b"];
+function cellColor(p) { const x = Math.max(0, Math.min(1, (p - 50) / 50)); const i = Math.round(x * (RAMP.length - 1)); return [RAMP[i], i >= 6 ? "#ffffff" : "#0b0b0b"]; }
+function drawMatrix() {
+  const L = R.filter(r => r.task === "LIBERO-Spatial"), T = window.LIBERO_TASKS || [];
+  let h = `<thead><tr><th></th>${T.map(n => `<th><div class="colh">${n}</div></th>`).join("")}<th>总体</th></tr></thead><tbody>`;
+  for (const r of L) {
+    h += `<tr><th class="row">${r.model}</th>`;
+    for (let i = 0; i < T.length; i++) {
+      const t = (r.tasks || []).find(x => x.id === i);
+      if (!t) { h += `<td class="na">—</td>`; continue; }
+      const p = 100 * t.ok / t.n, [bg, fg] = cellColor(p);
+      h += `<td style="background:${bg};color:${fg}" title="${r.model} · ${T[i]}:${t.ok}/${t.n}(${p.toFixed(0)}%)">${p.toFixed(0)}</td>`;
+    }
+    const [bg, fg] = r.pc != null ? cellColor(r.pc) : ["", ""];
+    h += r.pc != null ? `<td style="background:${bg};color:${fg};font-weight:600" title="${r.model} 总体 ${fmt(r.pc)}(${r.n} 回合)">${r.pc.toFixed(1)}</td>` : `<td class="na">评测中</td>`;
+    h += `</tr>`;
+  }
+  $("matrix").innerHTML = h + "</tbody>";
+}
+
+// ---- blackout
+const BO = window.BLACKOUT || { summary: [], runs: [] };
+const MNAME = { pi0: "π0", "pi0.5": "π0.5" };
+function drawBlackout() {
+  const svg = $("bchart"), W = svg.parentNode.clientWidth, labelW = Math.min(110, W * 0.22), padR = 24, rowH = 44, top = 20, axisH = 26;
+  const S = BO.summary, H = top + rowH * S.length + axisH, x = v => labelW + (W - labelW - padR) * v / 100;
+  let s = "";
+  for (let v = 0; v <= 100; v += 25) s += `<line x1="${x(v)}" x2="${x(v)}" y1="${top - 8}" y2="${H - axisH}" stroke="var(--grid)"/><text x="${x(v)}" y="${H - 8}" text-anchor="middle">${v}%</text>`;
+  S.forEach((r, i) => {
+    const cy = top + rowH * i + rowH / 2 - 8, a = r.normal.reduce((p, q) => p + q, 0), b = r.black.reduce((p, q) => p + q, 0);
+    s += `<text class="lbl" x="0" y="${cy + 4}">${MNAME[r.model] || r.model}</text>`;
+    s += `<line x1="${x(b)}" x2="${x(a)}" y1="${cy}" y2="${cy}" stroke="var(--border)" stroke-width="2"/>`;
+    s += `<circle cx="${x(a)}" cy="${cy}" r="6" fill="var(--series-1)" stroke="var(--surface-1)" stroke-width="2"><title>${MNAME[r.model] || r.model} 正常 ${a}%</title></circle>`;
+    s += `<circle cx="${x(b)}" cy="${cy}" r="5" fill="var(--surface-1)" stroke="var(--series-2)" stroke-width="2"><title>${MNAME[r.model] || r.model} 全涂黑 ${b}%</title></circle>`;
+    s += `<text class="val" x="${x(a)}" y="${cy - 11}" text-anchor="middle">${a}</text><text class="val" x="${x(b) + (b < 8 ? 12 : 0)}" y="${cy - 11}" text-anchor="middle">${b}</text>`;
+  });
+  svg.setAttribute("width", W); svg.setAttribute("height", H); svg.innerHTML = s;
+  const p0 = S.find(r => r.model === "pi0"), T = window.LIBERO_TASKS || [];
+  if (p0) {
+    let h = `<thead><tr><th></th>${T.map(n => `<th><div class="colh">${n}</div></th>`).join("")}</tr></thead><tbody>`;
+    for (const [lab, arr] of [["正常", p0.normal], ["全涂黑", p0.black]]) {
+      h += `<tr><th class="row">${lab}</th>` + arr.map((v, i) => { const [bg, fg] = cellColor(Math.max(50, v * 10)); return `<td style="background:${v * 10 < 50 ? "var(--grid)" : bg};color:${v * 10 < 50 ? "var(--text-primary)" : fg}" title="π0 ${lab} · ${T[i]}:${v}/10">${v}</td>`; }).join("") + "</tr>";
+    }
+    $("bmatrix").innerHTML = h + "</tbody>";
+  }
+}
+let bcur = BO.runs[0]?.id;
+function drawBVideos() {
+  $("bfilters").innerHTML = BO.runs.map(r => `<button class="chip" data-id="${r.id}" aria-pressed="${r.id === bcur}">${r.model} · 全涂黑 ${fmt(r.pc)}</button>`).join("");
+  $("bfilters").querySelectorAll(".chip").forEach(b => b.onclick = () => { bcur = b.dataset.id; drawBVideos(); });
+  const r = BO.runs.find(x => x.id === bcur);
+  if (!r || !r.videos?.length) { $("bvideos").innerHTML = `<p class="pending">没有回放视频。</p>`; return; }
+  $("bvideos").innerHTML = `<div class="grid">` + r.videos.map(v => `<div class="vid"><video src="${v.src}#t=0.1" controls muted loop playsinline preload="auto"></video>
+    <div class="meta"><span>${v.task} · 第 ${v.ep} 回合</span><span class="st ${v.success ? "ok" : "fail"}"><i>${v.success ? "✓" : "✗"}</i>${v.success ? "成功" : "失败"}</span></div></div>`).join("") + `</div>`;
+}
+
+// ---- 进一步实验
+const FU = window.FOLLOWUP || {};
+function drawFollowup() {
+  const F = FU.finetune || [], svg = $("ftchart");
+  if (svg && F.length) {
+    const W = svg.parentNode.clientWidth, labelW = Math.min(200, W * 0.34), padR = 24, rowH = 44, top = 20, axisH = 26;
+    const H = top + rowH * F.length + axisH, x = v => labelW + (W - labelW - padR) * v / 100;
+    let s = "";
+    for (let v = 0; v <= 100; v += 25) s += `<line x1="${x(v)}" x2="${x(v)}" y1="${top - 8}" y2="${H - axisH}" stroke="var(--grid)"/><text x="${x(v)}" y="${H - 8}" text-anchor="middle">${v}%</text>`;
+    F.forEach((r, i) => {
+      if (r.normal == null || r.black == null) return;
+      const cy = top + rowH * i + rowH / 2 - 8;
+      s += `<text class="lbl" x="0" y="${cy + 4}">${r.name}</text>`;
+      s += `<line x1="${x(r.black)}" x2="${x(r.normal)}" y1="${cy}" y2="${cy}" stroke="var(--border)" stroke-width="2"/>`;
+      s += `<circle cx="${x(r.normal)}" cy="${cy}" r="6" fill="var(--series-1)" stroke="var(--surface-1)" stroke-width="2"><title>${r.name} 正常 ${r.normal}%(${r.note})</title></circle>`;
+      s += `<circle cx="${x(r.black)}" cy="${cy}" r="5" fill="var(--surface-1)" stroke="var(--series-2)" stroke-width="2"><title>${r.name} 全涂黑 ${r.black}%</title></circle>`;
+      s += `<text class="val" x="${x(r.normal)}" y="${cy - 11}" text-anchor="middle">${r.normal}</text><text class="val" x="${x(r.black)}" y="${cy - 11}" text-anchor="middle">${r.black}</text>`;
+    });
+    svg.setAttribute("width", W); svg.setAttribute("height", H); svg.innerHTML = s;
+  }
+  const PT = Object.fromEntries((FU.perturb || []).map(r => [r.model, r]));
+  const C = (FU.cam || []).map(r => ({ ...PT[r.model], ...r }));
+  const cols = [["normal", "正常"], ["noise", "加高斯噪声"], ["freeze", "冻结首帧"], ["agent_black", "只涂主视角"], ["wrist_black", "只涂腕部"], ["all_black", "全涂黑"]];
+  if (C.length) {
+    let h = `<thead><tr><th></th>${cols.map(c => `<th>${c[1]}</th>`).join("")}</tr></thead><tbody>`;
+    for (const r of C) {
+      h += `<tr><th class="row">${MNAME[r.model] || r.model}</th>` + cols.map(([k, lab]) => {
+        const v = r[k];
+        if (v == null) return `<td class="na">在跑</td>`;
+        const [bg, fg] = cellColor(Math.max(50, v));
+        return `<td style="background:${v < 50 ? "var(--grid)" : bg};color:${v < 50 ? "var(--text-primary)" : fg}" title="${MNAME[r.model] || r.model} · ${lab}:${v}/100">${v}</td>`;
+      }).join("") + "</tr>";
+    }
+    $("cammatrix").innerHTML = h + "</tbody>";
+  }
+  const T = FU.traj;
+  if (T) {
+    const RN = { traj_pi0_normal: "π0 正常", traj_pi0_normal2: "π0 正常(重跑)", traj_pi0_black: "π0 全涂黑", traj_pi05_normal: "π0.5 正常" };
+    let h = `<table><thead><tr><th>对比</th><th>路线差异(DTW)</th><th>抓取点距离</th></tr></thead><tbody>` +
+      Object.entries(T.pairs).map(([k, v]) => `<tr><td>${k}</td><td>${v.dtw_mean.toFixed(2)}</td><td>${v.grasp_dist_mean.toFixed(2)}</td></tr>`).join("") + `</tbody></table>`;
+    h += `<table style="margin-top:10px"><thead><tr><th>抓取点离散度(同任务 10 回合)</th><th>平均</th></tr></thead><tbody>` +
+      Object.entries(T.grasp_spread).map(([k, arr]) => { const a = arr.filter(x => x === x); return `<tr><td>${RN[k] || k}</td><td>${(a.reduce((p, q) => p + q, 0) / a.length).toFixed(2)}</td></tr>`; }).join("") + `</tbody></table>`;
+    $("trajtbl").innerHTML = h;
+  }
+}
+
+// 回放视频体积大、不随仓库发布;加载不到时整块换成说明,而不是一排空播放器
+addEventListener("error", e => {
+  const box = e.target.tagName === "VIDEO" && e.target.closest("#videos, #bvideos");
+  if (box) box.innerHTML = `<p class="pending">回放视频未随仓库发布(体积大)。在本地把评测输出的 videos/ 放到 dashboard/data/&lt;run&gt;/ 下即可在此播放。</p>`;
+}, true);
+
+drawChart(); drawMatrix(); drawVideos(); drawBlackout(); drawBVideos(); drawFollowup();
+addEventListener("resize", () => { drawChart(); drawBlackout(); drawFollowup(); });
+</script>
+</body>
+</html>

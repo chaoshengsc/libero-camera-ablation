@@ -1,0 +1,11 @@
+cff-version: 1.2.0
+message: "如果这个仓库对你有帮助,可以按下面的信息引用。"
+title: "robot-policy-sim-repro: 6 个机器人策略的 MuJoCo 仿真复现与视觉依赖实验"
+type: software
+authors:
+  - name: "ShengChao"
+repository-code: "https://github.com/chaoshengsc/robot-policy-sim-repro"
+url: "https://chaoshengsc.github.io/robot-policy-sim-repro/dashboard/"
+license: MIT
+version: "1.0"
+date-released: "2026-10-01"

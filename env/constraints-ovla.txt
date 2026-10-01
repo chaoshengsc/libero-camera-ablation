@@ -1,0 +1,7 @@
+torch==2.2.0
+torchvision==0.17.0
+torchaudio==2.2.0
+numpy<2
+mujoco==3.3.2
+tensorflow-metadata==1.17.1
+protobuf==4.21.12

@@ -1,0 +1,7 @@
+model,task,checkpoint,episodes,success_pc,ci95,baseline_pc,baseline_source,reproduced
+ACT,ALOHA Transfer Cube,lerobot/act_aloha_sim_transfer_cube_human@ba73b276,500,83.2,3.3,83.0,HF 仓库自带 eval_info.json(500 回合),1
+OpenVLA,LIBERO-Spatial,openvla/openvla-7b-finetuned-libero-spatial@962318ce,500,86.2,3.0,84.7,"openvla README(3 种子 × 500 回合,A100)",1
+SmolVLA,LIBERO-Spatial,HuggingFaceVLA/smolvla_libero@6721902b,500,75.2,3.8,90.0,"SmolVLA 论文 Table 2(每任务 10 次);公开权重与论文结构不同,社区同权重实测约 82%",0
+π0.5,LIBERO-Spatial,lerobot/pi05_libero_finetuned_v044@8e174154,500,98.0,1.2,98.8,OpenPI LIBERO README(LeRobot 文档复现为 97.0%),1
+π0,LIBERO-Spatial,lerobot/pi0_libero_finetuned_v044@45dcc8fc,500,73.4,3.9,96.8,"OpenPI LIBERO README 旧版(commit c015073f,π0 @30k)",0
+Diffusion Policy,PushT,lerobot/diffusion_pusht@84a7c231,500,63.0,4.2,65.4,LeRobot 模型卡(500 回合;原版 DP 仓库同等模型 64.2%),1

@@ -1,0 +1,18 @@
+# 大文件与受许可约束的内容不入库(media/ 下的展示视频除外)
+*.mp4
+!media/*.mp4
+*.mjb
+*.npz
+*.pdf
+*.safetensors
+*.ckpt
+dashboard/data/**/videos/
+paligemma_tok/
+
+# 本地环境与缓存
+.venv*/
+__pycache__/
+*.pyc
+.DS_Store
+.pytest_cache/
+.ruff_cache/
