@@ -23,8 +23,8 @@ def per_task(run, first=None):
 
 
 def test_reproduction_csv_matches_raw_eval_info():
-    runs = {"ACT": "act_cube_500", "OpenVLA": "openvla_spatial_500", "SmolVLA": "smolvla_hfvla_500",
-            "π0.5": "pi05_spatial_500", "π0": "pi0_spatial_500", "Diffusion Policy": "dp_pusht_500"}
+    runs = {"ACT": "act_cube_500", "OpenVLA": "openvla_spatial_500", "SmolVLA": "smolvla2_spatial_500",
+            "π0.5": "pi05_spatial_500", "Diffusion Policy": "dp_pusht_500"}
     rs = rows("reproduction.csv")
     assert {r["model"] for r in rs} == set(runs)
     for r in rs:
@@ -78,15 +78,11 @@ def test_perturbations_csv_matches_raw_and_readme():
         assert all(line in md for md in READMES), line
 
 
-def test_finetune_csv_matches_raw_eval_info():
-    rs = {r["model"]: r for r in rows("finetune_statedrop.csv")}
-    for name, run in (("finetuned_control", "eval_ft_p0"), ("finetuned_state_zeroing", "eval_ft_p05")):
-        assert int(rs[name]["normal"]) == sum(per_task(f"{run}_normal"))
-        assert int(rs[name]["all_black"]) == sum(per_task(f"{run}_black"))
-    assert (int(rs["original"]["normal"]), int(rs["original"]["all_black"])) == (sum(per_task("pi0_spatial_500", 10)), sum(per_task("pi0_black_all")))
-    # README 2.4 的"额外下降":对照组 17、置零组 28
-    drop = {k: int(r["normal"]) - int(r["all_black"]) for k, r in rs.items()}
-    assert (drop["finetuned_control"], drop["finetuned_state_zeroing"]) == (17, 28)
+def test_section2_checkpoint_rates_in_readme():
+    """README 第 2 节注明的两个权重的 500 回合成功率:π0 73.4%、HuggingFaceVLA 的 SmolVLA 75.2%。"""
+    for run, pc in (("pi0_spatial_500", "73.4%"), ("smolvla_hfvla_500", "75.2%")):
+        s = per_task(run)
+        assert f"{sum(s) / 5:.1f}%" == pc and all(pc in md for md in READMES)
 
 
 def test_trajectory_summary_numbers_in_readme():

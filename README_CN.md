@@ -1,6 +1,6 @@
 # 机器人策略真的在看画面吗?
 
-**在仿真中复现 6 个开源机器人策略(5 个在 MuJoCo,Diffusion Policy 在 2D 的 PushT),再测试每个策略有多依赖视觉。**
+**在仿真中复现 5 个开源机器人策略(4 个在 MuJoCo,Diffusion Policy 在 2D 的 PushT),再测试 LIBERO 上的策略有多依赖视觉。**
 
 [![CI](https://github.com/chaoshengsc/robot-policy-sim-repro/actions/workflows/ci.yml/badge.svg)](https://github.com/chaoshengsc/robot-policy-sim-repro/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
@@ -13,9 +13,9 @@
   <br><sub>同一任务、同一初始状态。视频是仿真器里实际发生的情况;右边两次运行中,策略收到的是全黑图像。</sub>
 </p>
 
-- **复现。** ACT、OpenVLA、π0.5、Diffusion Policy 的成功率复现到基准的抽样误差范围内;π0 和 SmolVLA 的公开权重没有(73% 对 97%,75% 对 90%)。
-- **视觉依赖。** 把所有相机画面换成全黑后,π0.5、OpenVLA、SmolVLA 降到 0%,π0 仍有 56%。
-- **原因。** π0 对主视角相机测不出依赖,画面冻结后也只小幅下降。在它看不见仍能完成的任务上,它走的路线和看得见时的差别,不比两次正常运行之间的差别大。微调时把机械臂状态随机置零,全涂黑的成功率从 61% 降到 40%。
+- **复现。** ACT、OpenVLA、SmolVLA、π0.5、Diffusion Policy 的成功率复现到基准的抽样误差范围内。
+- **视觉依赖。** 把所有相机画面换成全黑后,π0.5、OpenVLA、SmolVLA 降到 0%,LeRobot 的公开 π0 权重仍有 56%。
+- **原因。** π0 对主视角相机测不出依赖,画面冻结后也只小幅下降。在它看不见仍能完成的任务上,它走的路线和看得见时的差别,不比两次正常运行之间的差别大。
 
 全部在一台工作站上完成(RTX A5000 24 GB,Ubuntu 24.04,EGL 无头渲染),只用公开权重;所有改动都是包装脚本,不改上游源码。
 
@@ -29,33 +29,30 @@
 |---|---|---|---|---|
 | ACT | ALOHA Transfer Cube | **83.2%** | 83.0%(Hugging Face 仓库) | ✅ |
 | OpenVLA | LIBERO-Spatial | **86.2%** | 84.7 ± 0.9%(官方 README) | ✅ |
+| SmolVLA | LIBERO-Spatial | **85.4%** | 90%(论文,100 回合) | ✅ |
 | π0.5 | LIBERO-Spatial | **98.0%** | 98.8%(OpenPI),97.0%(LeRobot) | ✅ |
 | Diffusion Policy | PushT(2D,非 MuJoCo) | **63.0%** | 65.4%(LeRobot 模型卡) | ✅ |
-| SmolVLA | LIBERO-Spatial | 75.2% | 90%(论文) | ❌ |
-| π0 | LIBERO-Spatial | 73.4% | 96.8%(OpenPI) | ❌ |
 
-500 回合的 95% 置信区间为 ±1–4 个百分点。"复现"指两个区间有重叠。
+500 回合的 95% 置信区间为 ±1–4 个百分点。"复现"指两个区间有重叠。SmolVLA 用的是 `lerobot/smolvla_libero`,评测时 `n_action_steps=10`;这个权重只在 LIBERO-Spatial 上训练,论文是四个 LIBERO 套件一起训练。
 
 <p align="center"><img src="media/act_transfer_cube_success.gif" width="320" alt="ACT 的一个成功回合"><br><sub>ACT · ALOHA Transfer Cube:右臂抓起方块交给左臂。</sub></p>
 
-两个没复现的原因:
-
-- **π0。** 基准数字是 OpenPI 自己训练的权重。这里用的 LeRobot 公开权重训练不足(维护者已确认),社区对同一权重的实测也是 73%。
-- **SmolVLA。** 公开权重和论文的结构不同(expert 宽度 0.5、VLM 32 层,论文是 0.75、16 层)。社区对同一权重的实测约 82%;这里的结果仍比它低 7 个百分点,原因还没找到。batch size 和 `n_action_steps` 已排除。
-
-π0 的 `n_action_steps` 取 5、10、50 时,成功率分别是 76%、70%、68%(各 100 回合),差异在误差内。
-
-各任务明细在[看板](https://chaoshengsc.github.io/robot-policy-sim-repro/dashboard/?lang=zh)上(回放视频体积大,没有发布;本地有视频文件时看板可以播放);基准出处与排查过程见 [`docs/NOTES_CN.md`](docs/NOTES_CN.md)。
+各任务明细在[看板](https://chaoshengsc.github.io/robot-policy-sim-repro/dashboard/?lang=zh)上(回放视频体积大,没有发布;本地有视频文件时看板可以播放);基准出处与完整的实验记录见 [`docs/NOTES_CN.md`](docs/NOTES_CN.md)。
 
 ## 2. 策略有没有在用相机?
 
-LIBERO 上的策略收到两路相机画面、机械臂状态(末端位姿与夹爪开合)和一句任务指令。OpenVLA 例外,它只用主视角画面和指令。下面每个实验只改其中一项输入。
+LIBERO 上的策略收到两路相机画面、机械臂状态(末端位姿与夹爪开合)和一句任务指令。OpenVLA 例外,它只用主视角画面和指令。下面每个实验改的都是相机输入。
 
 ![策略的输入,以及各实验改了哪一项](media/zh/inputs.svg)
 
 本节所有数字都是 100 回合的成功率(10 个任务 × 10 个初始状态,各条件用同一个种子)。单个数字的 95% 置信区间最宽约 ±10 个百分点,所以两个条件要相差约 13 个百分点以上才有意义。同一任务的回合彼此相关,这些区间是偏乐观的。
 
-"正常"一列取自第 1 节 500 回合评测里每个任务的前 10 回合,所以和那张表略有出入。为 2.3 节另外跑的两次 π0 正常评测分别是 73% 和 76%。
+其中两个权重需要说明:
+
+- **π0** 是 LeRobot 的公开权重 `lerobot/pi0_libero_finetuned_v044`。它 500 回合的正常成功率是 73.4%,远低于 OpenPI 对自家 π0 权重报告的 96.8%,LeRobot 维护者也说过它训练不足(lerobot issue #2114)。下面描述的是这个权重,不代表所有 π0。
+- **SmolVLA** 在本节是 `HuggingFaceVLA/smolvla_libero`(500 回合 75.2%),和第 1 节不是同一个权重。
+
+"正常"一列取自各模型 500 回合评测里每个任务的前 10 回合。为 2.3 节另外跑的两次 π0 正常评测分别是 73% 和 76%。
 
 ### 2.1 把所有相机涂黑
 
@@ -107,20 +104,6 @@ LIBERO 上的策略收到两路相机画面、机械臂状态(末端位姿与夹
 
 数据真正说明的是这个基准要求很低:LIBERO-Spatial 同一任务内,看得见的 π0 在不同初始状态下的抓取点只相差约 1.8 cm,和它两次运行之间的噪声同一量级。一个跟着碗走的策略,和一个每个任务只重复一套动作的策略,在这里看起来是一样的。完整的分任务数字见 [`results/trajectory.csv`](results/trajectory.csv)。
 
-### 2.4 训练能让 π0 去看画面吗?
-
-从公开的 π0 权重继续训练 3000 步(batch 16,只训动作专家,约为原训练量的 15%)。改动组训练时对 50% 的样本把 `observation.state` 置零。
-
-| 模型 | 正常 | 全涂黑 |
-|---|---|---|
-| 原始 π0 | 76% | 56% |
-| 继续微调,对照组 | 78% | 61% |
-| 继续微调,状态置零 | 68% | **40%** |
-
-状态置零让全涂黑的成功率从 61% 降到 40%(z ≈ 3.0,p ≈ 0.003)。正常成功率也降了,从 78% 到 68%(p ≈ 0.11,不显著)。涂黑带来的额外下降是 11 个百分点(对照组掉 17,置零组掉 28),在这个样本量下处于显著的边缘(按任务配对,t ≈ 2.2,p ≈ 0.06)。两组各只训练了一次。
-
-这个结果与"模型变得更依赖视觉"相符,但还不足以确立。第一次去掉状态时训练损失从 0.145 跳到 0.835,提示原来的 π0 对这项输入依赖很重。
-
 ## 快速开始
 
 ```bash
@@ -147,7 +130,7 @@ python3 dashboard/build.py && python3 scripts/analysis/make_figures.py
 
 ```
 scripts/eval/      评测入口;涂黑、扰动、轨迹记录的包装脚本
-scripts/train/     π0 状态置零微调与全自动流水线
+scripts/train/     π0 状态置零微调(实验记录见 docs/NOTES_CN.md)
 scripts/analysis/  指标、汇总、出图
 scripts/checks/    GPU、EGL 无头渲染、视频解码自检
 results/           由 dashboard/data 生成的结果表(CSV),以及 2.3 节画图用的轨迹
@@ -164,8 +147,7 @@ viewer/            在本地用 MuJoCo 交互查看器回放策略轨迹
 - 只用了一个基准套件(LIBERO-Spatial)和一个种子。同一任务内场景变化很小,这本身就是 2.3 的发现之一。
 - 视觉依赖实验每个条件 100 回合,约 13 个百分点以内的差异没有意义。
 - π0 的公开权重训练不足,训练充分的 π0 表现可能不同。
-- SmolVLA 与社区数字的差距原因未明。
-- 2.4 的微调训练量小,只训了动作专家,且每组只训练了一次。
+- 第 1 节和第 2 节用的 SmolVLA 权重不是同一个。
 - Diffusion Policy 评测的是 PushT(2D 物理),不在 MuJoCo 里。
 
 ## 致谢与许可证
@@ -181,7 +163,7 @@ viewer/            在本地用 MuJoCo 交互查看器回放策略轨迹
 | [Diffusion Policy](https://github.com/real-stanford/diffusion_policy)、[ACT](https://github.com/tonyzhaozh/act) | 原始方法 | MIT |
 | [MuJoCo](https://github.com/google-deepmind/mujoco)、[gym-aloha](https://github.com/huggingface/gym-aloha)、[gym-pusht](https://github.com/huggingface/gym-pusht) | 仿真 | Apache-2.0 |
 
-权重:`lerobot/act_aloha_sim_transfer_cube_human`、`openvla/openvla-7b-finetuned-libero-spatial`、`HuggingFaceVLA/smolvla_libero`、`lerobot/pi05_libero_finetuned_v044`、`lerobot/pi0_libero_finetuned_v044`、`lerobot/diffusion_pusht`,具体 commit 见 [`results/reproduction.csv`](results/reproduction.csv)。各权重有自己的许可证。π0 的分词器来自受限仓库 `google/paligemma-3b-pt-224`,受 Gemma 条款约束,本仓库不包含。
+权重:`lerobot/act_aloha_sim_transfer_cube_human`、`openvla/openvla-7b-finetuned-libero-spatial`、`lerobot/smolvla_libero`、`HuggingFaceVLA/smolvla_libero`、`lerobot/pi05_libero_finetuned_v044`、`lerobot/pi0_libero_finetuned_v044`、`lerobot/diffusion_pusht`,具体 commit 见 [`results/reproduction.csv`](results/reproduction.csv) 和 [`docs/NOTES_CN.md`](docs/NOTES_CN.md)。各权重有自己的许可证。π0 的分词器来自受限仓库 `google/paligemma-3b-pt-224`,受 Gemma 条款约束,本仓库不包含。
 
 论文:[ACT](https://arxiv.org/abs/2304.13705) · [Diffusion Policy](https://arxiv.org/abs/2303.04137) · [OpenVLA](https://arxiv.org/abs/2406.09246) · [LIBERO](https://arxiv.org/abs/2306.03310) · [SmolVLA](https://arxiv.org/abs/2506.01844) · [π0](https://arxiv.org/abs/2410.24164) · [π0.5](https://arxiv.org/abs/2504.16054)
 

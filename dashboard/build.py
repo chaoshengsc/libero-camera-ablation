@@ -18,16 +18,13 @@ RUNS = [
     {"id": "openvla_spatial_500", "model": "OpenVLA", "task": "LIBERO-Spatial", "sim": "MuJoCo",
      "checkpoint": "openvla/openvla-7b-finetuned-libero-spatial@962318ce",
      "baseline_pc": 84.7, "baseline_pm": 0.9, "baseline_src": "openvla README(3 种子 × 500 回合,A100)"},
-    {"id": "smolvla_hfvla_500", "model": "SmolVLA", "task": "LIBERO-Spatial", "sim": "MuJoCo",
-     "checkpoint": "HuggingFaceVLA/smolvla_libero@6721902b",
+    {"id": "smolvla2_spatial_500", "model": "SmolVLA", "task": "LIBERO-Spatial", "sim": "MuJoCo",
+     "checkpoint": "lerobot/smolvla_libero@31d453f7",
      "baseline_pc": 90.0, "baseline_n": 100,
-     "baseline_src": "SmolVLA 论文 Table 2(每任务 10 次);公开权重与论文结构不同,社区同权重实测约 82%"},
+     "baseline_src": "SmolVLA 论文 Table 2(每任务 10 次);该权重只在 LIBERO-Spatial 上训练,评测用 n_action_steps=10"},
     {"id": "pi05_spatial_500", "model": "π0.5", "task": "LIBERO-Spatial", "sim": "MuJoCo",
      "checkpoint": "lerobot/pi05_libero_finetuned_v044@8e174154",
      "baseline_pc": 98.8, "baseline_src": "OpenPI LIBERO README(LeRobot 文档复现为 97.0%)"},
-    {"id": "pi0_spatial_500", "model": "π0", "task": "LIBERO-Spatial", "sim": "MuJoCo",
-     "checkpoint": "lerobot/pi0_libero_finetuned_v044@45dcc8fc",
-     "baseline_pc": 96.8, "baseline_src": "OpenPI LIBERO README 旧版(commit c015073f,π0 @30k)"},
     {"id": "dp_pusht_500", "model": "Diffusion Policy", "task": "PushT", "sim": "2D(pymunk)",
      "checkpoint": "lerobot/diffusion_pusht@84a7c231",
      "baseline_pc": 65.4, "baseline_n": 500, "baseline_src": "LeRobot 模型卡(500 回合;原版 DP 仓库同等模型 64.2%)"},
@@ -111,7 +108,7 @@ BLACKOUT_RUNS = [
 blackout = {"summary": json.loads((ROOT / "data" / "B_summary.json").read_text()),
             "runs": [dict(r, **load(r)) for r in BLACKOUT_RUNS]}
 
-# 后续实验:末端轨迹、单路涂黑、温和扰动、状态置零继续微调(缺文件直接报错)
+# 后续实验:末端轨迹、单路涂黑、温和扰动(缺文件直接报错)
 def _json(name):
     return json.loads((ROOT / "data" / name).read_text())
 
@@ -129,11 +126,6 @@ followup = {
                 for m, base, k, black in PERTURB],
     "traj": _json("traj_analyze.json"),
     "cam": _json("cam_summary.json"),
-    "finetune": [
-        {"name": "原始 π0", "normal": _n("pi0_spatial_500", 10), "black": _n("pi0_black_all"), "note": "同一评测协议"},
-        {"name": "继续微调 · 对照(p=0)", "normal": _n("eval_ft_p0_normal"), "black": _n("eval_ft_p0_black"), "note": "3000 步,batch 16,只训动作专家"},
-        {"name": "继续微调 · 状态置零(p=0.5)", "normal": _n("eval_ft_p05_normal"), "black": _n("eval_ft_p05_black"), "note": "同上,训练时按样本 50% 置零 observation.state"},
-    ],
 }
 
 (ROOT / "results.js").write_text("window.RESULTS = " + json.dumps(rows, ensure_ascii=False, indent=1) + ";\n"

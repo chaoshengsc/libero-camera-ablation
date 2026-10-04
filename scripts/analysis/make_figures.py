@@ -31,7 +31,7 @@ TXT = {
         "in_title": "What the policy receives, and what each experiment changes",
         "in_agent": "Agent-view camera", "in_wrist": "Wrist camera", "in_state": "Robot state", "in_lang": "Instruction",
         "in_policy": "Policy", "in_action": "Action",
-        "in_img_note": "evaluation: black / noise / frozen", "in_state_note": "training: zeroed for 50% of samples",
+        "in_img_note": "black / noise / frozen", "in_state_note": "unchanged",
         "in_lang_note": "unchanged", "in_sub_state": "end-effector pose and gripper opening", "in_sub_lang": "“pick up the black bowl …”",
     },
     "zh": {
@@ -48,7 +48,7 @@ TXT = {
         "in_title": "策略收到什么输入,各实验改了哪一项",
         "in_agent": "主视角相机", "in_wrist": "腕部相机", "in_state": "机械臂状态", "in_lang": "任务指令",
         "in_policy": "策略", "in_action": "动作",
-        "in_img_note": "评测时:涂黑 / 加噪声 / 冻结", "in_state_note": "训练时:50% 样本置零",
+        "in_img_note": "涂黑 / 加噪声 / 冻结", "in_state_note": "不改",
         "in_lang_note": "不改", "in_sub_state": "末端位姿与夹爪开合", "in_sub_lang": "“把黑碗拿起来放到……”",
     },
 }
@@ -56,7 +56,6 @@ COND_KEYS = ["normal", "noise", "freeze", "agent_black", "wrist_black", "all_bla
 COND_COL = ["#9ca3af", "#86efac", "#14b8a6", "#60a5fa", "#f59e0b", "#111827"]
 TRAJ_TASKS = [4, 7]  # 轨迹图展示的任务:一个全涂黑仍成功的,一个全涂黑后失败的
 PAIR_IDS = ["pi0_normal_vs_rerun", "pi0_all_black_vs_normal", "pi05_vs_pi0_normal"]  # 与 traj_analyze.json 里 pairs 的顺序一致
-FT_IDS = ["original", "finetuned_control", "finetuned_state_zeroing"]
 SRC_EN = {"ACT": "eval_info.json shipped in the Hugging Face repo (500 episodes)", "OpenVLA": "openvla README (3 seeds x 500 episodes)",
           "SmolVLA": "SmolVLA paper, Table 2 (10 episodes per task)", "π0.5": "OpenPI LIBERO README",
           "π0": "OpenPI LIBERO README at commit c015073f (π0 @30k)", "Diffusion Policy": "LeRobot model card (500 episodes)"}
@@ -109,8 +108,10 @@ def fig_reproduction(rows, t):
     out = [title(t["rep_title"]),
            f'<circle cx="26" cy="46" r="5" fill="{BLUE}"/><text x="38" y="50" fill="{MUTED}">{t["rep_ours"]}</text>',
            f'<path d="M{lx2:.0f} 40 l6 6 l-6 6 l-6 -6 z" fill="none" stroke="{INK}" stroke-width="1.6"/>'
-           f'<text x="{lx2 + 14:.0f}" y="50" fill="{MUTED}">{t["rep_ref"]}</text>',
-           f'<circle cx="{lx3:.0f}" cy="46" r="5" fill="{RED}"/><text x="{lx3 + 12:.0f}" y="50" fill="{MUTED}">{t["rep_fail"]}</text>']
+           f'<text x="{lx2 + 14:.0f}" y="50" fill="{MUTED}">{t["rep_ref"]}</text>'
+]
+    if not all(reproduced(r) for r in rows):
+        out.append(f'<circle cx="{lx3:.0f}" cy="46" r="5" fill="{RED}"/><text x="{lx3 + 12:.0f}" y="50" fill="{MUTED}">{t["rep_fail"]}</text>')
     for v in range(50, 101, 10):
         out.append(f'<line x1="{x(v):.1f}" y1="{top}" x2="{x(v):.1f}" y2="{h - 40}" stroke="{GRID}"/>')
         out.append(f'<text x="{x(v):.1f}" y="{h - 22}" text-anchor="middle" fill="{MUTED}">{v}%</text>')
@@ -208,7 +209,7 @@ def fig_trajectory(trajs, t):
 def fig_inputs(t):
     w, h, bx, bw, bh = 760, 300, 30, 330, 46
     rows = [("in_agent", None, "in_img_note", ORANGE), ("in_wrist", None, "in_img_note", ORANGE),
-            ("in_state", "in_sub_state", "in_state_note", VIOLET), ("in_lang", "in_sub_lang", "in_lang_note", MUTED)]
+            ("in_state", "in_sub_state", "in_state_note", MUTED), ("in_lang", "in_sub_lang", "in_lang_note", MUTED)]
     px, py, pw, ph = 500, 106, 120, 110
     out = [title(t["in_title"]),
            '<defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">'
@@ -245,7 +246,6 @@ if __name__ == "__main__":
     for metric, by, mean in (("path_dtw_cm", "dtw_by_task", "dtw_mean"), ("grasp_distance_cm", "grasp_dist_by_task", "grasp_dist_mean")):
         rows += [[metric, pid] + [round(x, 2) for x in v[by]] + [round(v[mean], 2)] for pid, v in zip(PAIR_IDS, fu["traj"]["pairs"].values(), strict=True)]
     write_csv("trajectory.csv", ["metric", "pair"] + tasks + ["all"], rows)
-    write_csv("finetune_statedrop.csv", ["model", "normal", "all_black"], [[i, f["normal"], f["black"]] for i, f in zip(FT_IDS, fu["finetune"], strict=True)])
     traj = [json.loads((RES / f"trajectories_task{i}.json").read_text()) for i in TRAJ_TASKS]
     for lang, out in (("en", MEDIA), ("zh", MEDIA / "zh")):
         t = TXT[lang]

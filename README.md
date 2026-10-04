@@ -1,6 +1,6 @@
 # Do robot policies actually use their cameras?
 
-**Reproducing six open-source robot policies in simulation (five in MuJoCo, Diffusion Policy on 2-D PushT), then testing how much each one relies on vision.**
+**Reproducing five open-source robot policies in simulation (four in MuJoCo, Diffusion Policy on 2-D PushT), then testing how much LIBERO policies rely on vision.**
 
 [![CI](https://github.com/chaoshengsc/robot-policy-sim-repro/actions/workflows/ci.yml/badge.svg)](https://github.com/chaoshengsc/robot-policy-sim-repro/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
@@ -13,9 +13,9 @@ English | [中文](README_CN.md)
   <br><sub>Same task, same initial state. The videos show what happened in the simulator; in the two right-hand runs the policy itself received black images.</sub>
 </p>
 
-- **Reproduction.** ACT, OpenVLA, π0.5 and Diffusion Policy reproduce their reference success rates within sampling error. The public π0 and SmolVLA checkpoints do not (73% vs. 97%, 75% vs. 90%).
-- **Vision dependence.** With every camera image replaced by black frames, π0.5, OpenVLA and SmolVLA drop to 0%. π0 still succeeds 56% of the time.
-- **Why.** π0 shows no measurable dependence on the agent-view camera and loses little when the image is frozen. On the tasks it still solves blind, its path is as close to the sighted path as two sighted runs are to each other. Fine-tuning with the robot state randomly zeroed lowers its blind success from 61% to 40%.
+- **Reproduction.** ACT, OpenVLA, SmolVLA, π0.5 and Diffusion Policy reproduce their reference success rates within sampling error.
+- **Vision dependence.** With every camera image replaced by black frames, π0.5, OpenVLA and SmolVLA drop to 0%. The public LeRobot π0 checkpoint still succeeds 56% of the time.
+- **Why.** π0 shows no measurable dependence on the agent-view camera and loses little when the image is frozen. On the tasks it still solves blind, its path is as close to the sighted path as two sighted runs are to each other.
 
 Everything runs on one workstation (RTX A5000 24 GB, Ubuntu 24.04, headless EGL rendering), with public checkpoints and wrapper scripts that leave upstream source untouched.
 
@@ -29,33 +29,30 @@ Everything runs on one workstation (RTX A5000 24 GB, Ubuntu 24.04, headless EGL 
 |---|---|---|---|---|
 | ACT | ALOHA Transfer Cube | **83.2%** | 83.0% (Hugging Face repo) | ✅ |
 | OpenVLA | LIBERO-Spatial | **86.2%** | 84.7 ± 0.9% (official README) | ✅ |
+| SmolVLA | LIBERO-Spatial | **85.4%** | 90% (paper, 100 episodes) | ✅ |
 | π0.5 | LIBERO-Spatial | **98.0%** | 98.8% (OpenPI), 97.0% (LeRobot) | ✅ |
 | Diffusion Policy | PushT (2-D, not MuJoCo) | **63.0%** | 65.4% (LeRobot model card) | ✅ |
-| SmolVLA | LIBERO-Spatial | 75.2% | 90% (paper) | ❌ |
-| π0 | LIBERO-Spatial | 73.4% | 96.8% (OpenPI) | ❌ |
 
-The 95% confidence interval at 500 episodes is ±1–4 points. "Reproduced" means the intervals overlap.
+The 95% confidence interval at 500 episodes is ±1–4 points. "Reproduced" means the intervals overlap. SmolVLA uses `lerobot/smolvla_libero` with `n_action_steps=10`; this checkpoint was trained on LIBERO-Spatial only, while the paper trains on all four LIBERO suites.
 
 <p align="center"><img src="media/act_transfer_cube_success.gif" width="320" alt="A successful ACT episode"><br><sub>ACT on ALOHA Transfer Cube: the right arm picks up the cube and hands it to the left arm.</sub></p>
 
-Why two fall short:
-
-- **π0.** The reference number is for OpenPI's own checkpoint. A LeRobot maintainer has confirmed that the LeRobot checkpoint used here is under-trained, and the community reports 73% for it.
-- **SmolVLA.** The public checkpoint has a different architecture from the paper (expert width 0.5 and 32 VLM layers, vs. 0.75 and 16). The community reports about 82% for it; the result here is still 7 points below that, and the cause has not been found. Batch size and `n_action_steps` were ruled out.
-
-With `n_action_steps` set to 5, 10 and 50, π0 reaches 76%, 70% and 68% (100 episodes each), all within noise of each other.
-
-Per-task results are on the [dashboard](https://chaoshengsc.github.io/robot-policy-sim-repro/dashboard/). Replay videos are too large to publish; the dashboard plays them when the files are present locally. Sources and debugging history are in [`docs/NOTES.md`](docs/NOTES.md).
+Per-task results are on the [dashboard](https://chaoshengsc.github.io/robot-policy-sim-repro/dashboard/). Replay videos are too large to publish; the dashboard plays them when the files are present locally. Sources of the reference numbers and the full experiment log are in [`docs/NOTES.md`](docs/NOTES.md).
 
 ## 2. Do the policies use the camera?
 
-A LIBERO policy receives two camera images, the robot state (end-effector pose and gripper opening) and a language instruction. OpenVLA is the exception: it uses only the agent-view image and the instruction. Each experiment below changes one of these inputs.
+A LIBERO policy receives two camera images, the robot state (end-effector pose and gripper opening) and a language instruction. OpenVLA is the exception: it uses only the agent-view image and the instruction. Each experiment below changes the camera input.
 
 ![What the policy receives and what each experiment changes](media/inputs.svg)
 
 All numbers in this section are success rates over 100 episodes (10 tasks × 10 initial states, same seed for every condition). The 95% confidence interval of a single number is up to ±10 points, so two conditions have to differ by about 13 points before the difference means anything. Episodes of one task are correlated, which makes these intervals optimistic.
 
-The Normal column is the first 10 episodes per task of the 500-episode runs in section 1, which is why it differs slightly from that table. Two more normal π0 runs, made for section 2.3, gave 73% and 76%.
+Two of the checkpoints need a note:
+
+- **π0** is LeRobot's public checkpoint `lerobot/pi0_libero_finetuned_v044`. Over 500 normal episodes it scores 73.4%, well below the 96.8% that OpenPI reports for its own π0 checkpoint, and a LeRobot maintainer has said it is under-trained (lerobot issue #2114). What follows describes this checkpoint, not π0 in general.
+- **SmolVLA** here is `HuggingFaceVLA/smolvla_libero` (75.2% over 500 episodes), not the checkpoint in section 1.
+
+The Normal column is the first 10 episodes per task of each model's 500-episode run. Two more normal π0 runs, made for section 2.3, gave 73% and 76%.
 
 ### 2.1 Black out every camera
 
@@ -107,20 +104,6 @@ Averaged over all ten tasks, blind π0 looks twice as far from sighted π0 as th
 
 What the data do show is how little the benchmark asks. Within a LIBERO-Spatial task, sighted π0's grasp point varies by about 1.8 cm across initial states, the same order as its run-to-run noise. A policy that tracks the bowl and a policy that repeats one motion per task would look alike here. Full per-task numbers are in [`results/trajectory.csv`](results/trajectory.csv).
 
-### 2.4 Can training make π0 look?
-
-The public π0 checkpoint was fine-tuned for 3000 more steps (batch 16, action expert only, about 15% of the original training). The treatment group had `observation.state` zeroed for 50% of training samples.
-
-| Model | Normal | All cameras black |
-|---|---|---|
-| Original π0 | 76% | 56% |
-| Fine-tuned, control | 78% | 61% |
-| Fine-tuned, state zeroing | 68% | **40%** |
-
-State zeroing lowers blind success from 61% to 40% (z ≈ 3.0, p ≈ 0.003). Normal success also falls, from 78% to 68% (p ≈ 0.11, not significant). The extra drop when blind is 11 points (17 for the control, 28 with state zeroing), which is borderline at this sample size (paired by task, t ≈ 2.2, p ≈ 0.06). Each arm was trained once.
-
-This is consistent with a shift toward vision but does not establish it. The training loss jumps from 0.145 to 0.835 the first time the state is removed, which suggests the original π0 leaned heavily on that input.
-
 ## Quick start
 
 ```bash
@@ -147,7 +130,7 @@ python3 dashboard/build.py && python3 scripts/analysis/make_figures.py
 
 ```
 scripts/eval/      evaluation entry scripts; blackout, perturbation and trajectory-logging wrappers
-scripts/train/     π0 fine-tuning with state zeroing, and the automated pipeline
+scripts/train/     π0 fine-tuning with state zeroing (experiment recorded in docs/NOTES.md)
 scripts/analysis/  metrics, summaries, figure generation
 scripts/checks/    self-checks for GPU, headless EGL rendering and video decoding
 results/           result tables (CSV) generated from dashboard/data, and the trajectories plotted in 2.3
@@ -164,8 +147,7 @@ viewer/            replay a policy trajectory locally in the interactive MuJoCo 
 - One benchmark suite (LIBERO-Spatial) and one seed. The scene varies little within a task, which is itself part of the finding in 2.3.
 - The vision-dependence experiments use 100 episodes per condition, so differences under about 13 points are not meaningful.
 - The π0 checkpoint is under-trained. A properly trained π0 may behave differently.
-- The SmolVLA gap to the community number is unexplained.
-- Fine-tuning in 2.4 was short, trained the action expert only, and was run once per arm.
+- The SmolVLA checkpoint in section 1 differs from the one in section 2.
 - Diffusion Policy was evaluated on PushT (2-D physics), not in MuJoCo.
 
 ## Acknowledgements and licenses
@@ -181,7 +163,7 @@ This repository contains no model weights and no upstream source code. It builds
 | [Diffusion Policy](https://github.com/real-stanford/diffusion_policy), [ACT](https://github.com/tonyzhaozh/act) | original methods | MIT |
 | [MuJoCo](https://github.com/google-deepmind/mujoco), [gym-aloha](https://github.com/huggingface/gym-aloha), [gym-pusht](https://github.com/huggingface/gym-pusht) | simulation | Apache-2.0 |
 
-Checkpoints: `lerobot/act_aloha_sim_transfer_cube_human`, `openvla/openvla-7b-finetuned-libero-spatial`, `HuggingFaceVLA/smolvla_libero`, `lerobot/pi05_libero_finetuned_v044`, `lerobot/pi0_libero_finetuned_v044`, `lerobot/diffusion_pusht`. Exact commits are in [`results/reproduction.csv`](results/reproduction.csv). Each checkpoint has its own license. The π0 tokenizer comes from the gated `google/paligemma-3b-pt-224` repository under the Gemma terms and is not included.
+Checkpoints: `lerobot/act_aloha_sim_transfer_cube_human`, `openvla/openvla-7b-finetuned-libero-spatial`, `lerobot/smolvla_libero`, `HuggingFaceVLA/smolvla_libero`, `lerobot/pi05_libero_finetuned_v044`, `lerobot/pi0_libero_finetuned_v044`, `lerobot/diffusion_pusht`. Exact commits are in [`results/reproduction.csv`](results/reproduction.csv) and [`docs/NOTES.md`](docs/NOTES.md). Each checkpoint has its own license. The π0 tokenizer comes from the gated `google/paligemma-3b-pt-224` repository under the Gemma terms and is not included.
 
 Papers: [ACT](https://arxiv.org/abs/2304.13705) · [Diffusion Policy](https://arxiv.org/abs/2303.04137) · [OpenVLA](https://arxiv.org/abs/2406.09246) · [LIBERO](https://arxiv.org/abs/2306.03310) · [SmolVLA](https://arxiv.org/abs/2506.01844) · [π0](https://arxiv.org/abs/2410.24164) · [π0.5](https://arxiv.org/abs/2504.16054)
 

@@ -4,15 +4,15 @@
 <defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#6b7280"/></marker></defs>
 <rect x="30" y="50" width="330" height="46" rx="6" fill="#f9fafb" stroke="#e5e7eb" stroke-width="1.5"/>
 <text x="44" y="69" font-weight="600">Agent-view camera</text>
-<text x="44" y="86" font-size="12" fill="#ea580c" font-weight="600">evaluation: black / noise / frozen</text>
+<text x="44" y="86" font-size="12" fill="#ea580c" font-weight="600">black / noise / frozen</text>
 <path d="M360 73.0 L494 128" fill="none" stroke="#6b7280" stroke-width="1.3" marker-end="url(#a)"/>
 <rect x="30" y="110" width="330" height="46" rx="6" fill="#f9fafb" stroke="#e5e7eb" stroke-width="1.5"/>
 <text x="44" y="129" font-weight="600">Wrist camera</text>
-<text x="44" y="146" font-size="12" fill="#ea580c" font-weight="600">evaluation: black / noise / frozen</text>
+<text x="44" y="146" font-size="12" fill="#ea580c" font-weight="600">black / noise / frozen</text>
 <path d="M360 133.0 L494 150" fill="none" stroke="#6b7280" stroke-width="1.3" marker-end="url(#a)"/>
 <rect x="30" y="170" width="330" height="46" rx="6" fill="#f9fafb" stroke="#e5e7eb" stroke-width="1.5"/>
 <text x="44" y="189" font-weight="600">Robot state<tspan font-weight="400" font-size="11" fill="#6b7280">  end-effector pose and gripper opening</tspan></text>
-<text x="44" y="206" font-size="12" fill="#7c3aed" font-weight="600">training: zeroed for 50% of samples</text>
+<text x="44" y="206" font-size="12" fill="#6b7280" font-weight="600">unchanged</text>
 <path d="M360 193.0 L494 172" fill="none" stroke="#6b7280" stroke-width="1.3" marker-end="url(#a)"/>
 <rect x="30" y="230" width="330" height="46" rx="6" fill="#f9fafb" stroke="#e5e7eb" stroke-width="1.5"/>
 <text x="44" y="249" font-weight="600">Instruction<tspan font-weight="400" font-size="11" fill="#6b7280">  “pick up the black bowl …”</tspan></text>

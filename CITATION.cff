@@ -1,6 +1,6 @@
 cff-version: 1.2.0
 message: "If this repository is useful to you, please cite it as below."
-title: "robot-policy-sim-repro: reproducing six robot policies in simulation and testing their reliance on vision"
+title: "robot-policy-sim-repro: reproducing robot policies in simulation and testing their reliance on vision"
 type: software
 authors:
   - name: "ShengChao"

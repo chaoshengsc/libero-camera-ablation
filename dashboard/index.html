@@ -140,7 +140,7 @@ footer { margin-top: 80px; padding-top: 20px; border-top: 1px solid var(--border
   <header>
     <p class="eyebrow">robot-policy-sim-repro</p>
     <h1>机器人策略真的在看画面吗?</h1>
-    <p class="lede">在仿真中复现 6 个开源机器人策略的公开权重,再测试每个策略有多依赖视觉。</p>
+    <p class="lede">在仿真中复现 5 个开源机器人策略的公开权重,再测试策略有多依赖视觉。</p>
     <div class="keys" id="keys"></div>
   </header>
 
@@ -161,7 +161,7 @@ footer { margin-top: 80px; padding-top: 20px; border-top: 1px solid var(--border
         <div class="chart-wrap" id="chartWrap"><svg id="chart" role="img" aria-label="各模型成功率对比"></svg><div class="tip" id="tip"></div></div>
         <div id="tbl" class="hidden mx-wrap"></div>
       </div>
-      <p class="note">π0 的基准来自 OpenPI 自己训练的权重,这里用的 LeRobot 公开权重训练不足;SmolVLA 的公开权重与论文结构不同。把鼠标移到图上可以看基准出处。</p>
+      <p class="note">SmolVLA 用的是只在 LIBERO-Spatial 上训练的公开权重,评测时 n_action_steps=10。把鼠标移到图上可以看基准出处。</p>
     </div>
 
     <div class="block">
@@ -179,6 +179,7 @@ footer { margin-top: 80px; padding-top: 20px; border-top: 1px solid var(--border
     <h2>视觉依赖</h2>
     <p class="intro">LIBERO 上的策略收到两路相机画面、机械臂状态和一句任务指令。下面每个实验只改其中一项输入。</p>
     <p class="intro">每个条件 100 回合(10 个任务 × 10 个初始状态,同一个种子),两个条件要相差约 13 个百分点以上才有意义。</p>
+    <p class="intro">本节的 π0 是 LeRobot 的公开权重,正常成功率 73%(500 回合),低于 OpenPI 对自家权重报告的 96.8%;下面的现象属于这个权重。本节的 SmolVLA 是 HuggingFaceVLA/smolvla_libero(500 回合 75%),与上一节不是同一个权重。</p>
     <div class="block"><div class="fig"><img id="figInputs" alt="策略的输入,以及各实验改了哪一项"></div></div>
 
     <div class="block">
@@ -211,18 +212,6 @@ footer { margin-top: 80px; padding-top: 20px; border-top: 1px solid var(--border
       <p class="note">任务 0–3 的两次正常运行几乎重合,因为同一个种子下还没有分叉,不能反映噪声;噪声底线看任务 4–9(平均 3.4 cm)。全涂黑仍能成功的七个任务上,路线相差 2.8 cm。同一任务内抓取点只相差约 1.8 cm,所以这个基准分不出策略是跟着碗走,还是每个任务重复一套动作。</p>
     </div>
 
-    <div class="block">
-      <h3><span class="n">2.4</span>训练能让 π0 去看画面吗</h3>
-      <p class="take">微调时把机械臂状态随机置零,全涂黑的成功率从 61% 降到 40%。这与"更依赖视觉"相符,但证据还在显著的边缘。</p>
-      <div class="panel">
-        <div class="legend" style="margin-bottom:6px">
-          <span><svg width="14" height="14"><circle cx="7" cy="7" r="5" fill="var(--series-1)"/></svg>正常画面</span>
-          <span><svg width="14" height="14"><circle cx="7" cy="7" r="4" fill="none" stroke="var(--series-2)" stroke-width="2"/></svg>全涂黑</span>
-        </div>
-        <div class="chart-wrap"><svg id="ftchart" role="img" aria-label="继续微调前后正常与全涂黑成功率"></svg></div>
-      </div>
-      <p class="note">从公开的 π0 权重继续训练 3000 步(batch 16,只训动作专家),置零组对 50% 的训练样本把状态置零。全涂黑 61% 对 40%,p≈0.003;正常 78% 对 68%,p≈0.11,不显著。涂黑带来的额外下降是 11 个百分点(对照 17,置零 28),p≈0.06。两组各只训练了一次。</p>
-    </div>
   </section>
 
   <section id="replay">
@@ -247,9 +236,10 @@ const sum = (a) => a.reduce((p, q) => p + q, 0);
 // ---- 语言:默认跟随浏览器,?lang=zh|en 或右上角按钮切换。英文版在渲染后按词典替换文本(整句在前,短词在后)。
 const LANG = new URLSearchParams(location.search).get("lang") || ((navigator.language || "").toLowerCase().startsWith("zh") ? "zh" : "en");
 const DICT = [
-  ["在仿真中复现 6 个开源机器人策略的公开权重,再测试每个策略有多依赖视觉。", "Reproducing the public checkpoints of six open-source robot policies in simulation, then testing how much each one relies on vision."],
+  ["在仿真中复现 5 个开源机器人策略的公开权重,再测试策略有多依赖视觉。", "Reproducing the public checkpoints of five open-source robot policies in simulation, then testing how much policies rely on vision."],
   ["每个模型评测 500 回合,与原作者公布的基准对比。两个 95% 置信区间有重叠即算复现。", "Each model is evaluated for 500 episodes and compared with the reference published by its authors. A result counts as reproduced when the two 95% confidence intervals overlap."],
-  ["π0 的基准来自 OpenPI 自己训练的权重,这里用的 LeRobot 公开权重训练不足;SmolVLA 的公开权重与论文结构不同。把鼠标移到图上可以看基准出处。", "The π0 reference is for OpenPI's own checkpoint; the public LeRobot checkpoint used here is under-trained. The public SmolVLA checkpoint differs in architecture from the paper. Hover over the chart for the source of each reference."],
+  ["SmolVLA 用的是只在 LIBERO-Spatial 上训练的公开权重,评测时 n_action_steps=10。把鼠标移到图上可以看基准出处。", "SmolVLA uses a public checkpoint trained on LIBERO-Spatial only, evaluated with n_action_steps=10. Hover over the chart for the source of each reference."],
+  ["本节的 π0 是 LeRobot 的公开权重,正常成功率 73%(500 回合),低于 OpenPI 对自家权重报告的 96.8%;下面的现象属于这个权重。本节的 SmolVLA 是 HuggingFaceVLA/smolvla_libero(500 回合 75%),与上一节不是同一个权重。", "π0 in this section is LeRobot's public checkpoint. It scores 73% normally (500 episodes), below the 96.8% OpenPI reports for its own checkpoint, and the behaviour below belongs to this checkpoint. SmolVLA in this section is HuggingFaceVLA/smolvla_libero (75% over 500 episodes), a different checkpoint from the previous section."],
   ["每格是该任务 50 回合的成功率(%)。列标题是\"拿起黑碗并放到盘子上\"里碗的初始位置。", "Each cell is the success rate (%) over 50 episodes of that task. Column headers give where the bowl starts in \"pick up the black bowl and place it on the plate\"."],
   ["LIBERO 上的策略收到两路相机画面、机械臂状态和一句任务指令。下面每个实验只改其中一项输入。", "A LIBERO policy receives two camera images, the robot state and a language instruction. Each experiment below changes one of these inputs."],
   ["每个条件 100 回合(10 个任务 × 10 个初始状态,同一个种子),两个条件要相差约 13 个百分点以上才有意义。", "Each condition is 100 episodes (10 tasks × 10 initial states, same seed). Two conditions have to differ by about 13 points before the difference means anything."],
@@ -260,33 +250,25 @@ const DICT = [
   ["靠轨迹分不出来:在全涂黑仍能成功的任务上,它的路线和看得见时在噪声内无法区分。", "The trajectories cannot tell: on the tasks it still solves blind, its path cannot be told apart from the sighted path within noise."],
   ["各任务的末端路线差异(cm,动态时间规整后的平均点距)。标出的是全涂黑后失败的三个任务。", "End-effector path difference per task (cm, mean point distance after dynamic time warping). The three tasks where blind π0 fails are highlighted."],
   ["任务 0–3 的两次正常运行几乎重合,因为同一个种子下还没有分叉,不能反映噪声;噪声底线看任务 4–9(平均 3.4 cm)。全涂黑仍能成功的七个任务上,路线相差 2.8 cm。同一任务内抓取点只相差约 1.8 cm,所以这个基准分不出策略是跟着碗走,还是每个任务重复一套动作。", "The two normal runs of tasks 0–3 are almost identical because, with the same seed, they had not yet diverged, so they say nothing about noise. The noise floor comes from tasks 4–9 (3.4 cm on average). On the seven tasks blind π0 still solves, the path differs by 2.8 cm. Within a task the grasp point varies by only about 1.8 cm, so this benchmark cannot separate a policy that tracks the bowl from one that repeats one motion per task."],
-  ["微调时把机械臂状态随机置零,全涂黑的成功率从 61% 降到 40%。这与\"更依赖视觉\"相符,但证据还在显著的边缘。", "Fine-tuning with the robot state randomly zeroed lowers blind success from 61% to 40%. This is consistent with a shift toward vision, but the evidence is borderline."],
-  ["从公开的 π0 权重继续训练 3000 步(batch 16,只训动作专家),置零组对 50% 的训练样本把状态置零。全涂黑 61% 对 40%,p≈0.003;正常 78% 对 68%,p≈0.11,不显著。涂黑带来的额外下降是 11 个百分点(对照 17,置零 28),p≈0.06。两组各只训练了一次。", "The public π0 checkpoint is trained for 3000 more steps (batch 16, action expert only); the treatment arm zeroes the state for 50% of training samples. All black: 61% vs. 40%, p≈0.003. Normal: 78% vs. 68%, p≈0.11, not significant. The extra drop when blind is 11 points (17 for the control, 28 with state zeroing), p≈0.06. Each arm was trained once."],
   ["每个任务一段成功、一段失败的录像。全涂黑的录像是环境的真实渲染,模型当时收到的是黑图。", "One successful and one failed episode per task. Recordings of the all-black runs show the simulator's real rendering; the model received black images."],
   ["回放视频体积大,没有随仓库发布。在本地把评测输出的 videos/ 放到 dashboard/data/<run>/ 下,就能在这里播放。", "Replay videos are too large to publish with the repository. Put each run's videos/ folder under dashboard/data/<run>/ locally to play them here."],
   ["置信区间为二项分布的正态近似。全部数据、脚本与说明见 GitHub 仓库。", "Confidence intervals use the normal approximation to the binomial. All data, scripts and notes are in the GitHub repository."],
   ["公开权重复现到基准的误差范围内", "public checkpoints reproduced within sampling error"],
   ["π0 在相机全涂黑后的成功率", "π0 success rate with every camera black"],
-  ["状态置零微调后,π0 全涂黑的成功率", "blind π0 success after fine-tuning with state zeroing"],
-  ["对照组 → 置零组(%),各 100 回合", "control → state zeroing (%), 100 episodes each"],
-  ["未达基准:", "Below reference: "], ["降到 0%:", "Drop to 0%: "],
-  ["SmolVLA 论文 Table 2(每任务 10 次);公开权重与论文结构不同,社区同权重实测约 82%", "SmolVLA paper, Table 2 (10 episodes per task); the public checkpoint differs in architecture from the paper, and the community reports about 82% for it"],
-  ["OpenPI LIBERO README 旧版(commit c015073f,π0 @30k)", "OpenPI LIBERO README, older version (commit c015073f, π0 @30k)"],
+  ["π0.5 画面冻结后的成功率", "π0.5 success rate with the image frozen"],
+  ["整个回合只给第一帧画面(%),各 100 回合", "first frame only for the whole episode (%), 100 episodes each"],
+  ["降到 0%:", "Drop to 0%: "],
+  ["SmolVLA 论文 Table 2(每任务 10 次);该权重只在 LIBERO-Spatial 上训练,评测用 n_action_steps=10", "SmolVLA paper, Table 2 (10 episodes per task); this checkpoint was trained on LIBERO-Spatial only and is evaluated with n_action_steps=10"],
   ["OpenPI LIBERO README(LeRobot 文档复现为 97.0%)", "OpenPI LIBERO README (the LeRobot docs report 97.0%)"],
   ["openvla README(3 种子 × 500 回合,A100)", "openvla README (3 seeds × 500 episodes, A100)"],
   ["LeRobot 模型卡(500 回合;原版 DP 仓库同等模型 64.2%)", "LeRobot model card (500 episodes; the equivalent model in the original DP repo scores 64.2%)"],
   ["HF 仓库自带 eval_info.json(500 回合)", "eval_info.json shipped in the HF repo (500 episodes)"],
-  ["同上,训练时按样本 50% 置零 observation.state", "same, with observation.state zeroed for 50% of training samples"],
-  ["3000 步,batch 16,只训动作专家", "3000 steps, batch 16, action expert only"], ["同一评测协议", "same evaluation protocol"],
-  ["继续微调 · 状态置零(p=0.5)", "Fine-tuned · state zeroing (p=0.5)"], ["继续微调 · 对照(p=0)", "Fine-tuned · control (p=0)"], ["原始 π0", "Original π0"],
   ["策略的输入,以及各实验改了哪一项", "What the policy receives and what each experiment changes"],
   ["π0 有无相机输入时的末端路线", "End-effector paths of π0 with and without camera input"],
-  ["继续微调前后正常与全涂黑成功率", "Normal and all-black success before and after fine-tuning"],
   ["正常与全涂黑成功率对比", "Normal vs. all-black success rate"], ["各模型成功率对比", "Success rate by model"],
   ["机器人策略真的在看画面吗?", "Do robot policies actually use their cameras?"],
   ["LIBERO-Spatial 各任务成功率", "LIBERO-Spatial success rate per task"],
   ["看不见的 π0 是在背轨迹吗", "Is blind π0 replaying a memorised trajectory?"],
-  ["训练能让 π0 去看画面吗", "Can training make π0 look?"],
   ["哪一路相机,什么样的扰动", "Which camera, what kind of perturbation?"],
   ["把所有相机涂黑", "Black out every camera"],
   ["全涂黑时成功次数(/10)", "Blind π0 successes (of 10)"], ["正常 vs 正常重跑", "Normal vs. normal re-run"], ["全涂黑 vs 正常", "All black vs. normal"], ["π0.5 vs π0,都正常", "π0.5 vs. π0, both normal"],
@@ -331,12 +313,12 @@ const MNAME = { pi0: "π0", "pi0.5": "π0.5" };
 
 // ---- 三条结论(数字全部取自数据)
 {
-  const ok = done.filter(reproduced), p0 = BO.summary.find(r => r.model === "pi0"), F = FU.finetune || [];
+  const ok = done.filter(reproduced), p0 = BO.summary.find(r => r.model === "pi0"), p5 = (FU.perturb || []).find(r => r.model === "pi0.5");
   const zero = BO.summary.filter(r => sum(r.black) === 0).map(r => MNAME[r.model] || r.model);
   $("keys").innerHTML = [
-    [`${ok.length} / ${done.length}`, "公开权重复现到基准的误差范围内", "未达基准:" + done.filter(r => !reproduced(r)).map(r => r.model).join(" · ")],
+    [`${ok.length} / ${done.length}`, "公开权重复现到基准的误差范围内", done.map(r => r.model).join(" · ")],
     [`${sum(p0.black)}%`, "π0 在相机全涂黑后的成功率", "降到 0%:" + zero.join(" · ")],
-    [`${F[1].black} → ${F[2].black}`, "状态置零微调后,π0 全涂黑的成功率", "对照组 → 置零组(%),各 100 回合"],
+    [`${p5.normal} → ${p5.freeze}`, "π0.5 画面冻结后的成功率", "整个回合只给第一帧画面(%),各 100 回合"],
   ].map(([v, k, d]) => `<div class="key"><div class="v">${v}</div><div class="k">${k}</div><div class="d">${d}</div></div>`).join("");
 }
 
@@ -424,7 +406,7 @@ function countCell(v, n, title) {
   const p = 100 * v / n, [bg, fg] = cellColor(Math.max(50, p));
   return `<td style="background:${p < 50 ? "var(--grid)" : bg};color:${p < 50 ? "var(--text-primary)" : fg}" title="${title}:${v}/${n}">${v}</td>`;
 }
-// 正常 → 全涂黑 的哑铃图(2.1 与 2.4 共用)
+// 正常 → 全涂黑 的哑铃图
 function dumbbell(svg, rows, labelMax) {
   const W = svg.parentNode.clientWidth; if (!W) return;
   const labelW = Math.min(labelMax, W * 0.36), padR = 24, rowH = 44, top = 20, axisH = 26;
@@ -453,9 +435,8 @@ function drawBlackout() {
   $("bmatrix").innerHTML = h + "</tbody>";
 }
 
-// ---- 2.2 扰动矩阵、2.3 分任务路线差异、2.4 微调
+// ---- 2.2 扰动矩阵、2.3 分任务路线差异
 function drawFollowup() {
-  dumbbell($("ftchart"), (FU.finetune || []).map(r => [r.name, r.normal, r.black]), 210);
   const PT = Object.fromEntries((FU.perturb || []).map(r => [r.model, r]));
   const cols = [["normal", "正常"], ["noise", "加高斯噪声"], ["freeze", "冻结首帧"], ["agent_black", "只涂主视角"], ["wrist_black", "只涂腕部"], ["all_black", "全涂黑"]];
   let h = `<thead><tr><th></th>${cols.map(c => `<th>${c[1]}</th>`).join("")}</tr></thead><tbody>`;

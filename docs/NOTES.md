@@ -19,13 +19,22 @@ Entries are kept in chronological order. A judgement that was later overturned i
 - Required versions: Python 3.10.13, PyTorch 2.2.0, transformers 4.40.1, flash-attn 2.5.5; evaluate with `--center_crop True` (training used random crops of 90% area).
 - MuJoCo ≥ 3.3.3 makes LIBERO render darker, so 3.3.2 is required (LIBERO issue #88, by OpenVLA's first author; in openvla issue #282 someone dropped from ~70% to 62.6% because of this and returned to 85% after downgrading).
 
-## SmolVLA (paper number not reproduced)
+## SmolVLA (`lerobot/smolvla_libero` reproduced; `HuggingFaceVLA/smolvla_libero` below the paper)
 
 - This repo, `HuggingFaceVLA/smolvla_libero`: **75.2%** (500 episodes, batch_size=10); 72% when taking the first 10 trials per task as in the paper's protocol.
 - Community measurements with the same checkpoint (lerobot issue #2354): Spatial 82–83%. reobf points out that this checkpoint has `expert_width_multiplier=0.5` and a 32-layer VLM,
   while the paper uses 0.75 and 16 layers, and that the checkpoint looks under-trained. **The public checkpoint itself does not reach the paper's 90%.**
 - This repo is about 7 points below the community numbers, still to be explained: ~~batch_size=10~~ (control: batch_size=1 gives 75.0% over 100 episodes, **ruled out**), ~~`n_action_steps=10`~~ (**ruled out** after a control evaluation). The cause has not been found.
 - Ruled out: `max_parallel_tasks=1` (the shared policy state bug of issue #4341 does not apply); fps=20; mujoco 3.3.2 (issue #4390 concerns ≥ 3.4.0).
+- **Correction (2026-10-04): marking `n_action_steps=10` as "ruled out" above was wrong.** That control (`smolvla_ablB_bs1_nas10`) gave 65/100, lower than the 75/100 at `n_action_steps=1`, while the community's 82–83% was reported at `n_action_steps=10`, so the gap is larger, not smaller.
+  Those community numbers are from LeRobot v0.4.x in late 2025. On v0.6.1, the version used here, lerobot issue #4614 reports 31/50 (62%) for the same checkpoint and setting, consistent with this repo. Why the versions differ was not investigated.
+- Diagnosis (2026-10-03, 100 episodes each, seed 1000):
+  - Render resolution: the training data is 256×256, while LeRobot's LIBERO environment renders at 360×360 by default (`envs/configs.py:333-334`). At 256×256 the result is 76/100 (72 and 75 at 360); paired by episode 12 vs 11, no effect.
+  - Another checkpoint, `lerobot/smolvla_libero@31d453f7`, with `n_action_steps=10` and the camera `--rename_map`: 85/100, or 76/90 (84.4%) without task 5; in #4614 someone else gets 115/135 (85.2%) on CUDA. The evaluation stack here agrees with the community.
+    Task 5 is 9/10 here: mujoco 3.3.2 does not have the init-state problem of #4390. The base model of this checkpoint is `HuggingFaceTB/SmolVLM2-500M-Video-Instruct@7b375e1b`.
+- **`lerobot/smolvla_libero`, 500 episodes (2026-10-04): 85.4% (427/500, ±3.1)**, per task 45/47/45/45/34/38/49/38/42/44. Its interval overlaps that of the paper's 90% (100 episodes, about ±6), so by this repo's criterion it counts as reproduced.
+  It was trained on LIBERO-Spatial only, for 25k steps, while the paper trains on all four suites, so it reaches the paper's number rather than reproducing the paper's model. The reproduction table uses this row.
+- Conclusion: `HuggingFaceVLA/smolvla_libero` simply scores 65–75% on the current LeRobot version; the gap is in the checkpoint, not in this setup. The vision-dependence experiments still use that checkpoint.
 
 Source: Table 2 of the paper and the experimental setup in the main text.
 
@@ -61,6 +70,9 @@ Source: Table 2 of the paper and the experimental setup in the main text.
 - Community result with the same LeRobot checkpoint (lerobot issue #2114): Spatial 69% (mujoco 2.3.7) → **73%** (mujoco 3.3.2), consistent with this repo.
 - LeRobot maintainer pkooij (#2114, 2025-10-05): "The Pi0 checkpoint is finetuned but needs more training to achieve results similar to the paper." **The public checkpoint is under-trained.**
 - Related evidence, #3591: with both cameras blacked out this π0 still reaches about 60% (74.6% normally), which suggests it relies little on vision (LIBERO scenes vary little, so it may be "memorising the answer" from language and proprioceptive state). Reproduced independently here; see the next section.
+- Diagnosis (2026-10-03): rendering at 256×256 (matching the training data) gives 74/100; three runs at 360×360 gave 73, 76 and 76; paired by episode 11 vs 10, no effect.
+- Training this checkpoint for 10k more steps (action expert only, batch 16; the control arm of the fine-tuning section below) leaves normal success at 73%.
+- Not done: evaluating OpenPI's own π0 LIBERO checkpoint here to check that it reaches 97%.
 
 ## Vision-dependence test: all cameras blacked out (2026-09-30)
 
@@ -132,6 +144,18 @@ Source: Table 2 of the paper and the experimental setup in the main text.
   The 61 vs 40 under blackout includes the treatment being worse overall (normal also fell by 10 points and its loss did not converge to the control's level). Each run was trained once; there are no repeats over training seeds.
 - Conclusion: the result is consistent with "state zeroing pushes π0 towards relying more on vision", but not enough to establish it; at this training budget it also brought no improvement in overall success. Training was only 15% of the original
   and the treatment's loss has not reached the control's level. Whether longer training can recover success while relying more on vision is the next question.
+- **Correction (2026-10-04): the difference seen at 3000 steps did not replicate with longer training.** Same setup, 10k steps per arm (warmup 1000, checkpoint every 5000), each checkpoint evaluated for 100 normal and 100 blind episodes:
+
+| Steps | Arm | Normal | All black | Drop |
+|---|---|---|---|---|
+| 5000 | control | 72 | 53 | 19 |
+| 5000 | state zeroing | 69 | 55 | 14 |
+| 10000 | control | 73 | 51 | 22 |
+| 10000 | state zeroing | 74 | 52 | 22 |
+
+  At 10k steps the two arms do not differ in normal success, blind success or the drop; at 5000 steps the direction is reversed and within noise. The treatment's training loss ends at about 0.26–0.29, the control's at about 0.14.
+  The 61 vs 40 at 3000 steps came from a single training run and was more likely chance or a transient of early training; "state zeroing makes π0 rely more on vision" is not supported, and the README no longer includes this experiment.
+  Raw files: `dashboard/data/eval_ft10k_*`. Lesson: a single-run difference at p≈0.06 should not have been written up as a finding.
 
 ### Mild perturbations: noise / frozen image (2026-10-01, 100 episodes per run, same seed and initial states)
 
