@@ -1,6 +1,6 @@
 [project]
 name = "robot-policy-sim-repro"
-version = "1.0.0"
+version = "1.1.0"
 description = "Reproducing public checkpoints of robot policies in simulation, plus vision-dependence experiments"
 requires-python = ">=3.10"
 license = { text = "MIT" }

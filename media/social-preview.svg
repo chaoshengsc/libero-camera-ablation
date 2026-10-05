@@ -4,8 +4,8 @@
 <text x="86" y="236" font-size="66" font-weight="700" letter-spacing="-1.5">Do robot policies</text>
 <text x="86" y="310" font-size="66" font-weight="700" letter-spacing="-1.5">actually use</text>
 <text x="86" y="384" font-size="66" font-weight="700" letter-spacing="-1.5">their cameras?</text>
-<text x="88" y="452" font-size="23" fill="#55544f">Six open-source policies reproduced in simulation,</text>
-<text x="88" y="484" font-size="23" fill="#55544f">then evaluated with every camera image blacked out.</text>
+<text x="88" y="452" font-size="23" fill="#55544f">Five policies reproduced in simulation;</text>
+<text x="88" y="484" font-size="23" fill="#55544f">four tested with every camera blacked out.</text>
 <rect x="88" y="528" width="64" height="4" fill="#111110"/>
 <rect x="700" y="112" width="500" height="420" rx="18" fill="#ffffff" stroke="#e4e3de" stroke-width="1.5"/>
 <text x="732" y="160" font-size="19" font-weight="600">LIBERO-Spatial success rate</text>
