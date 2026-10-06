@@ -49,7 +49,7 @@ All numbers in this section are success rates over 100 episodes (10 tasks × 10 
 
 Two of the checkpoints need a note:
 
-- **π0** is LeRobot's public checkpoint `lerobot/pi0_libero_finetuned_v044`. Over 500 normal episodes it scores 73.4%, well below the 96.8% that OpenPI reports for its own π0 checkpoint, and a LeRobot maintainer has said it is under-trained (lerobot issue #2114). What follows describes this checkpoint, not π0 in general.
+- **π0** is LeRobot's public checkpoint `lerobot/pi0_libero_finetuned_v044`. Over 500 normal episodes it scores 73.4%, well below the 96.8% that an earlier OpenPI README gave for its own π0 fine-tuning run, and a LeRobot maintainer has said it is under-trained (lerobot issue #2114). OpenPI never released that π0 LIBERO checkpoint, so there is no official π0 checkpoint to compare against. What follows describes this checkpoint, not π0 in general.
 - **SmolVLA** here is `HuggingFaceVLA/smolvla_libero` (75.2% over 500 episodes), not the checkpoint in section 1.
 
 The Normal column is the first 10 episodes per task of each model's 500-episode run. Two more normal π0 runs, made for section 2.3, gave 73% and 76%.

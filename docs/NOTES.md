@@ -73,6 +73,7 @@ Source: Table 2 of the paper and the experimental setup in the main text.
 - Diagnosis (2026-10-03): rendering at 256×256 (matching the training data) gives 74/100; three runs at 360×360 gave 73, 76 and 76; paired by episode 11 vs 10, no effect.
 - Training this checkpoint for 10k more steps (action expert only, batch 16; the control arm of the fine-tuning section below) leaves normal success at 73%.
 - Not done: evaluating OpenPI's own π0 LIBERO checkpoint here to check that it reaches 97%.
+- Correction (2026-10-06): the premise of the previous item is wrong. OpenPI never released a π0 LIBERO checkpoint. The 96.8% comes from an earlier README (`examples/libero/README.md@7cf5f609`), which says that training with the `pi0_libero` config should give similar results; commit `35106c9b` (2025-09) replaced that row with π0.5, and only `pi05_libero` is public. There is therefore no official π0 checkpoint to compare against. Training one here as the maintainer suggests (batch 256, 20k steps or more) is not practical: at batch 16 a step takes 4.2 s and 10k steps took 11.7 h, so a linear extrapolation gives about 15 days (an estimate, not measured). The 10k-step run above trained the action expert only, on `lerobot/libero`, which is not the maintainer's recipe, so it does not show that more training is useless.
 
 ## Vision-dependence test: all cameras blacked out (2026-09-30)
 

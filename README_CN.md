@@ -49,7 +49,7 @@ LIBERO 上的策略收到两路相机画面、机械臂状态(末端位姿与夹
 
 其中两个权重需要说明:
 
-- **π0** 是 LeRobot 的公开权重 `lerobot/pi0_libero_finetuned_v044`。它 500 回合的正常成功率是 73.4%,远低于 OpenPI 对自家 π0 权重报告的 96.8%,LeRobot 维护者也说过它训练不足(lerobot issue #2114)。下面描述的是这个权重,不代表所有 π0。
+- **π0** 是 LeRobot 的公开权重 `lerobot/pi0_libero_finetuned_v044`。它 500 回合的正常成功率是 73.4%,远低于 OpenPI 旧版 README 给出的自家 π0 微调结果 96.8%,LeRobot 维护者也说过它训练不足(lerobot issue #2114)。OpenPI 没有发布那个 π0 LIBERO 权重,所以没有官方 π0 权重可以对照。下面描述的是这个权重,不代表所有 π0。
 - **SmolVLA** 在本节是 `HuggingFaceVLA/smolvla_libero`(500 回合 75.2%),和第 1 节不是同一个权重。
 
 "正常"一列取自各模型 500 回合评测里每个任务的前 10 回合。为 2.3 节另外跑的两次 π0 正常评测分别是 73% 和 76%。

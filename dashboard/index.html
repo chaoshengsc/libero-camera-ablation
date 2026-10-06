@@ -179,7 +179,7 @@ footer { margin-top: 80px; padding-top: 20px; border-top: 1px solid var(--border
     <h2>视觉依赖</h2>
     <p class="intro">LIBERO 上的策略收到两路相机画面、机械臂状态和一句任务指令。下面每个实验只改其中一项输入。</p>
     <p class="intro">每个条件 100 回合(10 个任务 × 10 个初始状态,同一个种子),两个条件要相差约 13 个百分点以上才有意义。</p>
-    <p class="intro">本节的 π0 是 LeRobot 的公开权重,正常成功率 73%(500 回合),低于 OpenPI 对自家权重报告的 96.8%;下面的现象属于这个权重。本节的 SmolVLA 是 HuggingFaceVLA/smolvla_libero(500 回合 75%),与上一节不是同一个权重。</p>
+    <p class="intro">本节的 π0 是 LeRobot 的公开权重,正常成功率 73%(500 回合),低于 OpenPI 旧版 README 给出的自家微调结果 96.8%(该权重没有发布);下面的现象属于这个权重,不代表所有 π0。本节的 SmolVLA 是 HuggingFaceVLA/smolvla_libero(500 回合 75%),与上一节不是同一个权重。</p>
     <div class="block"><div class="fig"><img id="figInputs" alt="策略的输入,以及各实验改了哪一项"></div></div>
 
     <div class="block">
@@ -239,7 +239,7 @@ const DICT = [
   ["在仿真中复现 5 个开源机器人策略的公开权重,再测试策略有多依赖视觉。", "Reproducing the public checkpoints of five open-source robot policies in simulation, then testing how much policies rely on vision."],
   ["每个模型评测 500 回合,与原作者公布的基准对比。两个 95% 置信区间有重叠即算复现。", "Each model is evaluated for 500 episodes and compared with the reference published by its authors. A result counts as reproduced when the two 95% confidence intervals overlap."],
   ["SmolVLA 用的是只在 LIBERO-Spatial 上训练的公开权重,评测时 n_action_steps=10。把鼠标移到图上可以看基准出处。", "SmolVLA uses a public checkpoint trained on LIBERO-Spatial only, evaluated with n_action_steps=10. Hover over the chart for the source of each reference."],
-  ["本节的 π0 是 LeRobot 的公开权重,正常成功率 73%(500 回合),低于 OpenPI 对自家权重报告的 96.8%;下面的现象属于这个权重。本节的 SmolVLA 是 HuggingFaceVLA/smolvla_libero(500 回合 75%),与上一节不是同一个权重。", "π0 in this section is LeRobot's public checkpoint. It scores 73% normally (500 episodes), below the 96.8% OpenPI reports for its own checkpoint, and the behaviour below belongs to this checkpoint. SmolVLA in this section is HuggingFaceVLA/smolvla_libero (75% over 500 episodes), a different checkpoint from the previous section."],
+  ["本节的 π0 是 LeRobot 的公开权重,正常成功率 73%(500 回合),低于 OpenPI 旧版 README 给出的自家微调结果 96.8%(该权重没有发布);下面的现象属于这个权重,不代表所有 π0。本节的 SmolVLA 是 HuggingFaceVLA/smolvla_libero(500 回合 75%),与上一节不是同一个权重。", "π0 in this section is LeRobot's public checkpoint. It scores 73% normally (500 episodes), below the 96.8% an earlier OpenPI README gave for its own fine-tuning run (that checkpoint was never released). The behaviour below belongs to this checkpoint, not to π0 in general. SmolVLA in this section is HuggingFaceVLA/smolvla_libero (75% over 500 episodes), a different checkpoint from the previous section."],
   ["每格是该任务 50 回合的成功率(%)。列标题是\"拿起黑碗并放到盘子上\"里碗的初始位置。", "Each cell is the success rate (%) over 50 episodes of that task. Column headers give where the bowl starts in \"pick up the black bowl and place it on the plate\"."],
   ["LIBERO 上的策略收到两路相机画面、机械臂状态和一句任务指令。下面每个实验只改其中一项输入。", "A LIBERO policy receives two camera images, the robot state and a language instruction. Each experiment below changes one of these inputs."],
   ["每个条件 100 回合(10 个任务 × 10 个初始状态,同一个种子),两个条件要相差约 13 个百分点以上才有意义。", "Each condition is 100 episodes (10 tasks × 10 initial states, same seed). Two conditions have to differ by about 13 points before the difference means anything."],
