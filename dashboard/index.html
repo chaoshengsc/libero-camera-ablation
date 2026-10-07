@@ -206,7 +206,7 @@ footer { margin-top: 80px; padding-top: 20px; border-top: 1px solid var(--border
 
     <div class="block">
       <h3>LIBERO-Spatial 各任务成功率</h3>
-      <p class="cap">每格是该任务 50 回合的成功率（%）。列标题是"拿起黑碗并放到盘子上"里碗的初始位置。</p>
+      <p class="cap">每格是该任务 50 回合的成功率（%）。列标题是“拿起黑碗并放到盘子上”里碗的初始位置。</p>
       <div class="panel">
         <div class="mx-wrap"><table class="mx" id="matrix"></table></div>
         <div class="mx-legend"><span>50%</span><span class="bar"></span><span>100%</span></div>
@@ -240,7 +240,7 @@ const DICT = [
   ["每个模型评测 500 回合，与原作者公布的基准对比。两个 95% 置信区间有重叠即算复现。", "Each model is evaluated for 500 episodes and compared with the reference published by its authors. A result counts as reproduced when the two 95% confidence intervals overlap."],
   ["SmolVLA 用的是只在 LIBERO-Spatial 上训练的公开权重，评测时 n_action_steps=10。把鼠标移到图上可以看基准出处。", "SmolVLA uses a public checkpoint trained on LIBERO-Spatial only, evaluated with n_action_steps=10. Hover over the chart for the source of each reference."],
   ["本节的 π0 是 LeRobot 的公开权重，500 回合的正常成功率是 73%。它训练不足，也没有官方的 π0 LIBERO 权重可以对照，所以下面的现象只说明这个权重，不代表所有 π0。", "π0 in this section is LeRobot's public checkpoint, which scores 73% over 500 normal episodes. It is under-trained and there is no official π0 LIBERO checkpoint to compare against, so the behaviour below describes this checkpoint, not π0 in general."],
-  ["每格是该任务 50 回合的成功率（%）。列标题是\"拿起黑碗并放到盘子上\"里碗的初始位置。", "Each cell is the success rate (%) over 50 episodes of that task. Column headers give where the bowl starts in \"pick up the black bowl and place it on the plate\"."],
+  ["每格是该任务 50 回合的成功率（%）。列标题是“拿起黑碗并放到盘子上”里碗的初始位置。", "Each cell is the success rate (%) over 50 episodes of that task. Column headers give where the bowl starts in \"pick up the black bowl and place it on the plate\"."],
   ["LIBERO 上的策略收到两路相机画面、机械臂状态和一句任务指令。每个实验只改相机输入。", "A LIBERO policy receives two camera images, the robot state and a language instruction. Each experiment changes only the camera input."],
   ["每个条件 100 回合（10 个任务 × 10 个初始状态，同一个种子），两个条件要相差约 13 个百分点以上才有意义。", "Each condition is 100 episodes (10 tasks × 10 initial states, same seed). Two conditions have to differ by about 13 points before the difference means anything."],
   ["三个模型没有画面就完全不能动作，π0 仍有一半以上的回合成功。", "Three models cannot act without images. π0 still succeeds in more than half of the episodes."],
@@ -393,7 +393,7 @@ function drawMatrix() {
       const t = (r.tasks || []).find(x => x.id === i);
       if (!t) { h += `<td class="na">—</td>`; continue; }
       const p = 100 * t.ok / t.n, [bg, fg] = cellColor(p);
-      h += `<td style="background:${bg};color:${fg}" title="${r.model} · ${T[i]}:${t.ok}/${t.n}(${p.toFixed(0)}%)">${p.toFixed(0)}</td>`;
+      h += `<td style="background:${bg};color:${fg}" title="${r.model} · ${T[i]}：${t.ok}/${t.n}（${p.toFixed(0)}%）">${p.toFixed(0)}</td>`;
     }
     const [bg, fg] = r.pc != null ? cellColor(r.pc) : ["", ""];
     h += r.pc != null ? `<td style="background:${bg};color:${fg};font-weight:600" title="${r.model} 总体 ${fmt(r.pc)}（${r.n} 回合）">${r.pc.toFixed(1)}</td>` : `<td class="na">评测中</td>`;
@@ -405,7 +405,7 @@ function drawMatrix() {
 // 成功次数的格子：不足一半用灰底，其余按色阶
 function countCell(v, n, title) {
   const p = 100 * v / n, [bg, fg] = cellColor(Math.max(50, p));
-  return `<td style="background:${p < 50 ? "var(--grid)" : bg};color:${p < 50 ? "var(--text-primary)" : fg}" title="${title}:${v}/${n}">${v}</td>`;
+  return `<td style="background:${p < 50 ? "var(--grid)" : bg};color:${p < 50 ? "var(--text-primary)" : fg}" title="${title}：${v}/${n}">${v}</td>`;
 }
 // 正常 → 全涂黑 的哑铃图
 function dumbbell(svg, rows, labelMax) {
