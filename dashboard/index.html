@@ -29,7 +29,7 @@
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; scroll-padding-top: 56px; }
 body { margin: 0; background: var(--surface-0); color: var(--text-primary);
-  font: 15px/1.6 -apple-system, "PingFang SC", "Noto Sans SC", system-ui, sans-serif; }
+  font: 15px/1.6 system-ui, -apple-system, "Segoe UI", "PingFang SC", "Noto Sans SC", sans-serif; }
 a { color: inherit; }
 main { max-width: 920px; margin: 0 auto; padding: 0 20px 80px; }
 
@@ -362,7 +362,7 @@ function drawChart() {
 }
 function showTip(r, e) {
   const tip = $("tip"), b = $("chartWrap").getBoundingClientRect();
-  const pm = r.baseline_pm != null ? `± ${r.baseline_pm}` : (r.baseline_ci ? `± ${r.baseline_ci}(95% CI)` : "");
+  const pm = r.baseline_pm != null ? `± ${r.baseline_pm}` : (r.baseline_ci ? `± ${r.baseline_ci}（95% CI）` : "");
   tip.innerHTML = `<b>${r.model} · ${r.task}</b><br>本仓库：${r.pc != null ? `${fmt(r.pc)} ± ${r.ci}（95% CI，${r.n} 回合）` : "待评测"}` +
     `<br>原作者基准：${fmt(r.baseline_pc)} ${pm}<br><span style="color:var(--text-muted)">${r.baseline_src}</span>`;
   tip.style.opacity = 1;

@@ -668,7 +668,7 @@ window.RESULTS = [
   "id": "dp_pusht_500",
   "model": "Diffusion Policy",
   "task": "PushT",
-  "sim": "2D(pymunk)",
+  "sim": "2D（pymunk）",
   "checkpoint": "lerobot/diffusion_pusht@84a7c231",
   "baseline_pc": 65.4,
   "baseline_n": 500,

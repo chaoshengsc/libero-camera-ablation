@@ -25,7 +25,7 @@ RUNS = [
     {"id": "pi05_spatial_500", "model": "π0.5", "task": "LIBERO-Spatial", "sim": "MuJoCo",
      "checkpoint": "lerobot/pi05_libero_finetuned_v044@8e174154",
      "baseline_pc": 98.8, "baseline_src": "OpenPI LIBERO README（LeRobot 文档复现为 97.0%）"},
-    {"id": "dp_pusht_500", "model": "Diffusion Policy", "task": "PushT", "sim": "2D(pymunk)",
+    {"id": "dp_pusht_500", "model": "Diffusion Policy", "task": "PushT", "sim": "2D（pymunk）",
      "checkpoint": "lerobot/diffusion_pusht@84a7c231",
      "baseline_pc": 65.4, "baseline_n": 500, "baseline_src": "LeRobot 模型卡（500 回合；原版 DP 仓库同等模型 64.2%）"},
 ]
