@@ -64,21 +64,42 @@ def test_blackout_csv_matches_raw_eval_info():
 
 
 def test_perturbations_csv_matches_raw_and_readme():
+    """1.2 节:每个条件两次运行,CSV、原始数据、README 表格三方一致。"""
     key = {"π0": ("pi0_spatial_500", "pi0", "pi0_black_all"), "π0.5": ("pi05_spatial_500", "pi05", "pi05_black_all"),
            "SmolVLA": ("smolvla2_spatial_500", "smol2", "smol2_black_all")}
+    conds = ("normal", "noise", "freeze", "agent_black", "wrist_black", "all_black")
     rs = rows("perturbations.csv")
-    assert {r["model"] for r in rs} == set(key)
-    for r in rs:
-        base, k, black = key[r["model"]]
-        assert int(r["normal"]) == sum(per_task(base, 10))
-        assert int(r["noise"]) == sum(per_task(f"pert_{k}_noise"))
-        assert int(r["freeze"]) == sum(per_task(f"pert_{k}_freeze"))
-        assert int(r["all_black"]) == sum(per_task(black))
-        for cam in ("agent", "wrist"):  # 单路涂黑:原始数据在仓库里的才核对
-            if (DATA / f"traj_{k}_{cam}").exists():
-                assert int(r[f"{cam}_black"]) == sum(per_task(f"traj_{k}_{cam}"))
-        line = f"| {r['model']} | " + " | ".join(f"{r[c]}%" for c in ("normal", "noise", "freeze", "agent_black", "wrist_black", "all_black")) + " |"
+    assert {r["model"] for r in rs} == set(key) and len(rs) == 6
+    by = {(r["model"], r["run"]): r for r in rs}
+    for model, (base, k, black) in key.items():
+        r1, r2 = by[model, "1"], by[model, "2"]
+        assert int(r1["normal"]) == sum(per_task(base, 10))
+        for r, d in ((r1, ""), (r2, "run2/")):
+            assert int(r["noise"]) == sum(per_task(f"{d}pert_{k}_noise"))
+            assert int(r["freeze"]) == sum(per_task(f"{d}pert_{k}_freeze"))
+            assert int(r["all_black"]) == sum(per_task(f"{d}{black}"))
+            for cam in ("agent", "wrist"):
+                assert int(r[f"{cam}_black"]) == sum(per_task(f"{d}traj_{k}_{cam}"))
+        if k == "smol2":
+            assert r2["normal"] == ""  # SmolVLA 没有第二次正常运行
+        else:
+            assert int(r2["normal"]) == sum(per_task(f"run2/traj_{k}_normal"))
+        line = f"| {model} | " + " | ".join(f"{r1[c]} / {r2[c] or '–'}" for c in conds) + " |"
         assert all(line in md for md in READMES), line
+
+
+def test_pi0_repeated_runs_in_readme():
+    """README 里 π0 的重复运行数字:正常 5 次、全涂黑 5 次,以及同一条件两次运行的最大差。"""
+    normal = [sum(per_task("pi0_spatial_500", 10))] + [sum(per_task(r)) for r in ("traj_pi0_normal", "traj_pi0_normal2", "run2/traj_pi0_normal", "run2/traj_pi0_normal2")]
+    black = [sum(per_task(r)) for r in ("pi0_black_all", "traj_pi0_black", "run2/pi0_black_all", "run2/traj_pi0_black", "run3/pi0_black_all")]
+    assert normal == [76, 73, 76, 72, 71] and black == [56, 54, 56, 54, 53]
+    by = {(r["model"], r["run"]): r for r in rows("perturbations.csv")}
+    gap = lambda m: [abs(int(by[m, "1"][c]) - int(by[m, "2"][c])) for c in ("noise", "freeze", "agent_black", "wrist_black")]
+    assert sorted(gap("π0")) == [9, 10, 12, 18] and max(gap("π0.5") + gap("SmolVLA")) == 6
+    single = [int(by["π0", n][c]) for n in "12" for c in ("noise", "freeze", "agent_black", "wrist_black")]
+    assert (min(single), max(single)) == (59, 80)
+    for md in READMES:
+        assert "53–56%" in md and "71–76%" in md
 
 
 def test_section2_checkpoint_rates_in_readme():

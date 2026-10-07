@@ -140,7 +140,7 @@ footer { margin-top: 80px; padding-top: 20px; border-top: 1px solid var(--border
   <header>
     <p class="eyebrow">libero-camera-ablation</p>
     <h1>四个机器人策略在 LIBERO-Spatial 上的相机输入消融</h1>
-    <p class="lede">四个策略里有三个离开实时相机画面就无法完成任务；一个公开的 π0 权重在所有相机涂黑后仍有 54–56% 的成功率。做消融之前，先复现了五个公开权重。</p>
+    <p class="lede">四个策略里有三个离开实时相机画面就无法完成任务；一个公开的 π0 权重在所有相机涂黑后仍有 53–56% 的成功率。做消融之前，先复现了五个公开权重。</p>
     <div class="keys" id="keys"></div>
   </header>
 
@@ -148,7 +148,7 @@ footer { margin-top: 80px; padding-top: 20px; border-top: 1px solid var(--border
     <div class="sec-n">01</div>
     <h2>相机消融</h2>
     <p class="intro">LIBERO 上的策略收到两路相机画面、机械臂状态和一句任务指令。每个实验只改相机输入。</p>
-    <p class="intro">每个条件 100 回合（10 个任务 × 10 个初始状态，同一个种子），两个条件要相差约 13 个百分点以上才有意义。</p>
+    <p class="intro">每次运行 100 回合（10 个任务 × 10 个初始状态，同一个种子）。只算抽样误差，两个条件要相差约 13 个百分点以上才有意义；对 π0，同一个条件跑两次最多相差 18 个百分点。</p>
     <p class="intro">本节的 π0 是 LeRobot 的公开权重，500 回合的正常成功率是 73%。它训练不足，也没有官方的 π0 LIBERO 权重可以对照，所以下面的现象只说明这个权重，不代表所有 π0。</p>
     <div class="block"><div class="fig"><img id="figInputs" alt="策略的输入，以及各实验改了哪一项"></div></div>
 
@@ -168,9 +168,9 @@ footer { margin-top: 80px; padding-top: 20px; border-top: 1px solid var(--border
 
     <div class="block">
       <h3><span class="n">1.2</span>单路相机、噪声、冻结画面</h3>
-      <p class="take">π0.5 和 SmolVLA 需要实时画面；π0 基本不需要，对主视角相机也测不出依赖。</p>
+      <p class="take">π0.5 和 SmolVLA 需要实时画面；对 π0，只有两路相机都涂黑才有稳定的影响。</p>
       <div class="panel"><div class="mx-wrap"><table class="mx" id="cammatrix" style="min-width:520px"></table></div></div>
-      <p class="note">每格是 100 回合里的成功次数。噪声是标准差 0.1 的高斯噪声；冻结首帧指整个回合只给第一帧画面，这是真实的、分布内的画面。对三个模型来说，腕部相机都比主视角更重要。</p>
+      <p class="note">每格是 100 回合里的成功次数，每个条件跑了两次（同样的脚本、同一个种子）。噪声是标准差 0.1 的高斯噪声；冻结首帧指整个回合只给第一帧画面，这是真实的、分布内的画面。对 π0.5 和 SmolVLA，腕部相机比主视角更重要。π0 的单路相机、噪声、冻结条件两次相差 9 到 18，说明不了它依赖哪一路相机。</p>
     </div>
 
     <div class="block">
@@ -236,17 +236,17 @@ const sum = (a) => a.reduce((p, q) => p + q, 0);
 // ---- 语言：默认跟随浏览器，？lang=zh|en 或右上角按钮切换。英文版在渲染后按词典替换文本（整句在前，短词在后）。
 const LANG = new URLSearchParams(location.search).get("lang") || ((navigator.language || "").toLowerCase().startsWith("zh") ? "zh" : "en");
 const DICT = [
-  ["四个策略里有三个离开实时相机画面就无法完成任务；一个公开的 π0 权重在所有相机涂黑后仍有 54–56% 的成功率。做消融之前，先复现了五个公开权重。", "Three of the four policies fail without a live camera image. One public π0 checkpoint still succeeds 54–56% of the time with every camera blacked out. Five public checkpoints were reproduced first."],
+  ["四个策略里有三个离开实时相机画面就无法完成任务；一个公开的 π0 权重在所有相机涂黑后仍有 53–56% 的成功率。做消融之前，先复现了五个公开权重。", "Three of the four policies fail without a live camera image. One public π0 checkpoint still succeeds 53–56% of the time with every camera blacked out. Five public checkpoints were reproduced first."],
   ["每个模型评测 500 回合，与原作者公布的基准对比。两个 95% 置信区间有重叠即算复现。", "Each model is evaluated for 500 episodes and compared with the reference published by its authors. A result counts as reproduced when the two 95% confidence intervals overlap."],
   ["SmolVLA 用的是只在 LIBERO-Spatial 上训练的公开权重，评测时 n_action_steps=10。把鼠标移到图上可以看基准出处。", "SmolVLA uses a public checkpoint trained on LIBERO-Spatial only, evaluated with n_action_steps=10. Hover over the chart for the source of each reference."],
   ["本节的 π0 是 LeRobot 的公开权重，500 回合的正常成功率是 73%。它训练不足，也没有官方的 π0 LIBERO 权重可以对照，所以下面的现象只说明这个权重，不代表所有 π0。", "π0 in this section is LeRobot's public checkpoint, which scores 73% over 500 normal episodes. It is under-trained and there is no official π0 LIBERO checkpoint to compare against, so the behaviour below describes this checkpoint, not π0 in general."],
   ["每格是该任务 50 回合的成功率（%）。列标题是“拿起黑碗并放到盘子上”里碗的初始位置。", "Each cell is the success rate (%) over 50 episodes of that task. Column headers give where the bowl starts in \"pick up the black bowl and place it on the plate\"."],
   ["LIBERO 上的策略收到两路相机画面、机械臂状态和一句任务指令。每个实验只改相机输入。", "A LIBERO policy receives two camera images, the robot state and a language instruction. Each experiment changes only the camera input."],
-  ["每个条件 100 回合（10 个任务 × 10 个初始状态，同一个种子），两个条件要相差约 13 个百分点以上才有意义。", "Each condition is 100 episodes (10 tasks × 10 initial states, same seed). Two conditions have to differ by about 13 points before the difference means anything."],
+  ["每次运行 100 回合（10 个任务 × 10 个初始状态，同一个种子）。只算抽样误差，两个条件要相差约 13 个百分点以上才有意义；对 π0，同一个条件跑两次最多相差 18 个百分点。", "Each run is 100 episodes (10 tasks × 10 initial states, same seed). Sampling error alone means two conditions have to differ by about 13 points; for π0, the same condition run twice differed by up to 18 points."],
   ["三个模型没有画面就完全不能动作，π0 仍有一半以上的回合成功。", "Three models cannot act without images. π0 still succeeds in more than half of the episodes."],
   ["π0 各任务的成功次数（每个任务 10 回合）：全涂黑后的失败集中在三个任务上。", "π0 successes per task (10 episodes each): the failures with black cameras are concentrated in three tasks."],
-  ["π0.5 和 SmolVLA 需要实时画面；π0 基本不需要，对主视角相机也测不出依赖。", "π0.5 and SmolVLA need a live image. π0 barely needs one and shows no measurable dependence on the agent-view camera."],
-  ["每格是 100 回合里的成功次数。噪声是标准差 0.1 的高斯噪声；冻结首帧指整个回合只给第一帧画面，这是真实的、分布内的画面。对三个模型来说，腕部相机都比主视角更重要。", "Each cell is successes out of 100 episodes. Noise is Gaussian with standard deviation 0.1. A frozen first frame means the policy sees only the first image for the whole episode, which is a real, in-distribution image. The wrist camera matters more than the agent view for all three models."],
+  ["π0.5 和 SmolVLA 需要实时画面；对 π0，只有两路相机都涂黑才有稳定的影响。", "π0.5 and SmolVLA need a live image. For π0, only blacking out both cameras has a reliable effect."],
+  ["每格是 100 回合里的成功次数，每个条件跑了两次（同样的脚本、同一个种子）。噪声是标准差 0.1 的高斯噪声；冻结首帧指整个回合只给第一帧画面，这是真实的、分布内的画面。对 π0.5 和 SmolVLA，腕部相机比主视角更重要。π0 的单路相机、噪声、冻结条件两次相差 9 到 18，说明不了它依赖哪一路相机。", "Each cell is successes out of 100 episodes; every condition was run twice with the same scripts and seed. Noise is Gaussian with standard deviation 0.1. A frozen first frame means the policy sees only the first image for the whole episode, which is a real, in-distribution image. For π0.5 and SmolVLA the wrist camera matters more than the agent view. π0's single-camera, noise and frozen-image runs differ by 9 to 18 between the two runs, so they cannot show which camera it depends on."],
   ["在全涂黑仍能成功的任务上，它的路线和看得见时在噪声内无法区分；在从未成功的任务 7 和 9 上，它走到了别处。", "On the tasks it still solves blind, its path cannot be told apart from the sighted path within noise. On tasks 7 and 9, where it never succeeds, it goes somewhere else."],
   ["各任务的末端路线差异（cm，动态时间规整后的平均点距）。标出的是全涂黑后失败的三个任务。", "End-effector path difference per task (cm, mean point distance after dynamic time warping). The three tasks where blind π0 fails are highlighted."],
   ["任务 0–3 的两次正常运行几乎重合，因为同一个种子下还没有分叉，不能反映噪声；噪声底线看任务 4–9（平均 3.4 cm）。全涂黑仍能成功的七个任务上，路线相差 2.8 cm。这种比较分不出策略是跟着碗走，还是每个任务重复一套动作；同一任务内碗的位置变化有多大，这里没有测。", "Re-runs of tasks 0–3 are almost identical because both runs use the same seed and had not yet diverged, so they say nothing about noise; the noise floor comes from tasks 4–9 (3.4 cm on average). On the seven tasks blind π0 still solves, the path differs by 2.8 cm. This comparison cannot separate a policy that tracks the bowl from one that repeats one motion per task, and how much the bowl position varies within a task was not measured here."],
@@ -275,7 +275,7 @@ const DICT = [
   ["本仓库（横线 = 95% 置信区间）", "This repo (bar = 95% confidence interval)"],
   ["盘子与小烤碗之间", "between plate and ramekin"], ["木柜上层抽屉里", "in top drawer of cabinet"], ["小烤碗旁", "next to ramekin"], ["小烤碗上", "on ramekin"],
   ["桌子中央", "table centre"], ["饼干盒上", "on cookie box"], ["饼干盒旁", "next to cookie box"], ["灶台上", "on stove"], ["盘子旁", "next to plate"], ["木柜顶上", "on top of cabinet"],
-  [/第 (\d+) 回合/g, "episode $1"], [/(\d+) 回合/g, "$1 episodes"], [/任务 (\d)/g, "Task $1"],
+  [/第 (\d+) 回合/g, "episode $1"], [/(\d+) 回合/g, "$1 episodes"], [/任务 (\d)/g, "Task $1"], [/第 (\d) 次/g, "run $1"],
   ["本仓库：", "This repo: "], ["原作者基准：", "Authors' reference: "], ["本仓库", "This repo"], ["原作者基准", "Authors' reference"],
   ["复现结果", "Reproduction"], ["相机消融", "Camera ablations"], ["回放", "Replays"], ["表格视图", "Table view"], ["图表视图", "Chart view"],
   ["加高斯噪声", "Gaussian noise"], ["冻结首帧", "Frozen first frame"], ["只涂主视角", "Agent-view black"], ["只涂腕部", "Wrist black"],
@@ -441,9 +441,13 @@ function drawFollowup() {
   const PT = Object.fromEntries((FU.perturb || []).map(r => [r.model, r]));
   const cols = [["normal", "正常"], ["noise", "加高斯噪声"], ["freeze", "冻结首帧"], ["agent_black", "只涂主视角"], ["wrist_black", "只涂腕部"], ["all_black", "全涂黑"]];
   let h = `<thead><tr><th></th>${cols.map(c => `<th>${c[1]}</th>`).join("")}</tr></thead><tbody>`;
+  const P2 = Object.fromEntries((FU.perturb2 || []).map(r => [r.model, r]));
   for (const c of FU.cam || []) {
-    const r = { ...PT[c.model], ...c }, name = MNAME[r.model] || r.model;
-    h += `<tr><th class="row">${name}</th>` + cols.map(([k, lab]) => countCell(r[k], 100, `${name} · ${lab}`)).join("") + "</tr>";
+    const name = MNAME[c.model] || c.model;
+    [{ ...PT[c.model], ...c }, P2[c.model]].forEach((r, i) => {  // 第 1 次、第 2 次运行各一行
+      if (!r) return;
+      h += `<tr><th class="row">${name} · 第 ${i + 1} 次</th>` + cols.map(([k, lab]) => r[k] == null ? `<td class="na">—</td>` : countCell(r[k], 100, `${name} 第 ${i + 1} 次 · ${lab}`)).join("") + "</tr>";
+    });
   }
   $("cammatrix").innerHTML = h + "</tbody>";
 

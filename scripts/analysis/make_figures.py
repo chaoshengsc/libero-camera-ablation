@@ -20,7 +20,7 @@ TXT = {
     "en": {
         "rep_title": "Public checkpoints: success rate in this repo vs. reference",
         "rep_ours": "This repo (500 episodes, 95% CI)", "rep_ref": "Reference", "rep_fail": "Not reproduced (intervals do not overlap)",
-        "pert_title": "Success rate when the camera input is perturbed (LIBERO-Spatial, 100 episodes each, 95% CI)",
+        "pert_title": "Success rate under camera perturbations (bar = mean, dots = two runs of 100 episodes)",
         "conds": ["Normal", "Gaussian noise", "Frozen first frame", "Agent-view black", "Wrist black", "All black"],
         "traj_title": "π0 end-effector paths, top view: 10 episodes per task, identical initial states",
         "traj_a": "Normal vs. normal re-run (noise floor)", "traj_b": "Normal vs. all cameras black",
@@ -37,7 +37,7 @@ TXT = {
     "zh": {
         "rep_title": "公开权重复现：本机成功率 vs 基准",
         "rep_ours": "本机（500 回合，95% 置信区间）", "rep_ref": "基准", "rep_fail": "未复现（区间不重叠）",
-        "pert_title": "扰动相机输入后的成功率（LIBERO-Spatial，每组 100 回合，95% 置信区间）",
+        "pert_title": "扰动相机输入后的成功率（柱 = 平均，圆点 = 两次运行，各 100 回合）",
         "conds": ["正常", "加高斯噪声", "冻结首帧", "只涂主视角", "只涂腕部", "全涂黑"],
         "traj_title": "π0 末端执行器路线（俯视）：每个任务 10 个回合，初始状态相同",
         "traj_a": "正常 vs 正常重跑（噪声底线）", "traj_b": "正常 vs 相机全涂黑",
@@ -146,13 +146,14 @@ def fig_perturbations(rows, t):
     for g, m in enumerate(rows):
         x0 = left + gw * g + (gw - bw * 6 - gap * 5) / 2
         for i, (key, col) in enumerate(zip(COND_KEYS, COND_COL, strict=True)):
-            v, bx = m[key], x0 + i * (bw + gap)
-            e = ci95(v, 100)
-            hi, lo, cx = min(100, v + e), max(0, v - e), bx + bw / 2
+            runs = [r for r in m[key] if r is not None]  # 每个条件一到两次运行
+            v, bx = sum(runs) / len(runs), x0 + i * (bw + gap)
+            hi, cx = max(runs), bx + bw / 2
             out.append(f'<rect x="{bx:.1f}" y="{y(max(v, 0.8)):.1f}" width="{bw}" height="{ph - (y(max(v, 0.8)) - top):.1f}" rx="2" fill="{col}"/>')
-            if e:
-                out.append(f'<path d="M{cx:.1f} {y(lo):.1f} V{y(hi):.1f} M{cx - 4:.1f} {y(hi):.1f} h8 M{cx - 4:.1f} {y(lo):.1f} h8" stroke="{ERR}" stroke-width="1.2"/>')
-            out.append(f'<text x="{cx:.1f}" y="{y(hi) - 5:.1f}" text-anchor="middle" font-size="12" font-weight="600">{v}</text>')
+            if len(runs) > 1:
+                for j, r in enumerate(runs):
+                    out.append(f'<circle cx="{cx + (j - 0.5) * 9:.1f}" cy="{y(r):.1f}" r="3.2" fill="#fff" stroke="#111827" stroke-width="1.3"/>')
+            out.append(f'<text x="{cx:.1f}" y="{y(hi) - 8:.1f}" text-anchor="middle" font-size="12" font-weight="600">{v:g}</text>')
         out.append(f'<text x="{left + gw * (g + 0.5):.1f}" y="{h - 16}" text-anchor="middle" font-weight="600">{MODEL.get(m["model"], m["model"])}</text>')
     return svg(w, h, out)
 
@@ -239,8 +240,11 @@ if __name__ == "__main__":
     write_csv("blackout_per_task.csv", ["model", "condition"] + [f"task{i}" for i in range(10)] + ["total"],
               [[MODEL.get(m["model"], m["model"]), c] + m[c] + [sum(m[c])] for m in d["BLACKOUT"]["summary"] for c in ("normal", "black")])
     cam = {m["model"]: m for m in fu["cam"]}
-    pert = [{**p, "agent_black": cam[p["model"]]["agent_black"], "wrist_black": cam[p["model"]]["wrist_black"]} for p in fu["perturb"]]
-    write_csv("perturbations.csv", ["model"] + COND_KEYS, [[MODEL.get(m["model"], m["model"])] + [m[k] for k in COND_KEYS] for m in pert])
+    run1 = [{**p, "agent_black": cam[p["model"]]["agent_black"], "wrist_black": cam[p["model"]]["wrist_black"]} for p in fu["perturb"]]
+    write_csv("perturbations.csv", ["model", "run"] + COND_KEYS,
+              [[MODEL.get(m["model"], m["model"]), n] + ["" if m[k] is None else m[k] for k in COND_KEYS]
+               for a, b in zip(run1, fu["perturb2"], strict=True) for n, m in ((1, a), (2, b))])
+    pert = [{"model": a["model"], **{k: [a[k], b[k]] for k in COND_KEYS}} for a, b in zip(run1, fu["perturb2"], strict=True)]
     tasks = [f"task{i}" for i in range(10)]
     rows = [["successes", "pi0_all_black"] + fu["traj"]["successes_by_task"]["traj_pi0_black"] + [sum(fu["traj"]["successes_by_task"]["traj_pi0_black"])]]
     for metric, by, mean in (("path_dtw_cm", "dtw_by_task", "dtw_mean"), ("grasp_distance_cm", "grasp_dist_by_task", "grasp_dist_mean")):

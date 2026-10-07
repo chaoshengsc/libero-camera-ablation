@@ -184,3 +184,22 @@ Source: Table 2 of the paper and the experimental setup in the main text.
 - **"The scene varies little, the benchmark asks little" is withdrawn.** It rested on sighted π0's grasp point spreading only 1.8 cm within a task. This π0 barely depends on images to begin with, so a small spread may be its own behaviour and cannot show that the bowl position varies little. How much the bowl position varies between initial states of a task was not measured in this project. The corresponding sentences were removed from the README and the dashboard. Related public work: LIBERO-PRO (arXiv:2510.03827) and LIBERO-Plus (arXiv:2510.13626); only the abstracts were read.
 - **The repository was renamed** to `libero-camera-ablation`, and the README now puts the ablations first and the reproduction second.
 - **The claim about task 5 is narrowed.** The earlier text said that on the three tasks blind π0 fails (5, 7, 9) the path differs by 6 to 11 cm and it goes somewhere else. On task 5 the 6.0 cm is no larger than the 6.6 cm between two sighted runs on that task, so the statement holds only for task 7 (10.9 vs. 2.6) and task 9 (7.8 vs. 3.3); task 5 is inconclusive. The README and the dashboard were changed.
+
+### Correction (2026-10-07, evening): after a full re-run, "π0 depends on the wrist camera" is withdrawn
+
+The three pipelines were re-run end to end on the workstation with the scripts as they are in the repository (`run_blackout_all.sh`, `run_perturbation.sh`, `run_trajectory_and_single_camera.sh`; 20 evaluations, 100 episodes each, same seed). The raw data of the second run is in `dashboard/data/run2/`.
+
+- **Script problem.** `run_blackout_all.sh` used to run OpenVLA alongside π0.5, and OpenVLA ran out of GPU memory while loading (OpenVLA about 14 GB, π0.5 about 9.4 GB, 24 GB card). OpenVLA now runs alone after the other three models. The re-run passed and OpenVLA is again 0/100 (log on the workstation, not converted into the repository).
+- **Successes in the two runs (first / second).**
+
+  | Model | Normal | Noise | Frozen first frame | Agent-view black | Wrist black | All black |
+  |---|---|---|---|---|---|---|
+  | π0 | 76 / 72 | 79 / 67 | 71 / 80 | 78 / 68 | 59 / 77 | 56 / 56 |
+  | π0.5 | 99 / 98 | 99 / 97 | 0 / 0 | 51 / 57 | 0 / 0 | 0 / 0 |
+  | SmolVLA | 83 / – | 78 / 73 | 0 / 0 | 33 / 31 | 4 / 4 | 0 / 0 |
+
+  π0 with all cameras black, five runs: 56, 54, 56, 54, 53 (the last from one more re-run after the script fix, data in `dashboard/data/run3/`). π0 normal, five runs: 76, 73, 76, 72, 71.
+- **Withdrawn.** "Losing the wrist camera (59%) costs about as much as losing both (56%), so π0 does use the wrist image": the second wrist-black run gave 77% and did not repeat it. "The wrist camera matters more than the agent view for all three models" is narrowed to π0.5 and SmolVLA.
+- **Unchanged.** π0 with black cameras stays at 53–56%. π0.5 and SmolVLA score 0 without a live image. π0.5 and SmolVLA repeat within 6 points.
+- **Added.** Two runs with the same seed are not identical. π0 differed by up to 18 points on one condition, more than the roughly 13 points expected from binomial sampling. The cause was not investigated. The README table and figure now show both runs.
+- **Not done.** The trajectory comparison in section 1.3 still uses the trajectories of the first run only.

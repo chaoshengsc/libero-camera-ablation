@@ -124,6 +124,14 @@ PERTURB = [("pi0", "pi0_spatial_500", "pi0", "pi0_black_all"), ("pi0.5", "pi05_s
 followup = {
     "perturb": [{"model": m, "normal": _n(base, 10), "noise": _n(f"pert_{k}_noise"), "freeze": _n(f"pert_{k}_freeze"), "all_black": _n(black)}
                 for m, base, k, black in PERTURB],
+    # 第二次独立运行（2026-10-07 按仓库脚本整条重跑，数据在 data/run2/）；SmolVLA 没有重跑正常条件
+    "perturb2": [{"model": m, "normal": _n(f"run2/traj_{k}_normal") if k != "smol2" else None,
+                  "noise": _n(f"run2/pert_{k}_noise"), "freeze": _n(f"run2/pert_{k}_freeze"),
+                  "agent_black": _n(f"run2/traj_{k}_agent"), "wrist_black": _n(f"run2/traj_{k}_wrist"), "all_black": _n(f"run2/{black}")}
+                 for m, base, k, black in PERTURB],
+    # π0 的全部 100 回合运行：正常 5 次、全涂黑 5 次
+    "pi0_normal_runs": [_n("pi0_spatial_500", 10), _n("traj_pi0_normal"), _n("traj_pi0_normal2"), _n("run2/traj_pi0_normal"), _n("run2/traj_pi0_normal2")],
+    "pi0_black_runs": [_n("pi0_black_all"), _n("traj_pi0_black"), _n("run2/pi0_black_all"), _n("run2/traj_pi0_black"), _n("run3/pi0_black_all")],
     "traj": _json("traj_analyze.json"),
     "cam": _json("cam_summary.json"),
 }
