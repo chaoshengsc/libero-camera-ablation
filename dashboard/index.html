@@ -257,7 +257,7 @@ const DICT = [
   ["π0 在相机全涂黑后的成功率", "π0 success rate with every camera black"],
   ["π0.5 画面冻结后的成功率", "π0.5 success rate with the image frozen"],
   ["整个回合只给第一帧画面（%），各 100 回合", "first frame only for the whole episode (%), 100 episodes each"],
-  ["降到 0%:", "Drop to 0%: "],
+  ["降到 0%：", "Drop to 0%: "],
   ["SmolVLA 论文 Table 2（每任务 10 次）；该权重只在 LIBERO-Spatial 上训练，评测用 n_action_steps=10", "SmolVLA paper, Table 2 (10 episodes per task); this checkpoint was trained on LIBERO-Spatial only and is evaluated with n_action_steps=10"],
   ["OpenPI LIBERO README（LeRobot 文档复现为 97.0%）", "OpenPI LIBERO README (the LeRobot docs report 97.0%)"],
   ["openvla README（3 种子 × 500 回合，A100）", "openvla README (3 seeds × 500 episodes, A100)"],
@@ -317,7 +317,7 @@ const MNAME = { pi0: "π0", "pi0.5": "π0.5" };
   const ok = done.filter(reproduced), p0 = BO.summary.find(r => r.model === "pi0"), p5 = (FU.perturb || []).find(r => r.model === "pi0.5");
   const zero = BO.summary.filter(r => sum(r.black) === 0).map(r => MNAME[r.model] || r.model);
   $("keys").innerHTML = [
-    [`${sum(p0.black)}%`, "π0 在相机全涂黑后的成功率", "降到 0%:" + zero.join(" · ")],
+    [`${sum(p0.black)}%`, "π0 在相机全涂黑后的成功率", "降到 0%：" + zero.join(" · ")],
     [`${p5.normal} → ${p5.freeze}`, "π0.5 画面冻结后的成功率", "整个回合只给第一帧画面（%），各 100 回合"],
     [`${ok.length} / ${done.length}`, "公开权重复现到基准的误差范围内", done.map(r => r.model).join(" · ")],
   ].map(([v, k, d]) => `<div class="key"><div class="v">${v}</div><div class="k">${k}</div><div class="d">${d}</div></div>`).join("");
