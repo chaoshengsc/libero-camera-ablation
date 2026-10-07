@@ -105,18 +105,24 @@ Per-task results are on the [dashboard](https://chaoshengsc.github.io/libero-cam
 ## Quick start
 
 ```bash
-export EMB_ROOT=/path/to/workdir      # environments, caches, checkpoints and logs all live here
-# after installing the environments and downloading checkpoints (docs/INSTALL.md):
-bash scripts/eval/run_act.sh          # ACT, 500 episodes, about 17 minutes on an RTX A5000
+# environments, caches, checkpoints and logs all live here
+export EMB_ROOT=/path/to/workdir
+
+# after setting up as described in docs/INSTALL.md:
+# ACT, 500 episodes, about 17 minutes on an RTX A5000
+bash scripts/eval/run_act.sh
 python3 scripts/analysis/summarize_eval.py act_cube_500
-bash scripts/eval/run_blackout_all.sh  # four LIBERO models with every camera black, 100 episodes each
+
+# four LIBERO models, every camera black, 100 episodes each
+bash scripts/eval/run_blackout_all.sh
 python3 scripts/analysis/summarize_blackout.py
 ```
 
 To regenerate the figures and tables in this README from the evaluation files in `dashboard/data/`, with no GPU and no dependencies:
 
 ```bash
-python3 dashboard/build.py && python3 scripts/analysis/make_figures.py
+python3 dashboard/build.py
+python3 scripts/analysis/make_figures.py
 ```
 
 | Document | Content |
@@ -128,19 +134,19 @@ python3 dashboard/build.py && python3 scripts/analysis/make_figures.py
 
 ## Repository layout
 
-```
-scripts/eval/      evaluation entry scripts; blackout, perturbation and trajectory-logging wrappers
-scripts/train/     π0 fine-tuning scripts for an experiment recorded in docs/NOTES.md (not part of the results above)
-scripts/analysis/  metrics, summaries, figure generation
-scripts/checks/    self-checks for GPU, headless EGL rendering and video decoding
-results/           result tables (CSV) generated from dashboard/data, and the trajectories plotted in 1.3
-dashboard/         results dashboard and the raw eval_info.json of every run
-media/             figures and demos used in this README (Chinese versions in media/zh/)
-docs/              installation, troubleshooting, reproduction notes
-env/               environment file, pip constraints, exported package lists
-tests/             unit tests for the metrics, consistency checks on the published numbers, entry-script regression tests
-viewer/            replay a policy trajectory locally in the interactive MuJoCo viewer
-```
+| Path | Content |
+|---|---|
+| `scripts/eval/` | Evaluation entry scripts; blackout, perturbation and trajectory-logging wrappers |
+| `scripts/analysis/` | Metrics, summaries, figure generation |
+| `scripts/checks/` | Self-checks for GPU, headless EGL rendering and video decoding |
+| `scripts/train/` | π0 fine-tuning scripts for an experiment recorded in `docs/NOTES.md` (not part of the results above) |
+| `results/` | Result tables (CSV) generated from `dashboard/data`, and the trajectories plotted in 1.3 |
+| `dashboard/` | Results dashboard and the raw `eval_info.json` of every run |
+| `media/` | Figures and demos used in this README (Chinese versions in `media/zh/`) |
+| `docs/` | Installation, troubleshooting, reproduction notes |
+| `env/` | Environment file, pip constraints, exported package lists |
+| `tests/` | Unit tests for the metrics, consistency checks on the published numbers, entry-script regression tests |
+| `viewer/` | Replay a policy trajectory locally in the interactive MuJoCo viewer |
 
 ## Limitations
 

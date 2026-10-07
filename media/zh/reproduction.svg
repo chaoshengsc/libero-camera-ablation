@@ -1,8 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 330" width="760" height="330" font-family="-apple-system,'Segoe UI','PingFang SC','Microsoft YaHei','Noto Sans CJK SC',sans-serif" font-size="13" fill="#1f2933">
 <rect width="760" height="330" rx="8" fill="#ffffff"/>
-<text x="20" y="28" font-size="16" font-weight="600">公开权重复现:本机成功率 vs 基准</text>
-<circle cx="26" cy="46" r="5" fill="#2563eb"/><text x="38" y="50" fill="#6b7280">本机(500 回合,95% 置信区间)</text>
-<path d="M248 40 l6 6 l-6 6 l-6 -6 z" fill="none" stroke="#1f2933" stroke-width="1.6"/><text x="262" y="50" fill="#6b7280">基准</text>
+<text x="20" y="28" font-size="16" font-weight="600">公开权重复现：本机成功率 vs 基准</text>
+<circle cx="26" cy="46" r="5" fill="#2563eb"/><text x="38" y="50" fill="#6b7280">本机（500 回合，95% 置信区间）</text>
+<path d="M265 40 l6 6 l-6 6 l-6 -6 z" fill="none" stroke="#1f2933" stroke-width="1.6"/><text x="279" y="50" fill="#6b7280">基准</text>
 <line x1="190.0" y1="64" x2="190.0" y2="290" stroke="#e5e7eb"/>
 <text x="190.0" y="308" text-anchor="middle" fill="#6b7280">50%</text>
 <line x1="296.0" y1="64" x2="296.0" y2="290" stroke="#e5e7eb"/>

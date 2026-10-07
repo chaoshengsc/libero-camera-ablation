@@ -1,7 +1,7 @@
-"""从 dashboard/ 的评测汇总生成 results/*.csv 和 README 用的 SVG 图(只用标准库)。
-英文图写到 media/,中文图写到 media/zh/。
+"""从 dashboard/ 的评测汇总生成 results/*.csv 和 README 用的 SVG 图（只用标准库）。
+英文图写到 media/，中文图写到 media/zh/。
 
-用法(仓库根目录): python3 dashboard/build.py && python3 scripts/analysis/make_figures.py
+用法（仓库根目录）：python3 dashboard/build.py && python3 scripts/analysis/make_figures.py
 """
 import csv
 import json
@@ -35,17 +35,17 @@ TXT = {
         "in_lang_note": "unchanged", "in_sub_state": "end-effector pose and gripper opening", "in_sub_lang": "“pick up the black bowl …”",
     },
     "zh": {
-        "rep_title": "公开权重复现:本机成功率 vs 基准",
-        "rep_ours": "本机(500 回合,95% 置信区间)", "rep_ref": "基准", "rep_fail": "未复现(区间不重叠)",
-        "pert_title": "扰动相机输入后的成功率(LIBERO-Spatial,每组 100 回合,95% 置信区间)",
+        "rep_title": "公开权重复现：本机成功率 vs 基准",
+        "rep_ours": "本机（500 回合，95% 置信区间）", "rep_ref": "基准", "rep_fail": "未复现（区间不重叠）",
+        "pert_title": "扰动相机输入后的成功率（LIBERO-Spatial，每组 100 回合，95% 置信区间）",
         "conds": ["正常", "加高斯噪声", "冻结首帧", "只涂主视角", "只涂腕部", "全涂黑"],
-        "traj_title": "π0 末端执行器路线(俯视):每个任务 10 个回合,初始状态相同",
-        "traj_a": "正常 vs 正常重跑(噪声底线)", "traj_b": "正常 vs 相机全涂黑",
-        "traj_row": "任务 {i}:碗在{name}。全涂黑时 10 回合成功 {k} 次。",
+        "traj_title": "π0 末端执行器路线（俯视）：每个任务 10 个回合，初始状态相同",
+        "traj_a": "正常 vs 正常重跑（噪声底线）", "traj_b": "正常 vs 相机全涂黑",
+        "traj_row": "任务 {i}：碗在{name}。全涂黑时 10 回合成功 {k} 次。",
         "traj_task": {4: "木柜上层抽屉里", 7: "灶台上"},
-        "traj_normal": "正常", "traj_rerun": "正常(重跑)", "traj_black": "相机全涂黑", "traj_grasp": "圆点 = 抓取点",
+        "traj_normal": "正常", "traj_rerun": "正常（重跑）", "traj_black": "相机全涂黑", "traj_grasp": "圆点 = 抓取点",
         "traj_start": "起点", "traj_scale": "10 cm",
-        "in_title": "策略收到什么输入,各实验改了哪一项",
+        "in_title": "策略收到什么输入，各实验改了哪一项",
         "in_agent": "主视角相机", "in_wrist": "腕部相机", "in_state": "机械臂状态", "in_lang": "任务指令",
         "in_policy": "策略", "in_action": "动作",
         "in_img_note": "涂黑 / 加噪声 / 冻结", "in_state_note": "不改",
@@ -54,7 +54,7 @@ TXT = {
 }
 COND_KEYS = ["normal", "noise", "freeze", "agent_black", "wrist_black", "all_black"]
 COND_COL = ["#9ca3af", "#86efac", "#14b8a6", "#60a5fa", "#f59e0b", "#111827"]
-TRAJ_TASKS = [4, 7]  # 轨迹图展示的任务:一个全涂黑仍成功的,一个全涂黑后失败的
+TRAJ_TASKS = [4, 7]  # 轨迹图展示的任务：一个全涂黑仍成功的，一个全涂黑后失败的
 PAIR_IDS = ["pi0_normal_vs_rerun", "pi0_all_black_vs_normal", "pi05_vs_pi0_normal"]  # 与 traj_analyze.json 里 pairs 的顺序一致
 SRC_EN = {"ACT": "eval_info.json shipped in the Hugging Face repo (500 episodes)", "OpenVLA": "openvla README (3 seeds x 500 episodes)",
           "SmolVLA": "SmolVLA paper, Table 2 (10 episodes per task)", "π0.5": "OpenPI LIBERO README",
@@ -62,7 +62,7 @@ SRC_EN = {"ACT": "eval_info.json shipped in the Hugging Face repo (500 episodes)
 
 
 def ci95(pc, n):
-    """二项分布正态近似的 95% 置信区间半宽(百分点);与 metrics.ci95 相同,这里重写一份以保持本脚本零依赖。"""
+    """二项分布正态近似的 95% 置信区间半宽（百分点）；与 metrics.ci95 相同，这里重写一份以保持本脚本零依赖。"""
     return 196 * math.sqrt(pc / 100 * (1 - pc / 100) / n)
 
 
@@ -89,12 +89,12 @@ def title(t):
 
 
 def tw(s, size=13):
-    """粗略估计文字宽度(像素),用于排图例。"""
+    """粗略估计文字宽度（像素），用于排图例。"""
     return sum(size * (0.56 if c.isascii() else 1.0) for c in s)
 
 
 def reproduced(r):
-    """本机区间与基准区间(没有则取基准点)是否重叠。"""
+    """本机区间与基准区间（没有则取基准点）是否重叠。"""
     b = r.get("baseline_pm") or r.get("baseline_ci") or 0
     return abs(r["pc"] - r["baseline_pc"]) <= r["ci"] + b
 
@@ -126,7 +126,7 @@ def fig_reproduction(rows, t):
         bx = x(r["baseline_pc"])
         out.append(f'<path d="M{bx:.1f} {y - 7} l7 7 l-7 7 l-7 -7 z" fill="none" stroke="{INK}" stroke-width="1.6"/>')
         out.append(f'<text x="{x(r["pc"]):.1f}" y="{y - 11:.1f}" text-anchor="middle" font-size="12" fill="{c}" font-weight="600">{r["pc"]:.1f}</text>')
-        if abs(r["pc"] - r["baseline_pc"]) > 6:  # 离得远才单独标基准值,避免重叠
+        if abs(r["pc"] - r["baseline_pc"]) > 6:  # 离得远才单独标基准值，避免重叠
             out.append(f'<text x="{bx:.1f}" y="{y - 11:.1f}" text-anchor="middle" font-size="12">{r["baseline_pc"]:.1f}</text>')
     return svg(w, h, out)
 
@@ -158,13 +158,13 @@ def fig_perturbations(rows, t):
 
 
 def fig_trajectory(trajs, t):
-    """每个任务一行、两幅俯视图:左 = 正常两次(噪声底线),右 = 正常 vs 全涂黑。坐标为机器人基座系 XY(cm),各行同一比例尺。"""
+    """每个任务一行、两幅俯视图：左 = 正常两次（噪声底线），右 = 正常 vs 全涂黑。坐标为机器人基座系 XY(cm)，各行同一比例尺。"""
     pw, pad, top = 340, 26, 104
     box = []
     for tr in trajs:
         pts = [p for eps in tr["runs"].values() for e in eps for p in e["xy"]]
         box.append((min(p[0] for p in pts) - 2, max(p[0] for p in pts) + 2, min(p[1] for p in pts) - 2, max(p[1] for p in pts) + 2))
-    s = (pw - 20) / max(b[3] - b[2] for b in box)  # 画面横向 = 机器人 Y,纵向 = 机器人 X
+    s = (pw - 20) / max(b[3] - b[2] for b in box)  # 画面横向 = 机器人 Y，纵向 = 机器人 X
     w = pad * 2 + pw * 2 + 28
     out = [title(t["traj_title"])]
     lx = pad

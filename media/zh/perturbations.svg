@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 350" width="760" height="350" font-family="-apple-system,'Segoe UI','PingFang SC','Microsoft YaHei','Noto Sans CJK SC',sans-serif" font-size="13" fill="#1f2933">
 <rect width="760" height="350" rx="8" fill="#ffffff"/>
-<text x="20" y="28" font-size="16" font-weight="600">扰动相机输入后的成功率(LIBERO-Spatial,每组 100 回合,95% 置信区间)</text>
+<text x="20" y="28" font-size="16" font-weight="600">扰动相机输入后的成功率（LIBERO-Spatial，每组 100 回合，95% 置信区间）</text>
 <rect x="20" y="42" width="12" height="12" rx="2" fill="#9ca3af"/><text x="37" y="53" fill="#6b7280">正常</text>
 <rect x="81" y="42" width="12" height="12" rx="2" fill="#86efac"/><text x="98" y="53" fill="#6b7280">加高斯噪声</text>
 <rect x="181" y="42" width="12" height="12" rx="2" fill="#14b8a6"/><text x="198" y="53" fill="#6b7280">冻结首帧</text>

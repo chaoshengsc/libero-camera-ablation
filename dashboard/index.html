@@ -33,7 +33,7 @@ body { margin: 0; background: var(--surface-0); color: var(--text-primary);
 a { color: inherit; }
 main { max-width: 920px; margin: 0 auto; padding: 0 20px 80px; }
 
-/* 顶栏:锚点导航 + 仓库链接 + 语言切换 */
+/* 顶栏：锚点导航 + 仓库链接 + 语言切换 */
 .bar { position: sticky; top: 0; z-index: 5; background: color-mix(in srgb, var(--surface-0) 88%, transparent);
   backdrop-filter: blur(10px); border-bottom: 1px solid var(--border); }
 .bar-in { max-width: 920px; margin: 0 auto; padding: 0 20px; height: 46px; display: flex; align-items: center; gap: 20px;
@@ -140,7 +140,7 @@ footer { margin-top: 80px; padding-top: 20px; border-top: 1px solid var(--border
   <header>
     <p class="eyebrow">libero-camera-ablation</p>
     <h1>四个机器人策略在 LIBERO-Spatial 上的相机输入消融</h1>
-    <p class="lede">四个策略里有三个离开实时相机画面就无法完成任务;一个公开的 π0 权重在所有相机涂黑后仍有 54–56% 的成功率。做消融之前,先复现了五个公开权重。</p>
+    <p class="lede">四个策略里有三个离开实时相机画面就无法完成任务；一个公开的 π0 权重在所有相机涂黑后仍有 54–56% 的成功率。做消融之前，先复现了五个公开权重。</p>
     <div class="keys" id="keys"></div>
   </header>
 
@@ -148,13 +148,13 @@ footer { margin-top: 80px; padding-top: 20px; border-top: 1px solid var(--border
     <div class="sec-n">01</div>
     <h2>相机消融</h2>
     <p class="intro">LIBERO 上的策略收到两路相机画面、机械臂状态和一句任务指令。每个实验只改相机输入。</p>
-    <p class="intro">每个条件 100 回合(10 个任务 × 10 个初始状态,同一个种子),两个条件要相差约 13 个百分点以上才有意义。</p>
-    <p class="intro">本节的 π0 是 LeRobot 的公开权重,500 回合的正常成功率是 73%。它训练不足,也没有官方的 π0 LIBERO 权重可以对照,所以下面的现象只说明这个权重,不代表所有 π0。</p>
-    <div class="block"><div class="fig"><img id="figInputs" alt="策略的输入,以及各实验改了哪一项"></div></div>
+    <p class="intro">每个条件 100 回合（10 个任务 × 10 个初始状态，同一个种子），两个条件要相差约 13 个百分点以上才有意义。</p>
+    <p class="intro">本节的 π0 是 LeRobot 的公开权重，500 回合的正常成功率是 73%。它训练不足，也没有官方的 π0 LIBERO 权重可以对照，所以下面的现象只说明这个权重，不代表所有 π0。</p>
+    <div class="block"><div class="fig"><img id="figInputs" alt="策略的输入，以及各实验改了哪一项"></div></div>
 
     <div class="block">
       <h3><span class="n">1.1</span>所有相机涂黑</h3>
-      <p class="take">三个模型没有画面就完全不能动作,π0 仍有一半以上的回合成功。</p>
+      <p class="take">三个模型没有画面就完全不能动作，π0 仍有一半以上的回合成功。</p>
       <div class="panel">
         <div class="legend" style="margin-bottom:6px">
           <span><svg width="14" height="14"><circle cx="7" cy="7" r="5" fill="var(--series-1)"/></svg>正常画面</span>
@@ -162,24 +162,24 @@ footer { margin-top: 80px; padding-top: 20px; border-top: 1px solid var(--border
         </div>
         <div class="chart-wrap"><svg id="bchart" role="img" aria-label="正常与全涂黑成功率对比"></svg></div>
       </div>
-      <p class="cap">π0 各任务的成功次数(每个任务 10 回合):全涂黑后的失败集中在三个任务上。</p>
+      <p class="cap">π0 各任务的成功次数（每个任务 10 回合）：全涂黑后的失败集中在三个任务上。</p>
       <div class="panel"><div class="mx-wrap"><table class="mx" id="bmatrix"></table></div></div>
     </div>
 
     <div class="block">
       <h3><span class="n">1.2</span>单路相机、噪声、冻结画面</h3>
-      <p class="take">π0.5 和 SmolVLA 需要实时画面;π0 基本不需要,对主视角相机也测不出依赖。</p>
+      <p class="take">π0.5 和 SmolVLA 需要实时画面；π0 基本不需要，对主视角相机也测不出依赖。</p>
       <div class="panel"><div class="mx-wrap"><table class="mx" id="cammatrix" style="min-width:520px"></table></div></div>
-      <p class="note">每格是 100 回合里的成功次数。噪声是标准差 0.1 的高斯噪声;冻结首帧指整个回合只给第一帧画面,这是真实的、分布内的画面。对三个模型来说,腕部相机都比主视角更重要。</p>
+      <p class="note">每格是 100 回合里的成功次数。噪声是标准差 0.1 的高斯噪声；冻结首帧指整个回合只给第一帧画面，这是真实的、分布内的画面。对三个模型来说，腕部相机都比主视角更重要。</p>
     </div>
 
     <div class="block">
       <h3><span class="n">1.3</span>看不见的 π0 在成功的任务上走的是同一条路线</h3>
-      <p class="take">在全涂黑仍能成功的任务上,它的路线和看得见时在噪声内无法区分;在从未成功的任务 7 和 9 上,它走到了别处。</p>
+      <p class="take">在全涂黑仍能成功的任务上，它的路线和看得见时在噪声内无法区分；在从未成功的任务 7 和 9 上，它走到了别处。</p>
       <div class="fig"><img id="figTraj" alt="π0 有无相机输入时的末端路线"></div>
-      <p class="cap">各任务的末端路线差异(cm,动态时间规整后的平均点距)。标出的是全涂黑后失败的三个任务。</p>
+      <p class="cap">各任务的末端路线差异（cm，动态时间规整后的平均点距）。标出的是全涂黑后失败的三个任务。</p>
       <div class="panel"><div class="mx-wrap"><table class="mx" id="trajmatrix" style="min-width:560px"></table></div></div>
-      <p class="note">任务 0–3 的两次正常运行几乎重合,因为同一个种子下还没有分叉,不能反映噪声;噪声底线看任务 4–9(平均 3.4 cm)。全涂黑仍能成功的七个任务上,路线相差 2.8 cm。这种比较分不出策略是跟着碗走,还是每个任务重复一套动作;同一任务内碗的位置变化有多大,这里没有测。</p>
+      <p class="note">任务 0–3 的两次正常运行几乎重合，因为同一个种子下还没有分叉，不能反映噪声；噪声底线看任务 4–9（平均 3.4 cm）。全涂黑仍能成功的七个任务上，路线相差 2.8 cm。这种比较分不出策略是跟着碗走，还是每个任务重复一套动作；同一任务内碗的位置变化有多大，这里没有测。</p>
     </div>
 
   </section>
@@ -187,13 +187,13 @@ footer { margin-top: 80px; padding-top: 20px; border-top: 1px solid var(--border
   <section id="repro">
     <div class="sec-n">02</div>
     <h2>复现结果</h2>
-    <p class="intro">每个模型评测 500 回合,与原作者公布的基准对比。两个 95% 置信区间有重叠即算复现。</p>
+    <p class="intro">每个模型评测 500 回合，与原作者公布的基准对比。两个 95% 置信区间有重叠即算复现。</p>
 
     <div class="block">
       <div class="panel">
         <div class="row-head">
           <div class="legend" id="legend">
-            <span><svg width="14" height="14"><circle cx="7" cy="7" r="5" fill="var(--series-1)"/></svg>本仓库(横线 = 95% 置信区间)</span>
+            <span><svg width="14" height="14"><circle cx="7" cy="7" r="5" fill="var(--series-1)"/></svg>本仓库（横线 = 95% 置信区间）</span>
             <span><svg width="14" height="14"><rect x="2.5" y="2.5" width="9" height="9" transform="rotate(45 7 7)" fill="var(--series-2)"/></svg>原作者基准</span>
           </div>
           <button class="toggle" id="tblBtn" aria-pressed="false">表格视图</button>
@@ -201,12 +201,12 @@ footer { margin-top: 80px; padding-top: 20px; border-top: 1px solid var(--border
         <div class="chart-wrap" id="chartWrap"><svg id="chart" role="img" aria-label="各模型成功率对比"></svg><div class="tip" id="tip"></div></div>
         <div id="tbl" class="hidden mx-wrap"></div>
       </div>
-      <p class="note">SmolVLA 用的是只在 LIBERO-Spatial 上训练的公开权重,评测时 n_action_steps=10。把鼠标移到图上可以看基准出处。</p>
+      <p class="note">SmolVLA 用的是只在 LIBERO-Spatial 上训练的公开权重，评测时 n_action_steps=10。把鼠标移到图上可以看基准出处。</p>
     </div>
 
     <div class="block">
       <h3>LIBERO-Spatial 各任务成功率</h3>
-      <p class="cap">每格是该任务 50 回合的成功率(%)。列标题是"拿起黑碗并放到盘子上"里碗的初始位置。</p>
+      <p class="cap">每格是该任务 50 回合的成功率（%）。列标题是"拿起黑碗并放到盘子上"里碗的初始位置。</p>
       <div class="panel">
         <div class="mx-wrap"><table class="mx" id="matrix"></table></div>
         <div class="mx-legend"><span>50%</span><span class="bar"></span><span>100%</span></div>
@@ -217,7 +217,7 @@ footer { margin-top: 80px; padding-top: 20px; border-top: 1px solid var(--border
   <section id="replay">
     <div class="sec-n">03</div>
     <h2>回放</h2>
-    <p class="intro">每个任务一段成功、一段失败的录像。全涂黑的录像是环境的真实渲染,模型当时收到的是黑图。</p>
+    <p class="intro">每个任务一段成功、一段失败的录像。全涂黑的录像是环境的真实渲染，模型当时收到的是黑图。</p>
     <div class="block" id="replayBody">
       <div class="filters" id="filters"></div>
       <div id="videos"></div>
@@ -233,37 +233,37 @@ const $ = (id) => document.getElementById(id);
 const fmt = (x) => x == null ? "—" : x.toFixed(1) + "%";
 const sum = (a) => a.reduce((p, q) => p + q, 0);
 
-// ---- 语言:默认跟随浏览器,?lang=zh|en 或右上角按钮切换。英文版在渲染后按词典替换文本(整句在前,短词在后)。
+// ---- 语言：默认跟随浏览器，？lang=zh|en 或右上角按钮切换。英文版在渲染后按词典替换文本（整句在前，短词在后）。
 const LANG = new URLSearchParams(location.search).get("lang") || ((navigator.language || "").toLowerCase().startsWith("zh") ? "zh" : "en");
 const DICT = [
-  ["四个策略里有三个离开实时相机画面就无法完成任务;一个公开的 π0 权重在所有相机涂黑后仍有 54–56% 的成功率。做消融之前,先复现了五个公开权重。", "Three of the four policies fail without a live camera image. One public π0 checkpoint still succeeds 54–56% of the time with every camera blacked out. Five public checkpoints were reproduced first."],
-  ["每个模型评测 500 回合,与原作者公布的基准对比。两个 95% 置信区间有重叠即算复现。", "Each model is evaluated for 500 episodes and compared with the reference published by its authors. A result counts as reproduced when the two 95% confidence intervals overlap."],
-  ["SmolVLA 用的是只在 LIBERO-Spatial 上训练的公开权重,评测时 n_action_steps=10。把鼠标移到图上可以看基准出处。", "SmolVLA uses a public checkpoint trained on LIBERO-Spatial only, evaluated with n_action_steps=10. Hover over the chart for the source of each reference."],
-  ["本节的 π0 是 LeRobot 的公开权重,500 回合的正常成功率是 73%。它训练不足,也没有官方的 π0 LIBERO 权重可以对照,所以下面的现象只说明这个权重,不代表所有 π0。", "π0 in this section is LeRobot's public checkpoint, which scores 73% over 500 normal episodes. It is under-trained and there is no official π0 LIBERO checkpoint to compare against, so the behaviour below describes this checkpoint, not π0 in general."],
-  ["每格是该任务 50 回合的成功率(%)。列标题是\"拿起黑碗并放到盘子上\"里碗的初始位置。", "Each cell is the success rate (%) over 50 episodes of that task. Column headers give where the bowl starts in \"pick up the black bowl and place it on the plate\"."],
+  ["四个策略里有三个离开实时相机画面就无法完成任务；一个公开的 π0 权重在所有相机涂黑后仍有 54–56% 的成功率。做消融之前，先复现了五个公开权重。", "Three of the four policies fail without a live camera image. One public π0 checkpoint still succeeds 54–56% of the time with every camera blacked out. Five public checkpoints were reproduced first."],
+  ["每个模型评测 500 回合，与原作者公布的基准对比。两个 95% 置信区间有重叠即算复现。", "Each model is evaluated for 500 episodes and compared with the reference published by its authors. A result counts as reproduced when the two 95% confidence intervals overlap."],
+  ["SmolVLA 用的是只在 LIBERO-Spatial 上训练的公开权重，评测时 n_action_steps=10。把鼠标移到图上可以看基准出处。", "SmolVLA uses a public checkpoint trained on LIBERO-Spatial only, evaluated with n_action_steps=10. Hover over the chart for the source of each reference."],
+  ["本节的 π0 是 LeRobot 的公开权重，500 回合的正常成功率是 73%。它训练不足，也没有官方的 π0 LIBERO 权重可以对照，所以下面的现象只说明这个权重，不代表所有 π0。", "π0 in this section is LeRobot's public checkpoint, which scores 73% over 500 normal episodes. It is under-trained and there is no official π0 LIBERO checkpoint to compare against, so the behaviour below describes this checkpoint, not π0 in general."],
+  ["每格是该任务 50 回合的成功率（%）。列标题是\"拿起黑碗并放到盘子上\"里碗的初始位置。", "Each cell is the success rate (%) over 50 episodes of that task. Column headers give where the bowl starts in \"pick up the black bowl and place it on the plate\"."],
   ["LIBERO 上的策略收到两路相机画面、机械臂状态和一句任务指令。每个实验只改相机输入。", "A LIBERO policy receives two camera images, the robot state and a language instruction. Each experiment changes only the camera input."],
-  ["每个条件 100 回合(10 个任务 × 10 个初始状态,同一个种子),两个条件要相差约 13 个百分点以上才有意义。", "Each condition is 100 episodes (10 tasks × 10 initial states, same seed). Two conditions have to differ by about 13 points before the difference means anything."],
-  ["三个模型没有画面就完全不能动作,π0 仍有一半以上的回合成功。", "Three models cannot act without images. π0 still succeeds in more than half of the episodes."],
-  ["π0 各任务的成功次数(每个任务 10 回合):全涂黑后的失败集中在三个任务上。", "π0 successes per task (10 episodes each): the failures with black cameras are concentrated in three tasks."],
-  ["π0.5 和 SmolVLA 需要实时画面;π0 基本不需要,对主视角相机也测不出依赖。", "π0.5 and SmolVLA need a live image. π0 barely needs one and shows no measurable dependence on the agent-view camera."],
-  ["每格是 100 回合里的成功次数。噪声是标准差 0.1 的高斯噪声;冻结首帧指整个回合只给第一帧画面,这是真实的、分布内的画面。对三个模型来说,腕部相机都比主视角更重要。", "Each cell is successes out of 100 episodes. Noise is Gaussian with standard deviation 0.1. A frozen first frame means the policy sees only the first image for the whole episode, which is a real, in-distribution image. The wrist camera matters more than the agent view for all three models."],
-  ["在全涂黑仍能成功的任务上,它的路线和看得见时在噪声内无法区分;在从未成功的任务 7 和 9 上,它走到了别处。", "On the tasks it still solves blind, its path cannot be told apart from the sighted path within noise. On tasks 7 and 9, where it never succeeds, it goes somewhere else."],
-  ["各任务的末端路线差异(cm,动态时间规整后的平均点距)。标出的是全涂黑后失败的三个任务。", "End-effector path difference per task (cm, mean point distance after dynamic time warping). The three tasks where blind π0 fails are highlighted."],
-  ["任务 0–3 的两次正常运行几乎重合,因为同一个种子下还没有分叉,不能反映噪声;噪声底线看任务 4–9(平均 3.4 cm)。全涂黑仍能成功的七个任务上,路线相差 2.8 cm。这种比较分不出策略是跟着碗走,还是每个任务重复一套动作;同一任务内碗的位置变化有多大,这里没有测。", "Re-runs of tasks 0–3 are almost identical because both runs use the same seed and had not yet diverged, so they say nothing about noise; the noise floor comes from tasks 4–9 (3.4 cm on average). On the seven tasks blind π0 still solves, the path differs by 2.8 cm. This comparison cannot separate a policy that tracks the bowl from one that repeats one motion per task, and how much the bowl position varies within a task was not measured here."],
-  ["每个任务一段成功、一段失败的录像。全涂黑的录像是环境的真实渲染,模型当时收到的是黑图。", "One successful and one failed episode per task. Recordings of the all-black runs show the simulator's real rendering; the model received black images."],
-  ["回放视频体积大,没有随仓库发布。在本地把评测输出的 videos/ 放到 dashboard/data/<run>/ 下,就能在这里播放。", "Replay videos are too large to publish with the repository. Put each run's videos/ folder under dashboard/data/<run>/ locally to play them here."],
+  ["每个条件 100 回合（10 个任务 × 10 个初始状态，同一个种子），两个条件要相差约 13 个百分点以上才有意义。", "Each condition is 100 episodes (10 tasks × 10 initial states, same seed). Two conditions have to differ by about 13 points before the difference means anything."],
+  ["三个模型没有画面就完全不能动作，π0 仍有一半以上的回合成功。", "Three models cannot act without images. π0 still succeeds in more than half of the episodes."],
+  ["π0 各任务的成功次数（每个任务 10 回合）：全涂黑后的失败集中在三个任务上。", "π0 successes per task (10 episodes each): the failures with black cameras are concentrated in three tasks."],
+  ["π0.5 和 SmolVLA 需要实时画面；π0 基本不需要，对主视角相机也测不出依赖。", "π0.5 and SmolVLA need a live image. π0 barely needs one and shows no measurable dependence on the agent-view camera."],
+  ["每格是 100 回合里的成功次数。噪声是标准差 0.1 的高斯噪声；冻结首帧指整个回合只给第一帧画面，这是真实的、分布内的画面。对三个模型来说，腕部相机都比主视角更重要。", "Each cell is successes out of 100 episodes. Noise is Gaussian with standard deviation 0.1. A frozen first frame means the policy sees only the first image for the whole episode, which is a real, in-distribution image. The wrist camera matters more than the agent view for all three models."],
+  ["在全涂黑仍能成功的任务上，它的路线和看得见时在噪声内无法区分；在从未成功的任务 7 和 9 上，它走到了别处。", "On the tasks it still solves blind, its path cannot be told apart from the sighted path within noise. On tasks 7 and 9, where it never succeeds, it goes somewhere else."],
+  ["各任务的末端路线差异（cm，动态时间规整后的平均点距）。标出的是全涂黑后失败的三个任务。", "End-effector path difference per task (cm, mean point distance after dynamic time warping). The three tasks where blind π0 fails are highlighted."],
+  ["任务 0–3 的两次正常运行几乎重合，因为同一个种子下还没有分叉，不能反映噪声；噪声底线看任务 4–9（平均 3.4 cm）。全涂黑仍能成功的七个任务上，路线相差 2.8 cm。这种比较分不出策略是跟着碗走，还是每个任务重复一套动作；同一任务内碗的位置变化有多大，这里没有测。", "Re-runs of tasks 0–3 are almost identical because both runs use the same seed and had not yet diverged, so they say nothing about noise; the noise floor comes from tasks 4–9 (3.4 cm on average). On the seven tasks blind π0 still solves, the path differs by 2.8 cm. This comparison cannot separate a policy that tracks the bowl from one that repeats one motion per task, and how much the bowl position varies within a task was not measured here."],
+  ["每个任务一段成功、一段失败的录像。全涂黑的录像是环境的真实渲染，模型当时收到的是黑图。", "One successful and one failed episode per task. Recordings of the all-black runs show the simulator's real rendering; the model received black images."],
+  ["回放视频体积大，没有随仓库发布。在本地把评测输出的 videos/ 放到 dashboard/data/<run>/ 下，就能在这里播放。", "Replay videos are too large to publish with the repository. Put each run's videos/ folder under dashboard/data/<run>/ locally to play them here."],
   ["置信区间为二项分布的正态近似。全部数据、脚本与说明见 GitHub 仓库。", "Confidence intervals use the normal approximation to the binomial. All data, scripts and notes are in the GitHub repository."],
   ["公开权重复现到基准的误差范围内", "public checkpoints reproduced within sampling error"],
   ["π0 在相机全涂黑后的成功率", "π0 success rate with every camera black"],
   ["π0.5 画面冻结后的成功率", "π0.5 success rate with the image frozen"],
-  ["整个回合只给第一帧画面(%),各 100 回合", "first frame only for the whole episode (%), 100 episodes each"],
+  ["整个回合只给第一帧画面（%），各 100 回合", "first frame only for the whole episode (%), 100 episodes each"],
   ["降到 0%:", "Drop to 0%: "],
-  ["SmolVLA 论文 Table 2(每任务 10 次);该权重只在 LIBERO-Spatial 上训练,评测用 n_action_steps=10", "SmolVLA paper, Table 2 (10 episodes per task); this checkpoint was trained on LIBERO-Spatial only and is evaluated with n_action_steps=10"],
-  ["OpenPI LIBERO README(LeRobot 文档复现为 97.0%)", "OpenPI LIBERO README (the LeRobot docs report 97.0%)"],
-  ["openvla README(3 种子 × 500 回合,A100)", "openvla README (3 seeds × 500 episodes, A100)"],
-  ["LeRobot 模型卡(500 回合;原版 DP 仓库同等模型 64.2%)", "LeRobot model card (500 episodes; the equivalent model in the original DP repo scores 64.2%)"],
-  ["HF 仓库自带 eval_info.json(500 回合)", "eval_info.json shipped in the HF repo (500 episodes)"],
-  ["策略的输入,以及各实验改了哪一项", "What the policy receives and what each experiment changes"],
+  ["SmolVLA 论文 Table 2（每任务 10 次）；该权重只在 LIBERO-Spatial 上训练，评测用 n_action_steps=10", "SmolVLA paper, Table 2 (10 episodes per task); this checkpoint was trained on LIBERO-Spatial only and is evaluated with n_action_steps=10"],
+  ["OpenPI LIBERO README（LeRobot 文档复现为 97.0%）", "OpenPI LIBERO README (the LeRobot docs report 97.0%)"],
+  ["openvla README（3 种子 × 500 回合，A100）", "openvla README (3 seeds × 500 episodes, A100)"],
+  ["LeRobot 模型卡（500 回合；原版 DP 仓库同等模型 64.2%）", "LeRobot model card (500 episodes; the equivalent model in the original DP repo scores 64.2%)"],
+  ["HF 仓库自带 eval_info.json（500 回合）", "eval_info.json shipped in the HF repo (500 episodes)"],
+  ["策略的输入，以及各实验改了哪一项", "What the policy receives and what each experiment changes"],
   ["π0 有无相机输入时的末端路线", "End-effector paths of π0 with and without camera input"],
   ["正常与全涂黑成功率对比", "Normal vs. all-black success rate"], ["各模型成功率对比", "Success rate by model"],
   ["四个机器人策略在 LIBERO-Spatial 上的相机输入消融", "Camera-input ablations of four robot policies on LIBERO-Spatial"],
@@ -271,28 +271,29 @@ const DICT = [
   ["看不见的 π0 在成功的任务上走的是同一条路线", "Where blind π0 succeeds, it follows the sighted path"],
   ["单路相机、噪声、冻结画面", "One camera, noise, frozen image"],
   ["所有相机涂黑", "All cameras black"],
-  ["全涂黑时成功次数(/10)", "Blind π0 successes (of 10)"], ["正常 vs 正常重跑", "Normal vs. normal re-run"], ["全涂黑 vs 正常", "All black vs. normal"], ["π0.5 vs π0,都正常", "π0.5 vs. π0, both normal"],
-  ["本仓库(横线 = 95% 置信区间)", "This repo (bar = 95% confidence interval)"],
+  ["全涂黑时成功次数（/10）", "Blind π0 successes (of 10)"], ["正常 vs 正常重跑", "Normal vs. normal re-run"], ["全涂黑 vs 正常", "All black vs. normal"], ["π0.5 vs π0，都正常", "π0.5 vs. π0, both normal"],
+  ["本仓库（横线 = 95% 置信区间）", "This repo (bar = 95% confidence interval)"],
   ["盘子与小烤碗之间", "between plate and ramekin"], ["木柜上层抽屉里", "in top drawer of cabinet"], ["小烤碗旁", "next to ramekin"], ["小烤碗上", "on ramekin"],
   ["桌子中央", "table centre"], ["饼干盒上", "on cookie box"], ["饼干盒旁", "next to cookie box"], ["灶台上", "on stove"], ["盘子旁", "next to plate"], ["木柜顶上", "on top of cabinet"],
   [/第 (\d+) 回合/g, "episode $1"], [/(\d+) 回合/g, "$1 episodes"], [/任务 (\d)/g, "Task $1"],
-  ["本仓库:", "This repo: "], ["原作者基准:", "Authors' reference: "], ["本仓库", "This repo"], ["原作者基准", "Authors' reference"],
+  ["本仓库：", "This repo: "], ["原作者基准：", "Authors' reference: "], ["本仓库", "This repo"], ["原作者基准", "Authors' reference"],
   ["复现结果", "Reproduction"], ["相机消融", "Camera ablations"], ["回放", "Replays"], ["表格视图", "Table view"], ["图表视图", "Chart view"],
   ["加高斯噪声", "Gaussian noise"], ["冻结首帧", "Frozen first frame"], ["只涂主视角", "Agent-view black"], ["只涂腕部", "Wrist black"],
   ["正常画面", "Normal"], ["全涂黑", "All black"], ["正常", "Normal"], ["待评测", "pending"], ["评测中", "running"],
   ["回合数", "Episodes"], ["仿真器", "Simulator"], ["模型", "Model"], ["任务", "Task"], ["权重", "Checkpoint"],
   ["总体", "Overall"], ["奖励 ", "reward "], ["成功", "success"], ["失败", "fail"],
+  ["（", " ("], ["）", ")"], ["，", ", "], ["：", ": "], ["；", "; "],
 ];
 function trStr(t) { for (const [a, b] of DICT) t = typeof a === "string" ? t.split(a).join(b) : t.replace(a, b); return t; }
 function trNode(n) {
-  if (n.nodeType === 3) { const t = trStr(n.nodeValue); if (t !== n.nodeValue) n.nodeValue = t; return; }  // 只在有变化时写回,否则会反复触发观察器
+  if (n.nodeType === 3) { const t = trStr(n.nodeValue); if (t !== n.nodeValue) n.nodeValue = t; return; }  // 只在有变化时写回，否则会反复触发观察器
   if (n.nodeType !== 1 || n.tagName === "SCRIPT" || n.tagName === "STYLE") return;
   for (const a of ["title", "aria-label", "alt"]) if (n.hasAttribute(a)) { const t = trStr(n.getAttribute(a)); if (t !== n.getAttribute(a)) n.setAttribute(a, t); }
   n.childNodes.forEach(trNode);
 }
 $("langBtn").textContent = LANG === "en" ? "中文" : "English";
 $("langBtn").onclick = () => { location.search = "?lang=" + (LANG === "en" ? "zh" : "en"); };
-// README 用的两张图:线上在仓库的 media/ 下;本地没有这些文件时整块隐藏
+// README 用的两张图：线上在仓库的 media/ 下；本地没有这些文件时整块隐藏
 for (const [id, name] of [["figInputs", "inputs"], ["figTraj", "trajectory"]]) {
   $(id).onerror = () => $(id).closest(".fig").classList.add("hidden");
   $(id).src = `../media/${LANG === "en" ? "" : "zh/"}${name}.svg`;
@@ -305,19 +306,19 @@ if (LANG === "en") {
 }
 
 const done = R.filter(r => r.status === "done");
-// 复现判定:本仓库 95% 区间与基准区间(± 或其 95% CI,没有则视为一个点)有重叠
+// 复现判定：本仓库 95% 区间与基准区间（± 或其 95% CI，没有则视为一个点）有重叠
 const reproduced = (r) => { const b = r.baseline_pm ?? r.baseline_ci ?? 0; return Math.abs(r.pc - r.baseline_pc) <= r.ci + b; };
 const BO = window.BLACKOUT || { summary: [], runs: [] };
 const FU = window.FOLLOWUP || {};
 const MNAME = { pi0: "π0", "pi0.5": "π0.5" };
 
-// ---- 三条结论(数字全部取自数据)
+// ---- 三条结论（数字全部取自数据）
 {
   const ok = done.filter(reproduced), p0 = BO.summary.find(r => r.model === "pi0"), p5 = (FU.perturb || []).find(r => r.model === "pi0.5");
   const zero = BO.summary.filter(r => sum(r.black) === 0).map(r => MNAME[r.model] || r.model);
   $("keys").innerHTML = [
     [`${sum(p0.black)}%`, "π0 在相机全涂黑后的成功率", "降到 0%:" + zero.join(" · ")],
-    [`${p5.normal} → ${p5.freeze}`, "π0.5 画面冻结后的成功率", "整个回合只给第一帧画面(%),各 100 回合"],
+    [`${p5.normal} → ${p5.freeze}`, "π0.5 画面冻结后的成功率", "整个回合只给第一帧画面（%），各 100 回合"],
     [`${ok.length} / ${done.length}`, "公开权重复现到基准的误差范围内", done.map(r => r.model).join(" · ")],
   ].map(([v, k, d]) => `<div class="key"><div class="v">${v}</div><div class="k">${k}</div><div class="d">${d}</div></div>`).join("");
 }
@@ -325,7 +326,7 @@ const MNAME = { pi0: "π0", "pi0.5": "π0.5" };
 // ---- dot plot
 function drawChart() {
   const svg = $("chart"), wrap = $("chartWrap");
-  const W = wrap.clientWidth; if (!W) return;  // 表格视图下图表被隐藏,宽度为 0
+  const W = wrap.clientWidth; if (!W) return;  // 表格视图下图表被隐藏，宽度为 0
   const labelW = Math.min(190, W * 0.34), padR = 24, rowH = 64, top = 8, axisH = 28;
   const H = top + rowH * R.length + axisH;
   svg.setAttribute("width", W); svg.setAttribute("height", H);
@@ -362,8 +363,8 @@ function drawChart() {
 function showTip(r, e) {
   const tip = $("tip"), b = $("chartWrap").getBoundingClientRect();
   const pm = r.baseline_pm != null ? `± ${r.baseline_pm}` : (r.baseline_ci ? `± ${r.baseline_ci}(95% CI)` : "");
-  tip.innerHTML = `<b>${r.model} · ${r.task}</b><br>本仓库:${r.pc != null ? `${fmt(r.pc)} ± ${r.ci}(95% CI,${r.n} 回合)` : "待评测"}` +
-    `<br>原作者基准:${fmt(r.baseline_pc)} ${pm}<br><span style="color:var(--text-muted)">${r.baseline_src}</span>`;
+  tip.innerHTML = `<b>${r.model} · ${r.task}</b><br>本仓库：${r.pc != null ? `${fmt(r.pc)} ± ${r.ci}（95% CI，${r.n} 回合）` : "待评测"}` +
+    `<br>原作者基准：${fmt(r.baseline_pc)} ${pm}<br><span style="color:var(--text-muted)">${r.baseline_src}</span>`;
   tip.style.opacity = 1;
   const tx = Math.min(e.clientX - b.left + 14, b.width - tip.offsetWidth - 4);
   tip.style.left = Math.max(4, tx) + "px"; tip.style.top = (e.clientY - b.top + 14) + "px";
@@ -377,7 +378,7 @@ $("tblBtn").addEventListener("click", (e) => {
   e.currentTarget.setAttribute("aria-pressed", on);
   e.currentTarget.textContent = on ? "图表视图" : "表格视图";
   $("tbl").classList.toggle("hidden", !on); $("chartWrap").classList.toggle("hidden", on); $("legend").classList.toggle("hidden", on);
-  if (!on) drawChart();  // 隐藏期间若缩放过窗口,切回来时重画
+  if (!on) drawChart();  // 隐藏期间若缩放过窗口，切回来时重画
 });
 
 // ---- per-task matrix (LIBERO-Spatial)
@@ -395,13 +396,13 @@ function drawMatrix() {
       h += `<td style="background:${bg};color:${fg}" title="${r.model} · ${T[i]}:${t.ok}/${t.n}(${p.toFixed(0)}%)">${p.toFixed(0)}</td>`;
     }
     const [bg, fg] = r.pc != null ? cellColor(r.pc) : ["", ""];
-    h += r.pc != null ? `<td style="background:${bg};color:${fg};font-weight:600" title="${r.model} 总体 ${fmt(r.pc)}(${r.n} 回合)">${r.pc.toFixed(1)}</td>` : `<td class="na">评测中</td>`;
+    h += r.pc != null ? `<td style="background:${bg};color:${fg};font-weight:600" title="${r.model} 总体 ${fmt(r.pc)}（${r.n} 回合）">${r.pc.toFixed(1)}</td>` : `<td class="na">评测中</td>`;
     h += `</tr>`;
   }
   $("matrix").innerHTML = h + "</tbody>";
 }
 
-// 成功次数的格子:不足一半用灰底,其余按色阶
+// 成功次数的格子：不足一半用灰底，其余按色阶
 function countCell(v, n, title) {
   const p = 100 * v / n, [bg, fg] = cellColor(Math.max(50, p));
   return `<td style="background:${p < 50 ? "var(--grid)" : bg};color:${p < 50 ? "var(--text-primary)" : fg}" title="${title}:${v}/${n}">${v}</td>`;
@@ -449,16 +450,16 @@ function drawFollowup() {
   const T = FU.traj, names = window.LIBERO_TASKS || [];
   if (!T) return;
   const succ = T.successes_by_task.traj_pi0_black, fail = succ.map(v => v < 5);
-  const labels = ["正常 vs 正常重跑", "全涂黑 vs 正常", "π0.5 vs π0,都正常"];  // 与 traj_analyze.json 里 pairs 的顺序一致
+  const labels = ["正常 vs 正常重跑", "全涂黑 vs 正常", "π0.5 vs π0，都正常"];  // 与 traj_analyze.json 里 pairs 的顺序一致
   h = `<thead><tr><th></th>${succ.map((_, i) => `<th title="${names[i]}">任务 ${i}</th>`).join("")}</tr></thead><tbody>`;
-  h += `<tr><th class="row">全涂黑时成功次数(/10)</th>` + succ.map((v, i) => `<td class="${fail[i] ? "hot" : "plain"}" title="${names[i]}">${v}</td>`).join("") + "</tr>";
+  h += `<tr><th class="row">全涂黑时成功次数（/10）</th>` + succ.map((v, i) => `<td class="${fail[i] ? "hot" : "plain"}" title="${names[i]}">${v}</td>`).join("") + "</tr>";
   Object.values(T.pairs).forEach((p, k) => {
     h += `<tr><th class="row">${labels[k]}</th>` + p.dtw_by_task.map((v, i) => `<td class="${k === 1 && fail[i] ? "hot" : "plain"}" title="${names[i]}">${v.toFixed(1)}</td>`).join("") + "</tr>";
   });
   $("trajmatrix").innerHTML = h + "</tbody>";
 }
 
-// ---- 03 回放:6 次正常评测 + 3 次全涂黑评测共用一排筛选
+// ---- 03 回放：6 次正常评测 + 3 次全涂黑评测共用一排筛选
 const RUNS = [...R.map(r => ({ ...r, label: `${r.model} · ${r.task}` })), ...BO.runs.map(r => ({ ...r, label: `${r.model} · 全涂黑` }))];
 let cur = RUNS[0]?.id;
 function drawVideos() {
@@ -468,10 +469,10 @@ function drawVideos() {
   $("videos").innerHTML = `<div class="grid">` + (r?.videos || []).map(v => `<div class="vid"><video src="${v.src}#t=0.1" controls muted loop playsinline preload="metadata"></video>
     <div class="meta"><span>${v.task !== r.task ? v.task + " · " : ""}第 ${v.ep} 回合${v.reward != null ? " · 奖励 " + v.reward : ""}</span><span class="st ${v.success ? "ok" : "fail"}"><i>${v.success ? "✓" : "✗"}</i>${v.success ? "成功" : "失败"}</span></div></div>`).join("") + `</div>`;
 }
-// 视频不随仓库发布:加载不到时整块换成一句说明,而不是一排空播放器。
-// 404 时浏览器不一定触发 <video> 的 error 事件,所以先探测一次,error 事件只作兜底。
+// 视频不随仓库发布：加载不到时整块换成一句说明，而不是一排空播放器。
+// 404 时浏览器不一定触发 <video> 的 error 事件，所以先探测一次，error 事件只作兜底。
 function noVideos() {
-  $("replayBody").innerHTML = `<p class="pending">回放视频体积大,没有随仓库发布。在本地把评测输出的 videos/ 放到 dashboard/data/&lt;run&gt;/ 下,就能在这里播放。</p>`;
+  $("replayBody").innerHTML = `<p class="pending">回放视频体积大，没有随仓库发布。在本地把评测输出的 videos/ 放到 dashboard/data/&lt;run&gt;/ 下，就能在这里播放。</p>`;
 }
 addEventListener("error", e => {
   if (e.target.tagName === "VIDEO" && $("replayBody").contains(e.target)) noVideos();

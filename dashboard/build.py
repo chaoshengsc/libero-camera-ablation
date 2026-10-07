@@ -1,8 +1,8 @@
-"""把 data/ 下各次评测的结果汇总成 results.js,供 index.html 读取。
+"""把 data/ 下各次评测的结果汇总成 results.js，供 index.html 读取。
 
-用法: python3 build.py
-每新增一次评测:把评测输出同步到 data/<id>/(至少含 eval_info.json,可带 videos/),再在 RUNS 里加一项。
-eval_info.json 为 LeRobot 结构(overall / per_task[].metrics);OpenVLA 的文本日志已在工作站转成同结构。
+用法：python3 build.py
+每新增一次评测：把评测输出同步到 data/<id>/（至少含 eval_info.json，可带 videos/），再在 RUNS 里加一项。
+eval_info.json 为 LeRobot 结构（overall / per_task[].metrics）；OpenVLA 的文本日志已在工作站转成同结构。
 """
 import json
 import math
@@ -14,20 +14,20 @@ ROOT = Path(__file__).parent
 RUNS = [
     {"id": "act_cube_500", "model": "ACT", "task": "ALOHA Transfer Cube", "sim": "MuJoCo",
      "checkpoint": "lerobot/act_aloha_sim_transfer_cube_human@ba73b276",
-     "baseline_pc": 83.0, "baseline_n": 500, "baseline_src": "HF 仓库自带 eval_info.json(500 回合)"},
+     "baseline_pc": 83.0, "baseline_n": 500, "baseline_src": "HF 仓库自带 eval_info.json（500 回合）"},
     {"id": "openvla_spatial_500", "model": "OpenVLA", "task": "LIBERO-Spatial", "sim": "MuJoCo",
      "checkpoint": "openvla/openvla-7b-finetuned-libero-spatial@962318ce",
-     "baseline_pc": 84.7, "baseline_pm": 0.9, "baseline_src": "openvla README(3 种子 × 500 回合,A100)"},
+     "baseline_pc": 84.7, "baseline_pm": 0.9, "baseline_src": "openvla README（3 种子 × 500 回合，A100）"},
     {"id": "smolvla2_spatial_500", "model": "SmolVLA", "task": "LIBERO-Spatial", "sim": "MuJoCo",
      "checkpoint": "lerobot/smolvla_libero@31d453f7",
      "baseline_pc": 90.0, "baseline_n": 100,
-     "baseline_src": "SmolVLA 论文 Table 2(每任务 10 次);该权重只在 LIBERO-Spatial 上训练,评测用 n_action_steps=10"},
+     "baseline_src": "SmolVLA 论文 Table 2（每任务 10 次）；该权重只在 LIBERO-Spatial 上训练，评测用 n_action_steps=10"},
     {"id": "pi05_spatial_500", "model": "π0.5", "task": "LIBERO-Spatial", "sim": "MuJoCo",
      "checkpoint": "lerobot/pi05_libero_finetuned_v044@8e174154",
-     "baseline_pc": 98.8, "baseline_src": "OpenPI LIBERO README(LeRobot 文档复现为 97.0%)"},
+     "baseline_pc": 98.8, "baseline_src": "OpenPI LIBERO README（LeRobot 文档复现为 97.0%）"},
     {"id": "dp_pusht_500", "model": "Diffusion Policy", "task": "PushT", "sim": "2D(pymunk)",
      "checkpoint": "lerobot/diffusion_pusht@84a7c231",
-     "baseline_pc": 65.4, "baseline_n": 500, "baseline_src": "LeRobot 模型卡(500 回合;原版 DP 仓库同等模型 64.2%)"},
+     "baseline_pc": 65.4, "baseline_n": 500, "baseline_src": "LeRobot 模型卡（500 回合；原版 DP 仓库同等模型 64.2%）"},
 ]
 
 LIBERO_SPATIAL_TASKS = [
@@ -37,15 +37,15 @@ LIBERO_SPATIAL_TASKS = [
 
 
 def ci95(p, n):
-    """二项分布正态近似的 95% 置信区间半宽(百分点)。"""
+    """二项分布正态近似的 95% 置信区间半宽（百分点）。"""
     return round(196 * math.sqrt(p / 100 * (1 - p / 100) / n), 1) if n else None
 
 
 def rel_video(run_id, path):
-    """LeRobot 记录的是工作站绝对路径;同步后文件在 data/<id>/ 下 out/ 之后的相对位置。"""
+    """LeRobot 记录的是工作站绝对路径；同步后文件在 data/<id>/ 下 out/ 之后的相对位置。"""
     if "/out/" in path:
         rel = path.split("/out/", 1)[1]
-    elif "/videos/" in path:  # 输出目录没有 out/ 这一层(如 ACT)
+    elif "/videos/" in path:  # 输出目录没有 out/ 这一层（如 ACT）
         rel = "videos/" + path.split("/videos/", 1)[1]
     else:
         rel = path
@@ -53,7 +53,7 @@ def rel_video(run_id, path):
 
 
 def pick(videos, per_task):
-    """每任务最多取 1 成功 + 1 失败;单任务环境(ACT/DP)则全部保留。"""
+    """每任务最多取 1 成功 + 1 失败；单任务环境（ACT/DP）则全部保留。"""
     if not per_task:
         return videos
     ok = [v for v in videos if v["success"]][:1]
@@ -63,7 +63,7 @@ def pick(videos, per_task):
 
 def load(run):
     d = ROOT / "data" / run["id"]
-    info = json.loads((d / "eval_info.json").read_text())  # 缺文件直接报错,不静默留空
+    info = json.loads((d / "eval_info.json").read_text())  # 缺文件直接报错，不静默留空
     tasks = info["per_task"]
     multi = len(tasks) > 1
     out = {"status": "done", "pc": round(info["overall"]["pc_success"], 1), "n": info["overall"]["n_episodes"],
@@ -74,7 +74,7 @@ def load(run):
         name = LIBERO_SPATIAL_TASKS[tid] if multi and run["task"] == "LIBERO-Spatial" else run["task"]
         out["tasks"].append({"id": tid, "name": name, "ok": sum(succ), "n": len(succ)})
         vids = []
-        if "videos" in t:  # OpenVLA 转换版:已给出相对路径与成败
+        if "videos" in t:  # OpenVLA 转换版：已给出相对路径与成败
             vids = [{"src": f"data/{run['id']}/{v['src']}", "ep": v["ep"], "success": v["success"]} for v in t["videos"]]
         else:
             for p in t["metrics"].get("video_paths", []):
@@ -99,7 +99,7 @@ for run in RUNS:
         row["baseline_ci"] = ci95(row["baseline_pc"], row["baseline_n"])
     rows.append(row)
 
-# 视觉依赖测试(相机全涂黑)。OpenVLA 的录像保存的是送进模型的黑图,无观看价值,不收录视频。
+# 视觉依赖测试（相机全涂黑）。OpenVLA 的录像保存的是送进模型的黑图，无观看价值，不收录视频。
 BLACKOUT_RUNS = [
     {"id": "pi0_black_all", "model": "π0", "task": "LIBERO-Spatial"},
     {"id": "pi05_black_all", "model": "π0.5", "task": "LIBERO-Spatial"},
@@ -108,16 +108,16 @@ BLACKOUT_RUNS = [
 blackout = {"summary": json.loads((ROOT / "data" / "B_summary.json").read_text()),
             "runs": [dict(r, **load(r)) for r in BLACKOUT_RUNS]}
 
-# 后续实验:末端轨迹、单路涂黑、温和扰动(缺文件直接报错)
+# 后续实验：末端轨迹、单路涂黑、温和扰动（缺文件直接报错）
 def _json(name):
     return json.loads((ROOT / "data" / name).read_text())
 
 def _n(run, first=None):
-    """成功次数(first:只数每任务前几回合,用于从 500 回合评测里取同初始状态的 100 回合)。"""
+    """成功次数（first：只数每任务前几回合，用于从 500 回合评测里取同初始状态的 100 回合）。"""
     return sum(sum(t["metrics"]["successes"][:first]) for t in _json(f"{run}/eval_info.json")["per_task"])
 
 
-# 温和扰动:加噪声 / 冻结画面(每组 100 回合,与正常、全涂黑同种子同初始状态)
+# 温和扰动：加噪声 / 冻结画面（每组 100 回合，与正常、全涂黑同种子同初始状态）
 PERTURB = [("pi0", "pi0_spatial_500", "pi0", "pi0_black_all"), ("pi0.5", "pi05_spatial_500", "pi05", "pi05_black_all"),
            ("SmolVLA", "smolvla2_spatial_500", "smol2", "smol2_black_all")]
 
