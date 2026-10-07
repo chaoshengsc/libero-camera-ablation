@@ -43,7 +43,7 @@ conda activate lerobot && cd $EMB_ROOT/src/lerobot
 C=$EMB_ROOT/logs/pip/constraints-torch.txt
 pip install --only-binary=:all: --index-url https://download.pytorch.org/whl/cu128 "torch==2.11.0+cu128" "torchvision==0.26.0+cu128"
 pip install --only-binary=:all: -c $C -e ".[aloha]"
-# Diffusion Policy · PushT:gym-pusht 不带依赖装,避免把 opencv-python-headless 换掉
+# Diffusion Policy · PushT：gym-pusht 不带依赖装，避免把 opencv-python-headless 换掉
 pip install --only-binary=:all: -c $C --no-deps "gym-pusht==0.1.6"
 pip install --only-binary=:all: -c $C "pymunk>=6.6.0,<7.0.0" "pygame>=2.5.2" "scikit-image>=0.22.0" "shapely>=2.0.3"
 pip install --only-binary=:all: -c $C "diffusers>=0.38.0,<0.40.0"
@@ -62,7 +62,7 @@ conda activate openvla
 C=$EMB_ROOT/logs/pip/constraints-ovla.txt
 pip install --only-binary=:all: --index-url https://download.pytorch.org/whl/cu121 torch==2.2.0 torchvision==0.17.0 torchaudio==2.2.0
 (cd $EMB_ROOT/src/openvla && pip install -c $C -e .)
-# flash-attn:直接装官方预编译 wheel(源码编译要求 CUDA_HOME)
+# flash-attn：直接装官方预编译 wheel（源码编译要求 CUDA_HOME）
 pip install -c $C "https://github.com/Dao-AILab/flash-attention/releases/download/v2.5.5/flash_attn-2.5.5+cu122torch2.2cxx11abiFALSE-cp310-cp310-linux_x86_64.whl"
 (cd $EMB_ROOT/src/LIBERO && pip install --no-deps -e . --config-settings editable_mode=compat)
 pip install -c $C -r $EMB_ROOT/src/openvla/experiments/robot/libero/libero_requirements.txt
@@ -95,10 +95,10 @@ hf download lerobot/pi05_libero_finetuned_v044 --revision 8e174154 --local-dir $
 - **ACT、Diffusion Policy** 的权重是旧格式，先迁移（DP 需经 `migrate_tuplefix.py` 包一层，修 list/tuple 解码问题）：
   ```bash
   conda activate lerobot
-  # ACT:用 LeRobot 自带的迁移脚本
+  # ACT：用 LeRobot 自带的迁移脚本
   CK=$EMB_ROOT/ckpt/act_aloha_sim_transfer_cube_human@ba73b276
   python $EMB_ROOT/src/lerobot/src/lerobot/processor/migrate_policy_normalization.py --pretrained-path $CK --output-dir ${CK}_migrated
-  # Diffusion Policy:只用这一条(包装脚本内部会调用上面的迁移脚本)
+  # Diffusion Policy：只用这一条（包装脚本内部会调用上面的迁移脚本）
   CK=$EMB_ROOT/ckpt/diffusion_pusht@84a7c231
   python $REPO/scripts/eval/migrate_tuplefix.py --pretrained-path $CK --output-dir ${CK}_migrated
   ```

@@ -26,7 +26,7 @@
 
 LIBERO 上的策略收到两路相机画面、机械臂状态（末端位姿与夹爪开合）和一句任务指令。每个实验只改相机输入。
 
-！[策略的输入，以及各实验改了哪一项](media/zh/inputs.svg)
+![策略的输入，以及各实验改了哪一项](media/zh/inputs.svg)
 
 本节所有数字都是 100 回合的成功率（10 个任务 × 10 个初始状态，各条件用同一个种子）。两个条件要相差约 13 个百分点以上才有意义。
 
@@ -43,7 +43,7 @@ LIBERO 上的策略收到两路相机画面、机械臂状态（末端位姿与�
 
 ### 1.2 单路相机、噪声、冻结画面
 
-！[各种扰动下的成功率](media/zh/perturbations.svg)
+![各种扰动下的成功率](media/zh/perturbations.svg)
 
 | 模型 | 正常 | 加高斯噪声 | 冻结首帧 | 只涂主视角 | 只涂腕部 | 全涂黑 |
 |---|---|---|---|---|---|---|
@@ -61,7 +61,7 @@ OpenVLA 只接收主视角画面和指令，所以对它只有“全涂黑”这
 
 逐步记录了末端执行器的位置，用动态时间规整比较路线（消除速度差异）。
 
-！[π0 有无相机输入时的末端路线](media/zh/trajectory.svg)
+![π0 有无相机输入时的末端路线](media/zh/trajectory.svg)
 
 | 比较 | 路线差异 | 抓取点差异 |
 |---|---|---|
@@ -81,12 +81,12 @@ OpenVLA 只接收主视角画面和指令，所以对它只有“全涂黑”这
 - **π0 权重。** `lerobot/pi0_libero_finetuned_v044` 500 回合的正常成功率是 73.4%。OpenPI 旧版 README 给出过自家 π0 微调结果 96.8%，但那个权重没有发布，所以没有官方的 π0 LIBERO 权重可以对照。LeRobot 维护者说过公开的这个权重训练不足（lerobot issue #2114）。
 - **“正常”一列。** 取自各模型 500 回合评测里每个任务的前 10 回合，它们与消融实验用的是同一批初始状态。
 - **置信区间。** 单个数字的 95% 置信区间最宽约 ±10 个百分点。同一任务的回合之间相关，所以这些区间偏乐观。
-- **噪声。** 高斯噪声，标准差 0.1，像素范围 [0，1]。
+- **噪声。** 高斯噪声，标准差 0.1，像素范围 [0, 1]。
 - **相关工作。** [LIBERO-PRO](https://arxiv.org/abs/2510.03827) 和 [LIBERO-Plus](https://arxiv.org/abs/2510.13626) 用范围大得多的扰动研究了 LIBERO 策略的鲁棒性。
 
 ## 2. 公开权重的复现
 
-！[本仓库成功率 vs 基准](media/zh/reproduction.svg)
+![本仓库成功率 vs 基准](media/zh/reproduction.svg)
 
 | 模型 | 任务 | 本仓库（500 回合） | 基准 | 是否复现 |
 |---|---|---|---|---|
@@ -108,12 +108,12 @@ OpenVLA 只接收主视角画面和指令，所以对它只有“全涂黑”这
 # 环境、缓存、权重、日志都放在这个目录下
 export EMB_ROOT=/path/to/workdir
 
-# 按 docs/INSTALL_CN.md 装好环境并下载权重后:
-# ACT,500 回合,RTX A5000 上约 17 分钟
+# 按 docs/INSTALL_CN.md 装好环境并下载权重后：
+# ACT，500 回合，RTX A5000 上约 17 分钟
 bash scripts/eval/run_act.sh
 python3 scripts/analysis/summarize_eval.py act_cube_500
 
-# 四个 LIBERO 模型相机全涂黑,各 100 回合
+# 四个 LIBERO 模型相机全涂黑，各 100 回合
 bash scripts/eval/run_blackout_all.sh
 python3 scripts/analysis/summarize_blackout.py
 ```
