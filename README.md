@@ -68,9 +68,11 @@ The end-effector position was logged at every step, and paths were compared with
 | Blind π0 vs. sighted π0, on the seven tasks blind π0 solves at least half the time | 2.8 cm | 2.4 cm |
 | π0.5 vs. π0, both sighted, same seven tasks | 2.9 cm | 2.6 cm |
 | Sighted π0 vs. its own re-run (tasks 4–9) | 3.4 cm | 2.4 cm |
-| Blind π0 vs. sighted π0, on the three tasks it fails | 6 to 11 cm | |
+| Blind π0 vs. sighted π0, on tasks 7 and 9, where blind π0 never succeeds | 10.9 and 7.8 cm | 24.1 and 6.4 cm |
 
-On the tasks it solves, blind π0 is as close to sighted π0 as two sighted runs are to each other. On the tasks it fails, it goes somewhere else.
+On the tasks it solves, blind π0 is as close to sighted π0 as two sighted runs are to each other. On tasks 7 and 9 it goes somewhere else. Task 5, where blind π0 succeeds 3 times out of 10, is inconclusive: its path differs by 6.0 cm, but two sighted runs differ by 6.6 cm on that task.
+
+The re-run row uses tasks 4–9 only. Re-runs of tasks 0–3 are almost identical because both runs use the same seed and had not yet diverged, so they say nothing about noise.
 
 This does not show whether blind π0 replays a memorised motion. The comparison cannot separate a policy that tracks the bowl from one that repeats one motion per task, and how much the bowl position varies between initial states was not measured here. Per-task numbers are in [`results/trajectory.csv`](results/trajectory.csv) and on the [dashboard](https://chaoshengsc.github.io/libero-camera-ablation/dashboard/).
 

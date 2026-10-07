@@ -175,7 +175,7 @@ footer { margin-top: 80px; padding-top: 20px; border-top: 1px solid var(--border
 
     <div class="block">
       <h3><span class="n">1.3</span>看不见的 π0 在成功的任务上走的是同一条路线</h3>
-      <p class="take">在全涂黑仍能成功的任务上,它的路线和看得见时在噪声内无法区分;在失败的任务上,它走到了别处。</p>
+      <p class="take">在全涂黑仍能成功的任务上,它的路线和看得见时在噪声内无法区分;在从未成功的任务 7 和 9 上,它走到了别处。</p>
       <div class="fig"><img id="figTraj" alt="π0 有无相机输入时的末端路线"></div>
       <p class="cap">各任务的末端路线差异(cm,动态时间规整后的平均点距)。标出的是全涂黑后失败的三个任务。</p>
       <div class="panel"><div class="mx-wrap"><table class="mx" id="trajmatrix" style="min-width:560px"></table></div></div>
@@ -247,7 +247,7 @@ const DICT = [
   ["π0 各任务的成功次数(每个任务 10 回合):全涂黑后的失败集中在三个任务上。", "π0 successes per task (10 episodes each): the failures with black cameras are concentrated in three tasks."],
   ["π0.5 和 SmolVLA 需要实时画面;π0 基本不需要,对主视角相机也测不出依赖。", "π0.5 and SmolVLA need a live image. π0 barely needs one and shows no measurable dependence on the agent-view camera."],
   ["每格是 100 回合里的成功次数。噪声是标准差 0.1 的高斯噪声;冻结首帧指整个回合只给第一帧画面,这是真实的、分布内的画面。对三个模型来说,腕部相机都比主视角更重要。", "Each cell is successes out of 100 episodes. Noise is Gaussian with standard deviation 0.1. A frozen first frame means the policy sees only the first image for the whole episode, which is a real, in-distribution image. The wrist camera matters more than the agent view for all three models."],
-  ["在全涂黑仍能成功的任务上,它的路线和看得见时在噪声内无法区分;在失败的任务上,它走到了别处。", "On the tasks it still solves blind, its path cannot be told apart from the sighted path within noise. On the tasks it fails, it goes somewhere else."],
+  ["在全涂黑仍能成功的任务上,它的路线和看得见时在噪声内无法区分;在从未成功的任务 7 和 9 上,它走到了别处。", "On the tasks it still solves blind, its path cannot be told apart from the sighted path within noise. On tasks 7 and 9, where it never succeeds, it goes somewhere else."],
   ["各任务的末端路线差异(cm,动态时间规整后的平均点距)。标出的是全涂黑后失败的三个任务。", "End-effector path difference per task (cm, mean point distance after dynamic time warping). The three tasks where blind π0 fails are highlighted."],
   ["任务 0–3 的两次正常运行几乎重合,因为同一个种子下还没有分叉,不能反映噪声;噪声底线看任务 4–9(平均 3.4 cm)。全涂黑仍能成功的七个任务上,路线相差 2.8 cm。这种比较分不出策略是跟着碗走,还是每个任务重复一套动作;同一任务内碗的位置变化有多大,这里没有测。", "Re-runs of tasks 0–3 are almost identical because both runs use the same seed and had not yet diverged, so they say nothing about noise; the noise floor comes from tasks 4–9 (3.4 cm on average). On the seven tasks blind π0 still solves, the path differs by 2.8 cm. This comparison cannot separate a policy that tracks the bowl from one that repeats one motion per task, and how much the bowl position varies within a task was not measured here."],
   ["每个任务一段成功、一段失败的录像。全涂黑的录像是环境的真实渲染,模型当时收到的是黑图。", "One successful and one failed episode per task. Recordings of the all-black runs show the simulator's real rendering; the model received black images."],

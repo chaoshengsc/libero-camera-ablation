@@ -103,6 +103,11 @@ def test_trajectory_summary_numbers_in_readme():
     assert mean("grasp_distance_cm", "pi0_normal_vs_rerun", range(4, 10)) == pytest.approx(2.4, abs=0.05)
     assert max(t["path_dtw_cm", "pi0_normal_vs_rerun"][:4]) <= 0.3
     assert all(6 <= t["path_dtw_cm", "pi0_all_black_vs_normal"][i] <= 11 for i in (5, 7, 9))
+    # README 1.3 表格最后一行(任务 7、9)与任务 5 的说明
+    for metric, vals in (("path_dtw_cm", ("10.9", "7.8")), ("grasp_distance_cm", ("24.1", "6.4"))):
+        assert tuple(f"{t[metric, 'pi0_all_black_vs_normal'][i]:.1f}" for i in (7, 9)) == vals and all(v in md for v in vals for md in READMES)
+    assert succ[5] == 3 and succ[7] == succ[9] == 0
+    assert f"{t['path_dtw_cm', 'pi0_all_black_vs_normal'][5]:.1f}" == "6.0" and f"{t['path_dtw_cm', 'pi0_normal_vs_rerun'][5]:.1f}" == "6.6"
     spread = json.loads((DATA / "traj_analyze.json").read_text())["grasp_spread"]["traj_pi0_normal"]
     assert sum(spread) / 10 == pytest.approx(1.8, abs=0.05)
 
