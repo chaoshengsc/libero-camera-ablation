@@ -362,8 +362,8 @@ function drawChart() {
 }
 function showTip(r, e) {
   const tip = $("tip"), b = $("chartWrap").getBoundingClientRect();
-  const pm = r.baseline_pm != null ? `± ${r.baseline_pm}` : (r.baseline_ci ? `± ${r.baseline_ci}（95% CI）` : "");
-  tip.innerHTML = `<b>${r.model} · ${r.task}</b><br>本仓库：${r.pc != null ? `${fmt(r.pc)} ± ${r.ci}（95% CI，${r.n} 回合）` : "待评测"}` +
+  const pm = r.baseline_pm != null ? `± ${r.baseline_pm}` : (r.baseline_ci ? `± ${r.baseline_ci.toFixed(1)}（95% CI）` : "");
+  tip.innerHTML = `<b>${r.model} · ${r.task}</b><br>本仓库：${r.pc != null ? `${fmt(r.pc)} ± ${r.ci.toFixed(1)}（95% CI，${r.n} 回合）` : "待评测"}` +
     `<br>原作者基准：${fmt(r.baseline_pc)} ${pm}<br><span style="color:var(--text-muted)">${r.baseline_src}</span>`;
   tip.style.opacity = 1;
   const tx = Math.min(e.clientX - b.left + 14, b.width - tip.offsetWidth - 4);
@@ -372,7 +372,7 @@ function showTip(r, e) {
 
 // ---- table view
 $("tbl").innerHTML = `<table><thead><tr><th>模型</th><th>任务</th><th>仿真器</th><th>本仓库</th><th>95% CI</th><th>回合数</th><th>原作者基准</th><th>权重</th></tr></thead><tbody>` +
-  R.map(r => `<tr><td>${r.model}</td><td>${r.task}</td><td>${r.sim}</td><td>${fmt(r.pc)}</td><td>${r.ci != null ? "± " + r.ci : "—"}</td><td>${r.n ?? "—"}</td><td>${fmt(r.baseline_pc)}${r.baseline_pm != null ? " ± " + r.baseline_pm : ""}</td><td><code>${r.checkpoint}</code></td></tr>`).join("") + `</tbody></table>`;
+  R.map(r => `<tr><td>${r.model}</td><td>${r.task}</td><td>${r.sim}</td><td>${fmt(r.pc)}</td><td>${r.ci != null ? "± " + r.ci.toFixed(1) : "—"}</td><td>${r.n ?? "—"}</td><td>${fmt(r.baseline_pc)}${r.baseline_pm != null ? " ± " + r.baseline_pm : ""}</td><td><code>${r.checkpoint}</code></td></tr>`).join("") + `</tbody></table>`;
 $("tblBtn").addEventListener("click", (e) => {
   const on = e.currentTarget.getAttribute("aria-pressed") !== "true";
   e.currentTarget.setAttribute("aria-pressed", on);

@@ -93,7 +93,7 @@ OpenVLA 只接收主视角画面和指令，所以对它只有“全涂黑”这
 | ACT | ALOHA Transfer Cube | **83.2%** | 83.0%（Hugging Face 仓库） | ✅ |
 | OpenVLA | LIBERO-Spatial | **86.2%** | 84.7 ± 0.9%（官方 README） | ✅ |
 | SmolVLA | LIBERO-Spatial | **85.4%** | 90%（论文，100 回合） | ✅ |
-| π0.5 | LIBERO-Spatial | **98.0%** | 98.8%(OpenPI),97.0%(LeRobot) | ✅ |
+| π0.5 | LIBERO-Spatial | **98.0%** | 98.8%（OpenPI），97.0%（LeRobot） | ✅ |
 | Diffusion Policy | PushT（2D，非 MuJoCo） | **63.0%** | 65.4%（LeRobot 模型卡） | ✅ |
 
 500 回合的 95% 置信区间为 ±1–4 个百分点。“复现”指两个区间有重叠。SmolVLA 是 `lerobot/smolvla_libero`，评测时 `n_action_steps=10`，与第 1 节是同一个权重。它只在 LIBERO-Spatial 上训练，论文则在四个 LIBERO 套件上训练；论文的 100 回合对应的基准区间约为 ±6 个百分点。
