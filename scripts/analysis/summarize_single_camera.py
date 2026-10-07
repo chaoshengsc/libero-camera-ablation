@@ -21,7 +21,7 @@ for run in ["traj_pi0_agent", "traj_pi0_wrist"]:
 
 rows = [("pi0", "pi0_spatial_500", "traj_pi0_agent", "traj_pi0_wrist", "pi0_black_all"),
         ("pi0.5", "pi05_spatial_500", "traj_pi05_agent", "traj_pi05_wrist", "pi05_black_all"),
-        ("SmolVLA", "smolvla_hfvla_500", "traj_smol_agent", "traj_smol_wrist", "smolvla_black_all")]
+        ("SmolVLA", "smolvla2_spatial_500", "traj_smol2_agent", "traj_smol2_wrist", "smol2_black_all")]
 out = []
 print("model    normal  agent_black  wrist_black  all_black")
 for m, n, a, w, b in rows:

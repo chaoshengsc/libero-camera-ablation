@@ -29,7 +29,7 @@ The `WRAP` switch of `eval/run_libero.sh`:
 | `blackout` | `eval/eval_blackout.py` | `BLACKOUT=all\|agent\|wrist` (any other value is an error) |
 | `probe` | `eval/eval_probe.py`, trajectories saved to `<output dir>/traj.npz` | `BLACKOUT=none\|all\|agent\|wrist\|noise\|freeze` |
 
-`lerobot/smolvla_libero` (the SmolVLA row of the reproduction table) needs two extra arguments: `--policy.n_action_steps=10` and `--rename_map='{"observation.images.image": "observation.images.camera1", "observation.images.image2": "observation.images.camera2"}'`. Its base model `HuggingFaceTB/SmolVLM2-500M-Video-Instruct` has to be in the Hugging Face cache.
+`lerobot/smolvla_libero` (the SmolVLA row of the reproduction table) needs two extra arguments (defined once as `SMOL2_ARGS` in `common.sh`): `--policy.n_action_steps=10` and `--rename_map='{"observation.images.image": "observation.images.camera1", "observation.images.image2": "observation.images.camera2"}'`. Its base model `HuggingFaceTB/SmolVLM2-500M-Video-Instruct` has to be in the Hugging Face cache.
 
 Entry scripts can be called from any directory, by relative or absolute path. With a positional argument missing they print the usage and exit without touching existing results.
 

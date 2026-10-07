@@ -169,3 +169,17 @@ Source: Table 2 of the paper and the experimental setup in the main text.
   π0 loses only 5 points with a frozen first frame (within error), so it barely needs live visual feedback.
   SmolVLA is also at 0% with a frozen first frame (0 on all 10 tasks): the frozen frame is a real in-distribution image, so like π0.5 it needs a live image, and "just sensitive to out-of-distribution input" cannot explain this cell;
   dropping to 32% under noise shows it is sensitive to image quality as well.
+
+### Correction (2026-10-07): SmolVLA re-run with `lerobot/smolvla_libero`; the "benchmark asks little" claim is withdrawn
+
+- **SmolVLA checkpoint changed.** SmolVLA in the sections above is `HuggingFaceVLA/smolvla_libero` (75.2% over 500 episodes), while the reproduction table uses `lerobot/smolvla_libero` (85.4%). To use one SmolVLA checkpoint throughout, the five camera conditions were re-run with the latter (100 episodes each, same seed and initial states, `n_action_steps=10` plus `rename_map`). The wrappers act before the renaming: the logs show the image keys are still `image` / `image2`, and their maximum is 0 after blackout.
+
+  | Checkpoint | Normal | Noise | Frozen first frame | Agent-view black | Wrist black | All black |
+  |---|---|---|---|---|---|---|
+  | `HuggingFaceVLA/smolvla_libero` (old) | 72 | 32 | 0 | 2 | 5 | 0 |
+  | `lerobot/smolvla_libero` (new, used in the README) | 83 | 78 | 0 | 33 | 4 | 0 |
+
+  Unchanged: a frozen first frame and black cameras both give 0, and the wrist camera matters more than the agent view. Changed: "SmolVLA is sensitive to image quality (32% with noise)" holds for the old checkpoint only; the new one scores 78% with noise, within error of its normal 83%. With the agent view black the old checkpoint is near 0 and the new one still reaches 33%. The old checkpoint's evaluation files remain in `dashboard/data/` (`smolvla_hfvla_500`, `smolvla_black_all`, `pert_smol_*`).
+- **Raw data for OpenVLA with black cameras added.** The workstation log from 2026-09-30 was converted to `dashboard/data/openvla_black_all/eval_info.json` (0/100), and the tests now check all 8 rows of the blackout table.
+- **"The scene varies little, the benchmark asks little" is withdrawn.** It rested on sighted π0's grasp point spreading only 1.8 cm within a task. This π0 barely depends on images to begin with, so a small spread may be its own behaviour and cannot show that the bowl position varies little. How much the bowl position varies between initial states of a task was not measured in this project. The corresponding sentences were removed from the README and the dashboard. Related public work: LIBERO-PRO (arXiv:2510.03827) and LIBERO-Plus (arXiv:2510.13626); only the abstracts were read.
+- **The repository was renamed** to `libero-camera-ablation`, and the README now puts the ablations first and the reproduction second.

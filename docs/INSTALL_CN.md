@@ -8,7 +8,7 @@
 ## 0. 工作目录与 Miniforge
 
 ```bash
-git clone https://github.com/chaoshengsc/robot-policy-sim-repro.git && cd robot-policy-sim-repro
+git clone https://github.com/chaoshengsc/libero-camera-ablation.git && cd libero-camera-ablation
 export REPO=$PWD                        # 本仓库的位置,后面的命令用它定位脚本
 export EMB_ROOT=/path/to/workdir        # 大容量盘上的目录:环境、缓存、权重、日志都放这里
 mkdir -p $EMB_ROOT/{home,tmp,cache,envs,src,ckpt,logs/pip}

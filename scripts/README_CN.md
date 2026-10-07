@@ -29,7 +29,7 @@
 | `blackout` | `eval/eval_blackout.py` | `BLACKOUT=all\|agent\|wrist`(其他取值直接报错) |
 | `probe` | `eval/eval_probe.py`,轨迹存到 `<输出目录>/traj.npz` | `BLACKOUT=none\|all\|agent\|wrist\|noise\|freeze` |
 
-`lerobot/smolvla_libero`(复现表里的 SmolVLA)要多加两个参数:`--policy.n_action_steps=10` 和 `--rename_map='{"observation.images.image": "observation.images.camera1", "observation.images.image2": "observation.images.camera2"}'`。它的底座模型 `HuggingFaceTB/SmolVLM2-500M-Video-Instruct` 需要已在 Hugging Face 缓存里。
+`lerobot/smolvla_libero`(复现表里的 SmolVLA)要多加两个参数(在 `common.sh` 里统一定义为 `SMOL2_ARGS`):`--policy.n_action_steps=10` 和 `--rename_map='{"observation.images.image": "observation.images.camera1", "observation.images.image2": "observation.images.camera2"}'`。它的底座模型 `HuggingFaceTB/SmolVLM2-500M-Video-Instruct` 需要已在 Hugging Face 缓存里。
 
 入口脚本可以从任意目录调用(相对路径或绝对路径都行);缺少位置参数时会打印用法并退出,不会动已有结果。
 

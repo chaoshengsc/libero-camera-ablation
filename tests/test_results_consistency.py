@@ -46,12 +46,12 @@ def test_act_baseline_matches_file_shipped_with_checkpoint():
 
 
 def test_blackout_csv_matches_raw_eval_info():
-    raw = {("OpenVLA", "normal"): per_task("openvla_spatial_500", 10), ("SmolVLA", "normal"): per_task("smolvla_hfvla_500", 10),
-           ("SmolVLA", "black"): per_task("smolvla_black_all"), ("π0", "normal"): per_task("pi0_spatial_500", 10),
+    raw = {("OpenVLA", "normal"): per_task("openvla_spatial_500", 10), ("SmolVLA", "normal"): per_task("smolvla2_spatial_500", 10),
+           ("SmolVLA", "black"): per_task("smol2_black_all"), ("OpenVLA", "black"): per_task("openvla_black_all"), ("π0", "normal"): per_task("pi0_spatial_500", 10),
            ("π0", "black"): per_task("pi0_black_all"), ("π0.5", "normal"): per_task("pi05_spatial_500", 10),
            ("π0.5", "black"): per_task("pi05_black_all")}
     rs = rows("blackout_per_task.csv")
-    assert len(rs) == 8  # 4 个模型 × 正常 / 全涂黑;OpenVLA 全涂黑的原始日志不在仓库里,只核对其余 7 行
+    assert len(rs) == 8  # 4 个模型 × 正常 / 全涂黑
     seen = set()
     for r in rs:
         got = [int(r[f"task{i}"]) for i in range(10)]
@@ -65,7 +65,7 @@ def test_blackout_csv_matches_raw_eval_info():
 
 def test_perturbations_csv_matches_raw_and_readme():
     key = {"π0": ("pi0_spatial_500", "pi0", "pi0_black_all"), "π0.5": ("pi05_spatial_500", "pi05", "pi05_black_all"),
-           "SmolVLA": ("smolvla_hfvla_500", "smol", "smolvla_black_all")}
+           "SmolVLA": ("smolvla2_spatial_500", "smol2", "smol2_black_all")}
     rs = rows("perturbations.csv")
     assert {r["model"] for r in rs} == set(key)
     for r in rs:
@@ -74,13 +74,16 @@ def test_perturbations_csv_matches_raw_and_readme():
         assert int(r["noise"]) == sum(per_task(f"pert_{k}_noise"))
         assert int(r["freeze"]) == sum(per_task(f"pert_{k}_freeze"))
         assert int(r["all_black"]) == sum(per_task(black))
+        for cam in ("agent", "wrist"):  # 单路涂黑:原始数据在仓库里的才核对
+            if (DATA / f"traj_{k}_{cam}").exists():
+                assert int(r[f"{cam}_black"]) == sum(per_task(f"traj_{k}_{cam}"))
         line = f"| {r['model']} | " + " | ".join(f"{r[c]}%" for c in ("normal", "noise", "freeze", "agent_black", "wrist_black", "all_black")) + " |"
         assert all(line in md for md in READMES), line
 
 
 def test_section2_checkpoint_rates_in_readme():
-    """README 第 2 节注明的两个权重的 500 回合成功率:π0 73.4%、HuggingFaceVLA 的 SmolVLA 75.2%。"""
-    for run, pc in (("pi0_spatial_500", "73.4%"), ("smolvla_hfvla_500", "75.2%")):
+    """README 第 2 节注明的 π0 权重 500 回合成功率 73.4%。"""
+    for run, pc in (("pi0_spatial_500", "73.4%"),):
         s = per_task(run)
         assert f"{sum(s) / 5:.1f}%" == pc and all(pc in md for md in READMES)
 

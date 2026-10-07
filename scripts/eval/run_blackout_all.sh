@@ -4,7 +4,7 @@ source "$(dirname "$0")/../common.sh"; R=$SCRIPTS/eval/run_libero.sh
 lane1() { WRAP=blackout BLACKOUT=all bash $R pi0_black_all 10 $CK_PI0 1 --policy.n_action_steps=5
           WRAP=blackout BLACKOUT=all bash $R pi05_black_all 10 $CK_PI05 1 --policy.n_action_steps=10; }
 lane2() { sleep 180
-          WRAP=blackout BLACKOUT=all bash $R smolvla_black_all 10 $CK_SMOL 1
+          WRAP=blackout BLACKOUT=all bash $R smol2_black_all 10 $CK_SMOL2 1 "${SMOL2_ARGS[@]}"
           BLACKOUT=all bash $SCRIPTS/eval/run_ovla.sh openvla_black_all 10; }
 lane1 & lane2 & wait
 echo DONE > ${EMB_ROOT}/logs/eval/blackout_done.flag

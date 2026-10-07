@@ -103,7 +103,7 @@ for run in RUNS:
 BLACKOUT_RUNS = [
     {"id": "pi0_black_all", "model": "π0", "task": "LIBERO-Spatial"},
     {"id": "pi05_black_all", "model": "π0.5", "task": "LIBERO-Spatial"},
-    {"id": "smolvla_black_all", "model": "SmolVLA", "task": "LIBERO-Spatial"},
+    {"id": "smol2_black_all", "model": "SmolVLA", "task": "LIBERO-Spatial"},
 ]
 blackout = {"summary": json.loads((ROOT / "data" / "B_summary.json").read_text()),
             "runs": [dict(r, **load(r)) for r in BLACKOUT_RUNS]}
@@ -119,7 +119,7 @@ def _n(run, first=None):
 
 # 温和扰动:加噪声 / 冻结画面(每组 100 回合,与正常、全涂黑同种子同初始状态)
 PERTURB = [("pi0", "pi0_spatial_500", "pi0", "pi0_black_all"), ("pi0.5", "pi05_spatial_500", "pi05", "pi05_black_all"),
-           ("SmolVLA", "smolvla_hfvla_500", "smol", "smolvla_black_all")]
+           ("SmolVLA", "smolvla2_spatial_500", "smol2", "smol2_black_all")]
 
 followup = {
     "perturb": [{"model": m, "normal": _n(base, 10), "noise": _n(f"pert_{k}_noise"), "freeze": _n(f"pert_{k}_freeze"), "all_black": _n(black)}

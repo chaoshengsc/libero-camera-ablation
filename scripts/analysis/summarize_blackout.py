@@ -20,7 +20,7 @@ def openvla(r, first=None):
     return [sum(v[:first]) for v in per.values()]
 
 rows = [("OpenVLA", openvla("openvla_spatial_500", 10), openvla("openvla_black_all")),
-        ("SmolVLA", lerobot("smolvla_hfvla_500", 10), lerobot("smolvla_black_all")),
+        ("SmolVLA", lerobot("smolvla2_spatial_500", 10), lerobot("smol2_black_all")),
         ("pi0", lerobot("pi0_spatial_500", 10), lerobot("pi0_black_all")),
         ("pi0.5", lerobot("pi05_spatial_500", 10), lerobot("pi05_black_all"))]
 out = []

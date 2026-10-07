@@ -52,20 +52,20 @@
 <rect x="457.5" y="304.3" width="26" height="1.7" rx="2" fill="#111827"/>
 <text x="470.5" y="301.0" text-anchor="middle" font-size="12" font-weight="600">0</text>
 <text x="393.0" y="334" text-anchor="middle" font-weight="600">π0.5</text>
-<rect x="527.2" y="151.9" width="26" height="154.1" rx="2" fill="#9ca3af"/>
-<path d="M540.2 170.8 V133.1 M536.2 133.1 h8 M536.2 170.8 h8" stroke="#6b7280" stroke-width="1.2"/>
-<text x="540.2" y="128.1" text-anchor="middle" font-size="12" font-weight="600">72</text>
-<rect x="558.2" y="237.5" width="26" height="68.5" rx="2" fill="#86efac"/>
-<path d="M571.2 257.1 V218.0 M567.2 218.0 h8 M567.2 257.1 h8" stroke="#6b7280" stroke-width="1.2"/>
-<text x="571.2" y="213.0" text-anchor="middle" font-size="12" font-weight="600">32</text>
+<rect x="527.2" y="128.4" width="26" height="177.6" rx="2" fill="#9ca3af"/>
+<path d="M540.2 144.1 V112.6 M536.2 112.6 h8 M536.2 144.1 h8" stroke="#6b7280" stroke-width="1.2"/>
+<text x="540.2" y="107.6" text-anchor="middle" font-size="12" font-weight="600">83</text>
+<rect x="558.2" y="139.1" width="26" height="166.9" rx="2" fill="#86efac"/>
+<path d="M571.2 156.5 V121.7 M567.2 121.7 h8 M567.2 156.5 h8" stroke="#6b7280" stroke-width="1.2"/>
+<text x="571.2" y="116.7" text-anchor="middle" font-size="12" font-weight="600">78</text>
 <rect x="589.2" y="304.3" width="26" height="1.7" rx="2" fill="#14b8a6"/>
 <text x="602.2" y="301.0" text-anchor="middle" font-size="12" font-weight="600">0</text>
-<rect x="620.2" y="301.7" width="26" height="4.3" rx="2" fill="#60a5fa"/>
-<path d="M633.2 306.0 V295.8 M629.2 295.8 h8 M629.2 306.0 h8" stroke="#6b7280" stroke-width="1.2"/>
-<text x="633.2" y="290.8" text-anchor="middle" font-size="12" font-weight="600">2</text>
-<rect x="651.2" y="295.3" width="26" height="10.7" rx="2" fill="#f59e0b"/>
-<path d="M664.2 304.4 V286.2 M660.2 286.2 h8 M660.2 304.4 h8" stroke="#6b7280" stroke-width="1.2"/>
-<text x="664.2" y="281.2" text-anchor="middle" font-size="12" font-weight="600">5</text>
+<rect x="620.2" y="235.4" width="26" height="70.6" rx="2" fill="#60a5fa"/>
+<path d="M633.2 255.1 V215.7 M629.2 215.7 h8 M629.2 255.1 h8" stroke="#6b7280" stroke-width="1.2"/>
+<text x="633.2" y="210.7" text-anchor="middle" font-size="12" font-weight="600">33</text>
+<rect x="651.2" y="297.4" width="26" height="8.6" rx="2" fill="#f59e0b"/>
+<path d="M664.2 305.7 V289.2 M660.2 289.2 h8 M660.2 305.7 h8" stroke="#6b7280" stroke-width="1.2"/>
+<text x="664.2" y="284.2" text-anchor="middle" font-size="12" font-weight="600">4</text>
 <rect x="682.2" y="304.3" width="26" height="1.7" rx="2" fill="#111827"/>
 <text x="695.2" y="301.0" text-anchor="middle" font-size="12" font-weight="600">0</text>
 <text x="617.7" y="334" text-anchor="middle" font-weight="600">SmolVLA</text>

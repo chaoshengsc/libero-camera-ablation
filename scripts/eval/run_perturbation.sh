@@ -9,6 +9,6 @@ lane1() {
   done
 }
 lane2() { sleep 240
-  for m in noise freeze; do BLACKOUT=$m bash $R pert_smol_$m 10 $CK_SMOL 1; done
+  for m in noise freeze; do BLACKOUT=$m bash $R pert_smol2_$m 10 $CK_SMOL2 1 "${SMOL2_ARGS[@]}"; done
 }
 lane1 & lane2 & wait

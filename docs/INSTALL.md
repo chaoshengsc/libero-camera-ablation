@@ -8,7 +8,7 @@ These are the steps that were actually run on the workstation (Ubuntu 24.04, RTX
 ## 0. Working directory and Miniforge
 
 ```bash
-git clone https://github.com/chaoshengsc/robot-policy-sim-repro.git && cd robot-policy-sim-repro
+git clone https://github.com/chaoshengsc/libero-camera-ablation.git && cd libero-camera-ablation
 export REPO=$PWD                        # location of this repo; later commands use it to find scripts
 export EMB_ROOT=/path/to/workdir        # a directory on a large disk: environments, caches, checkpoints and logs all go here
 mkdir -p $EMB_ROOT/{home,tmp,cache,envs,src,ckpt,logs/pip}

@@ -9,5 +9,7 @@ CK_DP=$CK/diffusion_pusht@84a7c231_migrated
 CK_OVLA=$CK/openvla-7b-finetuned-libero-spatial@962318ce
 CK_SMOL=$CK/HuggingFaceVLA__smolvla_libero@6721902b
 CK_SMOL2=$CK/lerobot__smolvla_libero@31d453f7
+# lerobot/smolvla_libero 评测时需要的额外参数
+SMOL2_ARGS=(--policy.n_action_steps=10 '--rename_map={"observation.images.image": "observation.images.camera1", "observation.images.image2": "observation.images.camera2"}')
 CK_PI0=$CK/pi0_libero_finetuned_v044@45dcc8fc
 CK_PI05=$CK/pi05_libero_finetuned_v044@8e174154
