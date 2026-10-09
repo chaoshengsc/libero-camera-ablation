@@ -88,6 +88,11 @@ def test_perturbations_csv_matches_raw_and_readme():
         assert all(line in md for md in READMES), line
 
 
+def test_blind_models_stay_at_zero_in_second_run():
+    for run in ("pi05_black_all", "openvla_black_all", "smol2_black_all"):
+        assert sum(per_task(run)) == sum(per_task(f"run2/{run}")) == 0 and len(per_task(f"run2/{run}")) == 10
+
+
 def test_pi0_repeated_runs_in_readme():
     """README 里 π0 的重复运行数字:正常 5 次、全涂黑 5 次,以及同一条件两次运行的最大差。"""
     normal = [sum(per_task("pi0_spatial_500", 10))] + [sum(per_task(r)) for r in ("traj_pi0_normal", "traj_pi0_normal2", "run2/traj_pi0_normal", "run2/traj_pi0_normal2")]

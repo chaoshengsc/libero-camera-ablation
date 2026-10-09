@@ -39,7 +39,7 @@ Every number in this section is a success rate over 100 episodes (10 tasks × 10
 | SmolVLA | 83% | 0% |
 | **π0** | 76% | **56%** |
 
-Three models cannot act without images. π0 succeeds in 56% of episodes: 6 to 9 out of 10 on seven tasks, and 0 or 1 out of 10 on the other three. Four more runs gave 54%, 56%, 54% and 53%, and lerobot issue #3591 reports about 60% for the same checkpoint.
+Three models cannot act without images, and a second run of each gave 0% again. π0 succeeds in 56% of episodes: 6 to 9 out of 10 on seven tasks, and 0 or 1 out of 10 on the other three. Four more runs gave 54%, 56%, 54% and 53%, and lerobot issue #3591 reports about 60% for the same checkpoint.
 
 ### 1.2 One camera, noise, frozen image
 
