@@ -203,3 +203,12 @@ The three pipelines were re-run end to end on the workstation with the scripts a
 - **Unchanged.** π0 with black cameras stays at 53–56%. π0.5 and SmolVLA score 0 without a live image. π0.5 and SmolVLA repeat within 6 points.
 - **Added.** Two runs with the same seed are not identical. π0 differed by up to 18 points on one condition, more than the roughly 13 points expected from binomial sampling. The cause was not investigated. The README table and figure now show both runs.
 - **Not done.** The trajectory comparison in section 1.3 still uses the trajectories of the first run only.
+
+## Correction (2026-10-09): section 1.3 recomputed on the second run
+
+The trajectory comparison in section 1.3 was based on one run. The same analysis was repeated on the trajectories of the second run (`dashboard/data/run2/traj_analyze.json`; both runs are in `results/trajectory.csv`).
+
+- **Holds in both runs.** On the tasks blind π0 solves at least half the time, its path differs from the sighted path by 2.8 and 3.2 cm (grasp point 2.4 and 2.2 cm); two sighted runs differ by 3.4 and 3.3 cm. On task 7 blind π0 never succeeds and ends up elsewhere: 10.9 and 10.3 cm, grasp point 24.1 and 23.7 cm.
+- **Weakened: task 9.** The first run gave 7.8 cm against 3.3 cm between sighted runs. The second gives 4.9 against 3.6 cm, and blind π0 succeeded once. The README no longer lists task 9 next to task 7.
+- **Changed wording.** "Re-runs of tasks 0–3 are almost identical" is true of the first run only. In the second run tasks 1–3 had already diverged (2.3 to 3.1 cm), although the seed is the same. The noise floor now uses every task where the two sighted runs differ by more than 1 cm.
+- **The set of solved tasks is not fixed.** Task 8 was solved 5 times out of 10 in the first run and 4 in the second, so the first row of the table covers seven tasks in one run and six in the other.

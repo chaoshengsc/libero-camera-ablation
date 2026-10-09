@@ -133,6 +133,7 @@ followup = {
     "pi0_normal_runs": [_n("pi0_spatial_500", 10), _n("traj_pi0_normal"), _n("traj_pi0_normal2"), _n("run2/traj_pi0_normal"), _n("run2/traj_pi0_normal2")],
     "pi0_black_runs": [_n("pi0_black_all"), _n("traj_pi0_black"), _n("run2/pi0_black_all"), _n("run2/traj_pi0_black"), _n("run3/pi0_black_all")],
     "traj": _json("traj_analyze.json"),
+    "traj2": _json("run2/traj_analyze.json"),
     "cam": _json("cam_summary.json"),
 }
 

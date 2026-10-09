@@ -67,14 +67,16 @@ The end-effector position was logged at every step, and paths were compared with
 
 | Comparison | Path difference | Grasp-point difference |
 |---|---|---|
-| Blind π0 vs. sighted π0, on the seven tasks blind π0 solves at least half the time | 2.8 cm | 2.4 cm |
-| π0.5 vs. π0, both sighted, same seven tasks | 2.9 cm | 2.6 cm |
-| Sighted π0 vs. its own re-run (tasks 4–9) | 3.4 cm | 2.4 cm |
-| Blind π0 vs. sighted π0, on tasks 7 and 9, where blind π0 never succeeds | 10.9 and 7.8 cm | 24.1 and 6.4 cm |
+| Blind π0 vs. sighted π0, on the tasks blind π0 solves at least half the time | 2.8 / 3.2 cm | 2.4 / 2.2 cm |
+| π0.5 vs. π0, both sighted, same tasks | 2.9 / 3.0 cm | 2.6 / 2.5 cm |
+| Sighted π0 vs. its own re-run | 3.4 / 3.3 cm | 2.4 / 2.4 cm |
+| Blind π0 vs. sighted π0, on task 7, where blind π0 never succeeds | 10.9 / 10.3 cm | 24.1 / 23.7 cm |
 
-On the tasks it solves, blind π0 is as close to sighted π0 as two sighted runs are to each other. On tasks 7 and 9 it goes somewhere else. Task 5, where blind π0 succeeds 3 times out of 10, is inconclusive: its path differs by 6.0 cm, but two sighted runs differ by 6.6 cm on that task.
+Each cell gives the first and the second run of the whole comparison. Blind π0 solves seven tasks at least half the time in the first run (0–4, 6, 8) and six in the second (0–4, 6).
 
-The re-run row uses tasks 4–9 only. Re-runs of tasks 0–3 are almost identical because both runs use the same seed and had not yet diverged, so they say nothing about noise.
+On the tasks it solves, blind π0 is as close to sighted π0 as two sighted runs are to each other, in both runs. On task 7 it goes somewhere else in both runs; two sighted runs differ by 2.6 and 2.2 cm there. Task 9, where blind π0 succeeds 0 and 1 times out of 10, points the same way but less clearly: the path differs by 7.8 and 4.9 cm, against 3.3 and 3.6 cm between sighted runs. Task 5 (3 and 4 successes) is inconclusive: 6.0 and 6.6 cm, against 6.6 and 4.7 cm between sighted runs.
+
+The re-run row leaves out tasks where the two sighted runs are still almost identical, because they use the same seed and had not yet diverged, so they say nothing about noise. These are tasks 0–3 in the first run and task 0 in the second.
 
 This does not show whether blind π0 replays a memorised motion. The comparison cannot separate a policy that tracks the bowl from one that repeats one motion per task, and how much the bowl position varies between initial states was not measured here. Per-task numbers are in [`results/trajectory.csv`](results/trajectory.csv) and on the [dashboard](https://chaoshengsc.github.io/libero-camera-ablation/dashboard/).
 

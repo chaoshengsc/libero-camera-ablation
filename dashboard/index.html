@@ -175,11 +175,11 @@ footer { margin-top: 80px; padding-top: 20px; border-top: 1px solid var(--border
 
     <div class="block">
       <h3><span class="n">1.3</span>看不见的 π0 在成功的任务上走的是同一条路线</h3>
-      <p class="take">在全涂黑仍能成功的任务上，它的路线和看得见时在噪声内无法区分；在从未成功的任务 7 和 9 上，它走到了别处。</p>
+      <p class="take">在全涂黑仍能成功的任务上，它的路线和看得见时在噪声内无法区分；在从未成功的任务 7 上，它走到了别处。两次运行都是这样。</p>
       <div class="fig"><img id="figTraj" alt="π0 有无相机输入时的末端路线"></div>
-      <p class="cap">各任务的末端路线差异（cm，动态时间规整后的平均点距）。标出的是全涂黑后失败的三个任务。</p>
+      <p class="cap">各任务的末端路线差异（cm，动态时间规整后的平均点距）。整套比较跑了两次；标出的是全涂黑后成功不到一半的任务。</p>
       <div class="panel"><div class="mx-wrap"><table class="mx" id="trajmatrix" style="min-width:560px"></table></div></div>
-      <p class="note">任务 0–3 的两次正常运行几乎重合，因为同一个种子下还没有分叉，不能反映噪声；噪声底线看任务 4–9（平均 3.4 cm）。全涂黑仍能成功的七个任务上，路线相差 2.8 cm。这种比较分不出策略是跟着碗走，还是每个任务重复一套动作；同一任务内碗的位置变化有多大，这里没有测。</p>
+      <p class="note">两次正常运行几乎重合的任务（第 1 次的任务 0–3，第 2 次的任务 0）是同一个种子下还没有分叉，不能反映噪声；其余任务上的噪声底线平均是 3.4 和 3.3 cm。全涂黑仍能成功的任务上，路线相差 2.8 和 3.2 cm。任务 9 第 1 次相差 7.8 cm，第 2 次只有 4.9 cm，不如任务 7 清楚。这种比较分不出策略是跟着碗走，还是每个任务重复一套动作；同一任务内碗的位置变化有多大，这里没有测。</p>
     </div>
 
   </section>
@@ -247,9 +247,9 @@ const DICT = [
   ["π0 各任务的成功次数（每个任务 10 回合）：全涂黑后的失败集中在三个任务上。", "π0 successes per task (10 episodes each): the failures with black cameras are concentrated in three tasks."],
   ["π0.5 和 SmolVLA 需要实时画面；对 π0，只有两路相机都涂黑才有稳定的影响。", "π0.5 and SmolVLA need a live image. For π0, only blacking out both cameras has a reliable effect."],
   ["每格是 100 回合里的成功次数，每个条件跑了两次（同样的脚本、同一个种子）。噪声是标准差 0.1 的高斯噪声；冻结首帧指整个回合只给第一帧画面，这是真实的、分布内的画面。对 π0.5 和 SmolVLA，腕部相机比主视角更重要。π0 的单路相机、噪声、冻结条件两次相差 9 到 18，说明不了它依赖哪一路相机。", "Each cell is successes out of 100 episodes; every condition was run twice with the same scripts and seed. Noise is Gaussian with standard deviation 0.1. A frozen first frame means the policy sees only the first image for the whole episode, which is a real, in-distribution image. For π0.5 and SmolVLA the wrist camera matters more than the agent view. π0's single-camera, noise and frozen-image runs differ by 9 to 18 between the two runs, so they cannot show which camera it depends on."],
-  ["在全涂黑仍能成功的任务上，它的路线和看得见时在噪声内无法区分；在从未成功的任务 7 和 9 上，它走到了别处。", "On the tasks it still solves blind, its path cannot be told apart from the sighted path within noise. On tasks 7 and 9, where it never succeeds, it goes somewhere else."],
-  ["各任务的末端路线差异（cm，动态时间规整后的平均点距）。标出的是全涂黑后失败的三个任务。", "End-effector path difference per task (cm, mean point distance after dynamic time warping). The three tasks where blind π0 fails are highlighted."],
-  ["任务 0–3 的两次正常运行几乎重合，因为同一个种子下还没有分叉，不能反映噪声；噪声底线看任务 4–9（平均 3.4 cm）。全涂黑仍能成功的七个任务上，路线相差 2.8 cm。这种比较分不出策略是跟着碗走，还是每个任务重复一套动作；同一任务内碗的位置变化有多大，这里没有测。", "Re-runs of tasks 0–3 are almost identical because both runs use the same seed and had not yet diverged, so they say nothing about noise; the noise floor comes from tasks 4–9 (3.4 cm on average). On the seven tasks blind π0 still solves, the path differs by 2.8 cm. This comparison cannot separate a policy that tracks the bowl from one that repeats one motion per task, and how much the bowl position varies within a task was not measured here."],
+  ["在全涂黑仍能成功的任务上，它的路线和看得见时在噪声内无法区分；在从未成功的任务 7 上，它走到了别处。两次运行都是这样。", "On the tasks it still solves blind, its path cannot be told apart from the sighted path within noise. On task 7, where it never succeeds, it goes somewhere else. Both runs agree."],
+  ["各任务的末端路线差异（cm，动态时间规整后的平均点距）。整套比较跑了两次；标出的是全涂黑后成功不到一半的任务。", "End-effector path difference per task (cm, mean point distance after dynamic time warping). The whole comparison was run twice; tasks where blind π0 succeeds less than half the time are highlighted."],
+  ["两次正常运行几乎重合的任务（第 1 次的任务 0–3，第 2 次的任务 0）是同一个种子下还没有分叉，不能反映噪声；其余任务上的噪声底线平均是 3.4 和 3.3 cm。全涂黑仍能成功的任务上，路线相差 2.8 和 3.2 cm。任务 9 第 1 次相差 7.8 cm，第 2 次只有 4.9 cm，不如任务 7 清楚。这种比较分不出策略是跟着碗走，还是每个任务重复一套动作；同一任务内碗的位置变化有多大，这里没有测。", "Tasks where the two sighted runs are almost identical (tasks 0–3 in run 1, task 0 in run 2) use the same seed and had not yet diverged, so they say nothing about noise; on the other tasks the noise floor averages 3.4 and 3.3 cm. On the tasks blind π0 still solves, the path differs by 2.8 and 3.2 cm. Task 9 differs by 7.8 cm in run 1 but only 4.9 cm in run 2, so it is less clear than task 7. This comparison cannot separate a policy that tracks the bowl from one that repeats one motion per task, and how much the bowl position varies within a task was not measured here."],
   ["每个任务一段成功、一段失败的录像。全涂黑的录像是环境的真实渲染，模型当时收到的是黑图。", "One successful and one failed episode per task. Recordings of the all-black runs show the simulator's real rendering; the model received black images."],
   ["回放视频体积大，没有随仓库发布。在本地把评测输出的 videos/ 放到 dashboard/data/<run>/ 下，就能在这里播放。", "Replay videos are too large to publish with the repository. Put each run's videos/ folder under dashboard/data/<run>/ locally to play them here."],
   ["置信区间为二项分布的正态近似。全部数据、脚本与说明见 GitHub 仓库。", "Confidence intervals use the normal approximation to the binomial. All data, scripts and notes are in the GitHub repository."],
@@ -451,14 +451,17 @@ function drawFollowup() {
   }
   $("cammatrix").innerHTML = h + "</tbody>";
 
-  const T = FU.traj, names = window.LIBERO_TASKS || [];
-  if (!T) return;
-  const succ = T.successes_by_task.traj_pi0_black, fail = succ.map(v => v < 5);
+  const names = window.LIBERO_TASKS || [];
+  if (!FU.traj) return;
   const labels = ["正常 vs 正常重跑", "全涂黑 vs 正常", "π0.5 vs π0，都正常"];  // 与 traj_analyze.json 里 pairs 的顺序一致
-  h = `<thead><tr><th></th>${succ.map((_, i) => `<th title="${names[i]}">任务 ${i}</th>`).join("")}</tr></thead><tbody>`;
-  h += `<tr><th class="row">全涂黑时成功次数（/10）</th>` + succ.map((v, i) => `<td class="${fail[i] ? "hot" : "plain"}" title="${names[i]}">${v}</td>`).join("") + "</tr>";
-  Object.values(T.pairs).forEach((p, k) => {
-    h += `<tr><th class="row">${labels[k]}</th>` + p.dtw_by_task.map((v, i) => `<td class="${k === 1 && fail[i] ? "hot" : "plain"}" title="${names[i]}">${v.toFixed(1)}</td>`).join("") + "</tr>";
+  h = `<thead><tr><th></th>${names.slice(0, 10).map((nm, i) => `<th title="${nm}">任务 ${i}</th>`).join("")}</tr></thead><tbody>`;
+  [FU.traj, FU.traj2].filter(Boolean).forEach((T, n) => {
+    const succ = T.successes_by_task.traj_pi0_black, fail = succ.map(v => v < 5);
+    h += `<tr><th class="row" colspan="11" style="text-align:left">第 ${n + 1} 次</th></tr>`;
+    h += `<tr><th class="row">全涂黑时成功次数（/10）</th>` + succ.map((v, i) => `<td class="${fail[i] ? "hot" : "plain"}" title="${names[i]}">${v}</td>`).join("") + "</tr>";
+    Object.values(T.pairs).forEach((p, k) => {
+      h += `<tr><th class="row">${labels[k]}</th>` + p.dtw_by_task.map((v, i) => `<td class="${k === 1 && fail[i] ? "hot" : "plain"}" title="${names[i]}">${v.toFixed(1)}</td>`).join("") + "</tr>";
+    });
   });
   $("trajmatrix").innerHTML = h + "</tbody>";
 }

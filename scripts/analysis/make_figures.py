@@ -246,10 +246,13 @@ if __name__ == "__main__":
                for a, b in zip(run1, fu["perturb2"], strict=True) for n, m in ((1, a), (2, b))])
     pert = [{"model": a["model"], **{k: [a[k], b[k]] for k in COND_KEYS}} for a, b in zip(run1, fu["perturb2"], strict=True)]
     tasks = [f"task{i}" for i in range(10)]
-    rows = [["successes", "pi0_all_black"] + fu["traj"]["successes_by_task"]["traj_pi0_black"] + [sum(fu["traj"]["successes_by_task"]["traj_pi0_black"])]]
-    for metric, by, mean in (("path_dtw_cm", "dtw_by_task", "dtw_mean"), ("grasp_distance_cm", "grasp_dist_by_task", "grasp_dist_mean")):
-        rows += [[metric, pid] + [round(x, 2) for x in v[by]] + [round(v[mean], 2)] for pid, v in zip(PAIR_IDS, fu["traj"]["pairs"].values(), strict=True)]
-    write_csv("trajectory.csv", ["metric", "pair"] + tasks + ["all"], rows)
+    rows = []
+    for n, tj in ((1, fu["traj"]), (2, fu["traj2"])):
+        succ = tj["successes_by_task"]["traj_pi0_black"]
+        rows.append([n, "successes", "pi0_all_black"] + succ + [sum(succ)])
+        for metric, by, mean in (("path_dtw_cm", "dtw_by_task", "dtw_mean"), ("grasp_distance_cm", "grasp_dist_by_task", "grasp_dist_mean")):
+            rows += [[n, metric, pid] + [round(x, 2) for x in v[by]] + [round(v[mean], 2)] for pid, v in zip(PAIR_IDS, tj["pairs"].values(), strict=True)]
+    write_csv("trajectory.csv", ["run", "metric", "pair"] + tasks + ["all"], rows)
     traj = [json.loads((RES / f"trajectories_task{i}.json").read_text()) for i in TRAJ_TASKS]
     for lang, out in (("en", MEDIA), ("zh", MEDIA / "zh")):
         t = TXT[lang]

@@ -110,25 +110,33 @@ def test_section2_checkpoint_rates_in_readme():
 
 
 def test_trajectory_summary_numbers_in_readme():
-    """README 2.3 的分层数字:全涂黑仍成功的 7 个任务、失败的 3 个任务、任务 4–9 的噪声底线。"""
-    t = {(r["metric"], r["pair"]): [float(r[f"task{i}"]) for i in range(10)] for r in rows("trajectory.csv")}
-    succ = t["successes", "pi0_all_black"]
-    ok = [i for i in range(10) if succ[i] >= 5]
-    assert ok == [0, 1, 2, 3, 4, 6, 8] and sum(succ) == 54
-    mean = lambda metric, pair, idx: sum(t[metric, pair][i] for i in idx) / len(idx)
-    assert mean("path_dtw_cm", "pi0_all_black_vs_normal", ok) == pytest.approx(2.8, abs=0.05)
-    assert mean("grasp_distance_cm", "pi0_all_black_vs_normal", ok) == pytest.approx(2.4, abs=0.05)
-    assert mean("path_dtw_cm", "pi05_vs_pi0_normal", ok) == pytest.approx(2.9, abs=0.05)
-    assert mean("grasp_distance_cm", "pi05_vs_pi0_normal", ok) == pytest.approx(2.6, abs=0.05)
-    assert mean("path_dtw_cm", "pi0_normal_vs_rerun", range(4, 10)) == pytest.approx(3.4, abs=0.05)
-    assert mean("grasp_distance_cm", "pi0_normal_vs_rerun", range(4, 10)) == pytest.approx(2.4, abs=0.05)
-    assert max(t["path_dtw_cm", "pi0_normal_vs_rerun"][:4]) <= 0.3
-    assert all(6 <= t["path_dtw_cm", "pi0_all_black_vs_normal"][i] <= 11 for i in (5, 7, 9))
-    # README 1.3 表格最后一行(任务 7、9)与任务 5 的说明
-    for metric, vals in (("path_dtw_cm", ("10.9", "7.8")), ("grasp_distance_cm", ("24.1", "6.4"))):
-        assert tuple(f"{t[metric, 'pi0_all_black_vs_normal'][i]:.1f}" for i in (7, 9)) == vals and all(v in md for v in vals for md in READMES)
-    assert succ[5] == 3 and succ[7] == succ[9] == 0
-    assert f"{t['path_dtw_cm', 'pi0_all_black_vs_normal'][5]:.1f}" == "6.0" and f"{t['path_dtw_cm', 'pi0_normal_vs_rerun'][5]:.1f}" == "6.6"
+    """README 1.3 的分层数字,两次运行都核对:全涂黑仍成功的任务、噪声底线、任务 7、9、5。"""
+    t = {(r["run"], r["metric"], r["pair"]): [float(r[f"task{i}"]) for i in range(10)] for r in rows("trajectory.csv")}
+    cell = {"dtw_ok": [], "grasp_ok": [], "dtw_05": [], "grasp_05": [], "dtw_noise": [], "grasp_noise": [], "dtw_7": [], "grasp_7": []}
+    for run, ok_expected, same_expected in (("1", [0, 1, 2, 3, 4, 6, 8], [0, 1, 2, 3]), ("2", [0, 1, 2, 3, 4, 6], [0])):
+        succ = t[run, "successes", "pi0_all_black"]
+        ok = [i for i in range(10) if succ[i] >= 5]
+        noise = t[run, "path_dtw_cm", "pi0_normal_vs_rerun"]
+        diverged = [i for i in range(10) if noise[i] > 1]
+        assert ok == ok_expected and sum(succ) == 54 and succ[7] == 0
+        assert [i for i in range(10) if i not in diverged] == same_expected and max(noise[i] for i in same_expected) <= 0.3
+        mean = lambda metric, pair, idx: sum(t[run, metric, pair][i] for i in idx) / len(idx)  # noqa: B023
+        for key, metric in (("dtw", "path_dtw_cm"), ("grasp", "grasp_distance_cm")):
+            cell[f"{key}_ok"].append(mean(metric, "pi0_all_black_vs_normal", ok))
+            cell[f"{key}_05"].append(mean(metric, "pi05_vs_pi0_normal", ok))
+            cell[f"{key}_noise"].append(mean(metric, "pi0_normal_vs_rerun", diverged))
+            cell[f"{key}_7"].append(t[run, metric, "pi0_all_black_vs_normal"][7])
+    expected = {"dtw_ok": "2.8 / 3.2", "grasp_ok": "2.4 / 2.2", "dtw_05": "2.9 / 3.0", "grasp_05": "2.6 / 2.5",
+                "dtw_noise": "3.4 / 3.3", "grasp_noise": "2.4 / 2.4", "dtw_7": "10.9 / 10.3", "grasp_7": "24.1 / 23.7"}
+    for key, (a, b) in cell.items():
+        assert f"{a:.1f} / {b:.1f}" == expected[key] and all(f"{expected[key]} cm" in md for md in READMES)
+    # 任务 7、9、5 的说明:全涂黑对正常,以及同一任务上两次正常运行之间
+    two = lambda pair, i: tuple(f"{t[run, 'path_dtw_cm', pair][i]:.1f}" for run in ("1", "2"))
+    assert two("pi0_normal_vs_rerun", 7) == ("2.6", "2.2")
+    assert two("pi0_all_black_vs_normal", 9) == ("7.8", "4.9") and two("pi0_normal_vs_rerun", 9) == ("3.3", "3.6")
+    assert two("pi0_all_black_vs_normal", 5) == ("6.0", "6.6") and two("pi0_normal_vs_rerun", 5) == ("6.6", "4.7")
+    assert [t[run, "successes", "pi0_all_black"][9] for run in ("1", "2")] == [0, 1]
+    assert [t[run, "successes", "pi0_all_black"][5] for run in ("1", "2")] == [3, 4]
     spread = json.loads((DATA / "traj_analyze.json").read_text())["grasp_spread"]["traj_pi0_normal"]
     assert sum(spread) / 10 == pytest.approx(1.8, abs=0.05)
 
