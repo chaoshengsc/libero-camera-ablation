@@ -54,7 +54,7 @@ Success rate (%) in two runs of 100 episodes each, first run / second run. The s
 | SmolVLA | 83 / – | 78 / 73 | 0 / 0 | 33 / 31 | 4 / 4 | 0 / 0 |
 
 - **π0.5 and SmolVLA need a live image.** A frozen first frame is a real, in-distribution image, and it takes both to 0% in both runs. Noise changes neither beyond sampling error.
-- **Only blacking out both cameras changes π0 reliably.** That costs about 20 points in every run. With noise, a frozen first frame, or one camera black, its two runs differ by 9 to 18 points and all land between 59% and 80%, around its normal 71–76%. These runs cannot show that π0 depends on either single camera. The first run alone suggested a wrist-camera dependence (59%); the second run (77%) did not repeat it.
+- **Only blacking out both cameras changes π0 reliably.** That costs about 20 points in every run. With noise, a frozen first frame, or one camera black, its two runs differ by 9 to 18 points and all land between 59% and 80%, around its normal 71–76%. These runs cannot show that π0 depends on either single camera. The first run alone suggested a wrist-camera dependence (59%). Four more runs with the wrist camera black gave 77%, 72%, 67% and 70%, so the five average 69%, against 74% for five normal runs.
 - **For π0.5 and SmolVLA the wrist camera matters more than the agent view**, in both runs.
 
 OpenVLA takes only the agent-view image and the instruction, so only the all-black condition applies to it.
@@ -85,7 +85,7 @@ This does not show whether blind π0 replays a memorised motion. The comparison 
 - **π0 checkpoint.** `lerobot/pi0_libero_finetuned_v044` scores 73.4% over 500 normal episodes. An earlier OpenPI README gave 96.8% for its own π0 fine-tuning run, but that checkpoint was never released, so there is no official π0 LIBERO checkpoint to compare against. A LeRobot maintainer has said the public one is under-trained (lerobot issue #2114).
 - **Normal column.** The first number is the first 10 episodes per task of each model's 500-episode run, which use the same initial states as the ablation runs. The second is a separate 100-episode run; SmolVLA has none. π0's five normal runs gave 76%, 73%, 76%, 72% and 71%.
 - **Confidence intervals.** The 95% interval of a single number is up to ±10 points. Episodes of one task are correlated, which makes these intervals optimistic.
-- **Run-to-run variation.** Runs with the same seed are not identical. π0.5 and SmolVLA repeat within 6 points; π0 differs by up to 18 points on the same condition.
+- **Run-to-run variation.** Runs with the same seed are not identical: the evaluation fixes the random seed but does not make GPU computation deterministic, the end-effector paths of two π0 runs differ from the first step, and a repeat is in effect a new sample. π0.5 and SmolVLA repeat within 6 points; π0 differs by up to 18 points on the same condition.
 - **Noise.** Gaussian, standard deviation 0.1, on pixels in [0, 1].
 - **Related work.** [LIBERO-PRO](https://arxiv.org/abs/2510.03827) and [LIBERO-Plus](https://arxiv.org/abs/2510.13626) study the robustness of LIBERO policies under a much wider set of perturbations.
 

@@ -98,6 +98,9 @@ def test_pi0_repeated_runs_in_readme():
     normal = [sum(per_task("pi0_spatial_500", 10))] + [sum(per_task(r)) for r in ("traj_pi0_normal", "traj_pi0_normal2", "run2/traj_pi0_normal", "run2/traj_pi0_normal2")]
     black = [sum(per_task(r)) for r in ("pi0_black_all", "traj_pi0_black", "run2/pi0_black_all", "run2/traj_pi0_black", "run3/pi0_black_all")]
     assert normal == [76, 73, 76, 72, 71] and black == [56, 54, 56, 54, 53]
+    wrist = [sum(per_task("traj_pi0_wrist"))] + [sum(per_task(f"run{i}/traj_pi0_wrist")) for i in (2, 3, 4, 5)]
+    assert wrist == [59, 77, 72, 67, 70] and round(sum(wrist) / 5) == 69 and round(sum(normal) / 5) == 74
+    assert all("77%, 72%, 67% and 70%" in md or "77%、72%、67% 和 70%" in md for md in READMES)
     by = {(r["model"], r["run"]): r for r in rows("perturbations.csv")}
     gap = lambda m: [abs(int(by[m, "1"][c]) - int(by[m, "2"][c])) for c in ("noise", "freeze", "agent_black", "wrist_black")]
     assert sorted(gap("π0")) == [9, 10, 12, 18] and max(gap("π0.5") + gap("SmolVLA")) == 6

@@ -212,3 +212,10 @@ The trajectory comparison in section 1.3 was based on one run. The same analysis
 - **Weakened: task 9.** The first run gave 7.8 cm against 3.3 cm between sighted runs. The second gives 4.9 against 3.6 cm, and blind π0 succeeded once. The README no longer lists task 9 next to task 7.
 - **Changed wording.** "Re-runs of tasks 0–3 are almost identical" is true of the first run only. In the second run tasks 1–3 had already diverged (2.3 to 3.1 cm), although the seed is the same. The noise floor now uses every task where the two sighted runs differ by more than 1 cm.
 - **The set of solved tasks is not fixed.** Task 8 was solved 5 times out of 10 in the first run and 4 in the second, so the first row of the table covers seven tasks in one run and six in the other.
+
+## Why two π0 runs with the same seed differ (2026-10-09)
+
+- **Source.** `lerobot_eval.py` (v0.6.1, lines 746–748) calls `set_seed`, and also sets `cudnn.benchmark = True` and `allow_tf32 = True`. It does not enable deterministic algorithms, so a fixed seed does not make the GPU computation bit-reproducible.
+- **Checked on our data.** Four π0 normal runs share the seed and the initial states. In every one of the 100 episodes the end-effector position already differs after the first step. In most episodes the paths are more than 1 cm apart within about five steps; in a few they stay within 1 mm for 50 to 250 steps. A repeat is therefore a new sample, not a replay.
+- **Wrist camera black, five runs: 59, 77, 72, 67, 70** (average 69; five normal runs average 74). The 18-point gap was the lowest and the highest of the five. Three runs were added today with the same script (`dashboard/data/run3..5/traj_pi0_wrist`).
+- **Not established.** Which component introduces the first difference (cuDNN algorithm choice, TF32, bfloat16 weights, or EGL rendering) was not isolated, and no run with deterministic algorithms was made. The five wrist-black runs spread more (standard deviation 6.7) than the five normal runs (2.3) or the five all-black runs (1.3); five runs are too few to say whether that is real.
