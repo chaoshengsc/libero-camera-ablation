@@ -71,13 +71,20 @@ def fake_lerobot(tmp_path):
     (pkg.parent / "__init__.py").write_text("")
     (pkg / "__init__.py").write_text("")
     (pkg / "lerobot_eval.py").write_text("preprocess_observation = rollout = None\ndef main():\n    return 0\n")
+    for sub, cls in (("pi0", "PI0Policy"), ("pi05", "PI05Policy")):  # eval_probe.py 在 π0/π0.5 的图像预处理外包一层
+        d = pkg.parent / "policies" / sub
+        d.mkdir(parents=True)
+        for f in (d.parent / "__init__.py", d / "__init__.py"):
+            f.write_text("")
+        (d / f"modeling_{sub}.py").write_text(f"class {cls}:\n    _preprocess_images = None\n")
     for mod in ("torch", "numpy"):
         (tmp_path / "stub" / f"{mod}.py").write_text("")
     return str(tmp_path / "stub")
 
 
 @pytest.mark.parametrize("script,good,bad", [("eval_blackout.py", ["all", "agent", "wrist"], ["none", "noise", "agnet"]),
-                                             ("eval_probe.py", ["none", "all", "agent", "wrist", "noise", "freeze"], ["agnet", "black"])])
+                                             ("eval_probe.py", ["none", "all", "agent", "wrist", "noise", "freeze", "drop_wrist", "drop_agent", "freeze_wrist", "freeze_agent"],
+                                              ["agnet", "black", "drop", "drop_all"])])
 def test_wrappers_validate_blackout(fake_lerobot, script, good, bad):
     def rc(mode):
         return subprocess.run([sys.executable, "-B", str(ROOT / "scripts" / "eval" / script)], capture_output=True,

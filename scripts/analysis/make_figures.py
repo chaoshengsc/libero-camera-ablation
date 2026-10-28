@@ -33,6 +33,9 @@ TXT = {
         "in_policy": "Policy", "in_action": "Action",
         "in_img_note": "black / noise / frozen", "in_state_note": "unchanged",
         "in_lang_note": "unchanged", "in_sub_state": "end-effector pose and gripper opening", "in_sub_lang": "“pick up the black bowl …”",
+        "sc_title": "One camera removed at test time (500 episodes per bar, 95% Wilson interval)",
+        "sc_conds": ["Both cameras", "Wrist black", "Wrist dropped", "Wrist frozen at frame 1", "Agent view dropped"],
+        "sc_note": "π0.5 wrist black: same 100 initial states run 5 times, 0/500",
     },
     "zh": {
         "rep_title": "公开权重复现：本机成功率 vs 基准",
@@ -50,10 +53,19 @@ TXT = {
         "in_policy": "策略", "in_action": "动作",
         "in_img_note": "涂黑 / 加噪声 / 冻结", "in_state_note": "不改",
         "in_lang_note": "不改", "in_sub_state": "末端位姿与夹爪开合", "in_sub_lang": "“把黑碗拿起来放到……”",
+        "sc_title": "测试时去掉一路相机（每根柱 500 回合，误差线为 Wilson 95% 区间）",
+        "sc_conds": ["两路都给", "腕部涂黑", "去掉腕部", "腕部冻结在第 1 帧", "去掉主视角"],
+        "sc_note": "π0.5 腕部涂黑：同一批 100 个初始状态跑 5 次，0/500",
     },
 }
 COND_KEYS = ["normal", "noise", "freeze", "agent_black", "wrist_black", "all_black"]
 COND_COL = ["#9ca3af", "#86efac", "#14b8a6", "#60a5fa", "#f59e0b", "#111827"]
+# 单相机实验（docs/NOTES.md 的预先登记与结果）：dashboard/data/s500/<run>/，每个条件 500 回合，同一批初始状态
+SC_RUNS = {"π0.5": {"both": "pi05_none", "wrist_dropped": "pi05_drop_wrist", "wrist_frozen": "pi05_freeze_wrist", "agent_dropped": "pi05_drop_agent"},
+           "π0": {"both": "pi0_none", "both_rerun": "pi0_none_r2", "wrist_black": "pi0_wrist", "wrist_dropped": "pi0_drop_wrist",
+                  "wrist_dropped_rerun": "pi0_drop_wrist_r2", "wrist_frozen": "pi0_freeze_wrist", "agent_dropped": "pi0_drop_agent"}}
+SC_BARS = ["both", "wrist_black", "wrist_dropped", "wrist_frozen", "agent_dropped"]
+SC_COL = ["#9ca3af", "#f59e0b", "#2563eb", "#14b8a6", "#7c3aed"]
 TRAJ_TASKS = [4, 7]  # 轨迹图展示的任务：一个全涂黑仍成功的，一个全涂黑后失败的
 PAIR_IDS = ["pi0_normal_vs_rerun", "pi0_all_black_vs_normal", "pi05_vs_pi0_normal"]  # 与 traj_analyze.json 里 pairs 的顺序一致
 SRC_EN = {"ACT": "eval_info.json shipped in the Hugging Face repo (500 episodes)", "OpenVLA": "openvla README (3 seeds x 500 episodes)",
@@ -64,6 +76,81 @@ SRC_EN = {"ACT": "eval_info.json shipped in the Hugging Face repo (500 episodes)
 def ci95(pc, n):
     """二项分布正态近似的 95% 置信区间半宽（百分点）；与 metrics.ci95 相同，这里重写一份以保持本脚本零依赖。"""
     return 196 * math.sqrt(pc / 100 * (1 - pc / 100) / n)
+
+
+def wilson(k, n, z=1.96):
+    """Wilson 95% 区间（百分数）。"""
+    p, den = k / n, 1 + z * z / n
+    c, hw = (p + z * z / (2 * n)) / den, z * math.sqrt(p * (1 - p) / n + z * z / (4 * n * n)) / den
+    return 100 * (c - hw), 100 * (c + hw)
+
+
+def mcnemar(b, c):
+    """McNemar 精确检验（双侧）：b、c 为两种不一致的回合数。"""
+    n = b + c
+    return 1.0 if n == 0 else min(1.0, 2 * sum(math.comb(n, i) for i in range(min(b, c) + 1)) / 2 ** n)
+
+
+def load_single_camera():
+    out = {}
+    for model, conds in SC_RUNS.items():
+        for cond, run in conds.items():
+            d = ROOT / "dashboard" / "data" / "s500" / run
+            per = sorted(json.loads((d / "eval_info.json").read_text())["per_task"], key=lambda t: t["task_id"])
+            succ = [int(x) for t in per for x in t["metrics"]["successes"]]
+            out[model, cond] = (succ, json.loads((d / "first_frame_hash.json").read_text()))
+    return out
+
+
+def single_camera_summary(sc):
+    """每个条件：成功率、Wilson 区间，以及与同模型「两路都给」按初始状态配对的差值（95% 区间）和 McNemar p。"""
+    rows = []
+    for (model, cond), (s, _) in sc.items():
+        n, k = len(s), sum(s)
+        lo, hi = wilson(k, n)
+        row = [model, cond, n, k, round(100 * k / n, 1), round(lo, 1), round(hi, 1)]
+        if cond != "both":
+            base = sc[model, "both"][0]
+            x = [b - a for a, b in zip(base, s, strict=True)]
+            m = sum(x) / n
+            se = math.sqrt(sum((xi - m) ** 2 for xi in x) / (n - 1) / n)
+            lost, gained = x.count(-1), x.count(1)
+            row += [round(100 * m, 1), round(196 * se, 1), lost, gained, f"{mcnemar(lost, gained):.2g}"]
+        else:
+            row += ["", "", "", "", ""]
+        rows.append(row)
+    return rows
+
+
+def fig_single_camera(summary, t):
+    w, left, top, bh, gap = 760, 150, 70, 22, 6
+    models = list(SC_RUNS)
+    gh = len(SC_BARS) * (bh + gap) + 34
+    h = top + gh * len(models) + 30
+    pw = w - left - 70
+    x = lambda v: left + pw * v / 100
+    by = {(r[0], r[1]): r for r in summary}
+    out = [title(t["sc_title"])]
+    for v in range(0, 101, 25):
+        out.append(f'<line x1="{x(v):.1f}" y1="{top - 8}" x2="{x(v):.1f}" y2="{h - 30}" stroke="{GRID}"/>')
+        out.append(f'<text x="{x(v):.1f}" y="{h - 12}" text-anchor="middle" fill="{MUTED}">{v}%</text>')
+    for g, model in enumerate(models):
+        y0 = top + g * gh
+        out.append(f'<text x="20" y="{y0 + 6}" font-size="14" font-weight="600">{model}</text>')
+        for i, (cond, col, lab) in enumerate(zip(SC_BARS, SC_COL, t["sc_conds"], strict=True)):
+            y = y0 + 16 + i * (bh + gap)
+            out.append(f'<text x="{left - 10}" y="{y + bh / 2 + 4:.1f}" text-anchor="end">{lab}</text>')
+            r = by.get((model, cond))
+            if r is None:  # π0.5 腕部涂黑没有在这一轮重跑
+                out.append(f'<text x="{x(0) + 6:.1f}" y="{y + bh / 2 + 4:.1f}" font-size="12" fill="{MUTED}">{t["sc_note"]}</text>')
+                continue
+            pc, lo, hi = r[4], r[5], r[6]
+            out.append(f'<rect x="{x(0):.1f}" y="{y}" width="{max(x(pc) - x(0), 1.5):.1f}" height="{bh}" rx="2" fill="{col}"/>')
+            out.append(f'<line x1="{x(lo):.1f}" y1="{y + bh / 2}" x2="{x(hi):.1f}" y2="{y + bh / 2}" stroke="{INK}" stroke-width="1.4"/>')
+            for e in (lo, hi):
+                out.append(f'<line x1="{x(e):.1f}" y1="{y + 6}" x2="{x(e):.1f}" y2="{y + bh - 6}" stroke="{INK}" stroke-width="1.4"/>')
+            out.append(f'<text x="{x(hi) + 6:.1f}" y="{y + bh / 2 + 4:.1f}" font-size="12" font-weight="600">{pc:.1f}</text>')
+    return svg(w, h, out)
 
 
 def load_dashboard():
@@ -253,6 +340,12 @@ if __name__ == "__main__":
         for metric, by, mean in (("path_dtw_cm", "dtw_by_task", "dtw_mean"), ("grasp_distance_cm", "grasp_dist_by_task", "grasp_dist_mean")):
             rows += [[n, metric, pid] + [round(x, 2) for x in v[by]] + [round(v[mean], 2)] for pid, v in zip(PAIR_IDS, tj["pairs"].values(), strict=True)]
     write_csv("trajectory.csv", ["run", "metric", "pair"] + tasks + ["all"], rows)
+    sc = load_single_camera()
+    write_csv("single_camera.csv", ["model", "condition", "task", "episode", "success", "first_frame_hash"],
+              [[m, c, i // 50, i % 50, s, h] for (m, c), (succ, hs) in sc.items() for i, (s, h) in enumerate(zip(succ, hs, strict=True))])
+    sc_sum = single_camera_summary(sc)
+    write_csv("single_camera_summary.csv", ["model", "condition", "episodes", "successes", "success_pc", "wilson_lo", "wilson_hi",
+                                            "paired_diff_pp", "diff_ci95_pp", "lost", "gained", "mcnemar_p"], sc_sum)
     traj = [json.loads((RES / f"trajectories_task{i}.json").read_text()) for i in TRAJ_TASKS]
     for lang, out in (("en", MEDIA), ("zh", MEDIA / "zh")):
         t = TXT[lang]
@@ -260,4 +353,5 @@ if __name__ == "__main__":
         (out / "perturbations.svg").write_text(fig_perturbations(pert, t))
         (out / "trajectory.svg").write_text(fig_trajectory(traj, t))
         (out / "inputs.svg").write_text(fig_inputs(t))
-    print(f"wrote {len(list(RES.glob('*.csv')))} csv -> results/, 4 svg -> media/ and media/zh/")
+        (out / "single_camera.svg").write_text(fig_single_camera(sc_sum, t))
+    print(f"wrote {len(list(RES.glob('*.csv')))} csv -> results/, 5 svg -> media/ and media/zh/")

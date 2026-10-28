@@ -14,9 +14,9 @@ English | [中文](README_CN.md)
 </p>
 
 - **What was done.** Four public LIBERO checkpoints (π0, π0.5, OpenVLA, SmolVLA) were evaluated with the camera input blacked out, frozen at the first frame, noised, or with one of the two cameras removed. Robot state and instruction were left unchanged.
-- **Result.** π0.5, OpenVLA and SmolVLA drop to 0% with black cameras, and π0.5 and SmolVLA also drop to 0% when the image is frozen. LeRobot's public π0 checkpoint scores 71–76% normally, 53–56% with black cameras (five runs each), and 71% and 80% in two runs with a frozen image.
+- **Result.** π0.5, OpenVLA and SmolVLA drop to 0% with black cameras, and π0.5 and SmolVLA also drop to 0% when the image is frozen. LeRobot's public π0 checkpoint scores 71–76% normally, 53–56% with black cameras (five runs each), and 71% and 80% in two runs with a frozen image. With the wrist camera dropped (500 episodes each), π0.5 falls from 98.4% to 4.6% and π0 is unchanged (71.2% vs. 72.0% with both cameras).
 - **What follows from it.** On LIBERO-Spatial, a success rate alone does not show whether a policy uses its cameras. Blacking out or freezing the image is a cheap way to check.
-- **Scope.** One suite, one seed, 100 episodes per run; the single-camera, noise and frozen-image conditions were each run twice. The π0 checkpoint is under-trained, so its result describes this checkpoint and not π0 in general.
+- **Scope.** One suite, one seed, 100 episodes per run (500 in section 1.4); the single-camera, noise and frozen-image conditions were each run twice. The π0 checkpoint is under-trained, so its result describes this checkpoint and not π0 in general.
 
 Before the ablations, five public checkpoints were reproduced to within sampling error of their reference success rates ([section 2](#2-reproduction-of-the-public-checkpoints)). Everything runs on one workstation (RTX A5000 24 GB, Ubuntu 24.04, headless EGL rendering), with wrapper scripts that leave upstream source untouched. CI recomputes the result tables on this page from the raw evaluation files in `dashboard/data/`.
 
@@ -28,7 +28,7 @@ A LIBERO policy receives two camera images, the robot state (end-effector pose a
 
 ![What the policy receives and what each experiment changes](media/inputs.svg)
 
-Every number in this section is a success rate over 100 episodes (10 tasks × 10 initial states, same seed for every condition). Sampling error alone means two conditions have to differ by about 13 points. For π0 the bar is higher: the same condition run twice differed by up to 18 points (section 1.2).
+Except in section 1.4, every number in this section is a success rate over 100 episodes (10 tasks × 10 initial states, same seed for every condition). Sampling error alone means two conditions have to differ by about 13 points. For π0 the bar is higher: the same condition run twice differed by up to 18 points (section 1.2).
 
 ### 1.1 All cameras black
 
@@ -54,7 +54,7 @@ Success rate (%) in two runs of 100 episodes each, first run / second run. The s
 | SmolVLA | 83 / – | 78 / 73 | 0 / 0 | 33 / 31 | 4 / 4 | 0 / 0 |
 
 - **π0.5 and SmolVLA need a live image.** A frozen first frame is a real, in-distribution image, and it takes both to 0% in both runs. Noise changes neither beyond sampling error.
-- **Only blacking out both cameras changes π0 reliably.** That costs about 20 points in every run. With noise, a frozen first frame, or one camera black, its two runs differ by 9 to 18 points and all land between 59% and 80%, around its normal 71–76%. These runs cannot show that π0 depends on either single camera. The first run alone suggested a wrist-camera dependence (59%). Four more runs with the wrist camera black gave 77%, 72%, 67% and 70%, so the five average 69%, against 74% for five normal runs.
+- **Only blacking out both cameras changes π0 reliably.** That costs about 20 points in every run. With noise, a frozen first frame, or one camera black, its two runs differ by 9 to 18 points and all land between 59% and 80%, around its normal 71–76%. These runs cannot show that π0 depends on either single camera (section 1.4 answers this with 500 episodes). The first run alone suggested a wrist-camera dependence (59%). Four more runs with the wrist camera black gave 77%, 72%, 67% and 70%, so the five average 69%, against 74% for five normal runs.
 - **For π0.5 and SmolVLA the wrist camera matters more than the agent view**, in both runs.
 
 OpenVLA takes only the agent-view image and the instruction, so only the all-black condition applies to it.
@@ -79,6 +79,33 @@ On the tasks it solves, blind π0 is as close to sighted π0 as two sighted runs
 The re-run row leaves out tasks where the two sighted runs are still almost identical, because they use the same seed and had not yet diverged, so they say nothing about noise. These are tasks 0–3 in the first run and task 0 in the second.
 
 This does not show whether blind π0 replays a memorised motion. The comparison cannot separate a policy that tracks the bowl from one that repeats one motion per task, and how much the bowl position varies between initial states was not measured here. Per-task numbers are in [`results/trajectory.csv`](results/trajectory.csv) and on the [dashboard](https://chaoshengsc.github.io/libero-camera-ablation/dashboard/).
+
+### 1.4 Wrist camera removed: 500 episodes
+
+Section 1.2 leaves two questions open. Is π0.5's 0% with the wrist camera black caused by needing the wrist view, or by a black image it never saw in training? And with 100 episodes per run, π0 varies too much to show which camera it relies on. This section runs both models for 500 episodes per condition (10 tasks × 50 initial states, the same initial states for every condition run in this round) and treats the wrist camera in three ways:
+
+- **Black**: pixels 0, attention mask still 1, so the model attends to a black image.
+- **Dropped**: inside the model the camera's slot is filled with the empty-camera placeholder and its mask set to 0, the same way LeRobot fills the always-empty third camera slot in the configuration.
+- **Frozen**: the whole episode gets the real image from the episode's first frame.
+
+The design, acceptance checks and expected results were written down before the runs (the pre-registration in [docs/NOTES.md](docs/NOTES.md); it was not committed before the results, see the note there).
+
+![Success rate with one camera removed at test time](media/single_camera.svg)
+
+| Wrist camera | π0.5 | π0 |
+|---|---|---|
+| Both cameras | 98.4% | 72.0% (rerun 71.2%) |
+| Black | 0/500 (the same 100 initial states run 5 times: the two runs in section 1.2 and three more) | 70.4% |
+| Dropped | 4.6% | 71.2% (rerun 72.6%) |
+| Frozen at frame 1 | 0.0% | 72.8% |
+| Agent view dropped, wrist only | 55.4% | 74.2% |
+
+- **π0.5 needs the live wrist image.** All three treatments are near 0, so the earlier 0% was not caused by the black image. A real but stale wrist image (0.0%) is worse than none (4.6%).
+- **Removing the wrist camera does not change π0's success rate.** Paired by initial state against both cameras, every difference has a 95% interval inside the pre-set ±8-point margin (McNemar p ≥ 0.58). π0 also keeps 53–56% with both cameras black (section 1.1), so this shows that this checkpoint relies little on images, not that the agent view is enough.
+- **With the wrist view only, π0.5 keeps 55.4%**, in line with 51% and 57% for agent-view black in section 1.2; tasks differ widely (task 5: 1/50, task 2: 49/50).
+- **A pitfall.** In LeRobot v0.6.1, removing the agent-view key from the input moves the wrist image into the agent-view slot without any error ([lerobot#5118](https://github.com/huggingface/lerobot/issues/5118), proposed fix in [lerobot#5129](https://github.com/huggingface/lerobot/pull/5129), under review). "Dropped" here masks the camera in its own slot, and every run logs each slot's mask as evidence.
+
+Per-episode results and first-frame hashes are in `results/single_camera.csv`; the summary and paired statistics are in `results/single_camera_summary.csv`.
 
 ### Notes on these numbers
 
@@ -156,7 +183,7 @@ python3 scripts/analysis/make_figures.py
 ## Limitations
 
 - One benchmark suite (LIBERO-Spatial) and one seed.
-- The ablations use 100 episodes per run, so differences under about 13 points are not meaningful; for π0, repeated runs of one condition differed by up to 18 points.
+- The ablations in sections 1.1–1.3 use 100 episodes per run (section 1.4 uses 500), so differences under about 13 points are not meaningful; for π0, repeated runs of one condition differed by up to 18 points.
 - The π0 checkpoint is under-trained. A properly trained π0 may behave differently.
 - How much the scene varies between initial states of a task was not measured, so nothing here says how much vision the benchmark itself requires.
 - Diffusion Policy was evaluated on PushT (2-D physics), not in MuJoCo.

@@ -152,3 +152,35 @@ def test_trajectory_summary_numbers_in_readme():
 def test_no_placeholder_left():
     for md in READMES:
         assert "running" not in md and "在跑" not in md
+
+
+def test_single_camera_csv_matches_raw_and_readme():
+    """1.4 节:每回合结果与原始 eval_info.json 一致,同一模型各条件的初始状态相同,README 表格与汇总一致。"""
+    raw = DATA / "s500"
+    rs = rows("single_camera.csv")
+    summary = {(r["model"], r["condition"]): r for r in rows("single_camera_summary.csv")}
+    by = {}
+    for r in rs:
+        by.setdefault((r["model"], r["condition"]), []).append(r)
+    assert set(by) == set(summary) and len(by) == 11
+    run = {"π0.5": "pi05", "π0": "pi0"}
+    name = {"both": "none", "both_rerun": "none_r2", "wrist_black": "wrist", "wrist_dropped": "drop_wrist",
+            "wrist_dropped_rerun": "drop_wrist_r2", "wrist_frozen": "freeze_wrist", "agent_dropped": "drop_agent"}
+    for (model, cond), eps in by.items():
+        d = raw / f"{run[model]}_{name[cond]}"
+        info = json.loads((d / "eval_info.json").read_text())
+        succ = [int(s) for t in sorted(info["per_task"], key=lambda t: t["task_id"]) for s in t["metrics"]["successes"]]
+        assert [int(e["success"]) for e in eps] == succ and len(succ) == 500
+        assert [e["first_frame_hash"] for e in eps] == json.loads((d / "first_frame_hash.json").read_text())
+        assert [e["first_frame_hash"] for e in eps] == [e["first_frame_hash"] for e in by[model, "both"]]
+        s = summary[model, cond]
+        assert int(s["successes"]) == sum(succ) and float(s["success_pc"]) == round(100 * sum(succ) / 500, 1)
+        assert all(f"{float(s['success_pc']):.1f}%" in md for md in READMES), (model, cond)
+
+
+def test_pi05_wrist_black_five_runs_all_zero():
+    """1.4 节 π0.5 腕部涂黑引用的 5 次 × 100 回合,原始数据都在仓库里,且都是 0。"""
+    runs = ["traj_pi05_wrist"] + [f"run{i}/traj_pi05_wrist" for i in range(2, 6)]
+    assert [sum(per_task(r)) for r in runs] == [0] * 5
+    assert all(len([s for t in json.loads((DATA / r / "eval_info.json").read_text())["per_task"] for s in t["metrics"]["successes"]]) == 100
+               for r in runs)
