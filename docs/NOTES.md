@@ -69,7 +69,7 @@ Source: Table 2 of the paper and the experimental setup in the main text.
 - This repo: **73.4%** (500 episodes, ±3.9); per task 68/86/92/84/58/64/78/80/68/56.
 - Community result with the same LeRobot checkpoint (lerobot issue #2114): Spatial 69% (mujoco 2.3.7) → **73%** (mujoco 3.3.2), consistent with this repo.
 - LeRobot maintainer pkooij (#2114, 2025-10-05): "The Pi0 checkpoint is finetuned but needs more training to achieve results similar to the paper." **The public checkpoint is under-trained.**
-- Related evidence, #3591: with both cameras blacked out this π0 still reaches about 60% (74.6% normally), which suggests it relies little on vision (LIBERO scenes vary little, so it may be "memorising the answer" from language and proprioceptive state). Reproduced independently here; see the next section.
+- Related evidence, #3591: with both cameras blacked out this π0 still reaches about 60% (74.6% normally), which suggests it relies little on vision (LIBERO scenes vary little *[withdrawn on 2026-10-07, see the correction below]*, so it may be "memorising the answer" from language and proprioceptive state). Reproduced independently here; see the next section.
 - Diagnosis (2026-10-03): rendering at 256×256 (matching the training data) gives 74/100; three runs at 360×360 gave 73, 76 and 76; paired by episode 11 vs 10, no effect.
 - Training this checkpoint for 10k more steps (action expert only, batch 16; the control arm of the fine-tuning section below) leaves normal success at 73%.
 - Not done: evaluating OpenPI's own π0 LIBERO checkpoint here to check that it reaches 97%.
@@ -109,7 +109,7 @@ Source: Table 2 of the paper and the experimental setup in the main text.
   - The 2.12 cm noise floor is pulled down by tasks 0–3: on these four tasks the two runs coincide almost point for point (0.04–0.30 cm) because they share a seed and have not diverged yet, which says nothing about noise. On tasks 4–9 the re-run difference is 3.4 cm (grasp point 2.4 cm).
   - The 4.44 cm for blind vs normal comes mostly from tasks 5, 7 and 9, which fail when blind (6.0 / 10.9 / 7.8 cm). On the seven tasks that still succeed it is 2.8 cm (grasp point 2.4 cm), comparable to π0.5 vs π0 at 2.9 cm (grasp point 2.6 cm) and to the re-run at 3.4 cm.
   - So: on tasks that still succeed blind, π0's path cannot be distinguished from the sighted one within noise; on tasks that fail it goes somewhere else. The grasp-point spread (blind 2.4, normal 1.8 cm) is also at noise level,
-    so trajectories cannot separate "following the bowl" from "repeating one motion per task". "Scenes vary little and the benchmark asks little" still stands; "a grasp off by 5 cm still succeeds half the time" has no data behind it and is withdrawn.
+    so trajectories cannot separate "following the bowl" from "repeating one motion per task". "Scenes vary little and the benchmark asks little" still stands *(Withdrawn on 2026-10-07; see the correction below.)*; "a grasp off by 5 cm still succeeds half the time" has no data behind it and is withdrawn.
   - Success rates of the three π0 runs that logged trajectories: normal 73%, normal re-run 76%, blind 54%.
 - The state the policy receives is end-effector position (3) + axis-angle (3) + gripper (2), 8 dimensions in total, not joint angles (LeRobot v0.6.1 `processor/env_processor.py:68-75`, checked in the installed source).
 

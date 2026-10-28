@@ -182,6 +182,13 @@ footer { margin-top: 80px; padding-top: 20px; border-top: 1px solid var(--border
       <p class="note">两次正常运行几乎重合的任务（第 1 次的任务 0–3，第 2 次的任务 0）是同一个种子下还没有分叉，不能反映噪声；其余任务上的噪声底线平均是 3.4 和 3.3 cm。全涂黑仍能成功的任务上，路线相差 2.8 和 3.2 cm。任务 9 第 1 次相差 7.8 cm，第 2 次只有 4.9 cm，不如任务 7 清楚。这种比较分不出策略是跟着碗走，还是每个任务重复一套动作；同一任务内碗的位置变化有多大，这里没有测。</p>
     </div>
 
+    <div class="block">
+      <h3><span class="n">1.4</span>去掉腕部相机：每个条件 500 回合</h3>
+      <p class="take">π0.5 需要实时的腕部画面，涂黑、屏蔽、冻结都接近 0；π0 去掉腕部相机后成功率不变。</p>
+      <div class="fig"><img id="figSingle" alt="测试时去掉一路相机后的成功率"></div>
+      <p class="note">每个条件 500 回合（10 个任务 × 50 个初始状态，各条件初始状态相同；π0.5 腕部涂黑一项是同一组 100 个初始状态跑 5 次）。“屏蔽”指在模型内部把这一路相机的槽位换成空相机占位、掩码置 0；“冻结”指整个回合只给第一帧的真实画面。π0 与双相机按初始状态配对，各条件差值的 95% 区间都在预设的 ±8 个百分点以内。逐回合结果见仓库的 results/single_camera.csv。</p>
+    </div>
+
   </section>
 
   <section id="repro">
@@ -263,6 +270,10 @@ const DICT = [
   ["openvla README（3 种子 × 500 回合，A100）", "openvla README (3 seeds × 500 episodes, A100)"],
   ["LeRobot 模型卡（500 回合；原版 DP 仓库同等模型 64.2%）", "LeRobot model card (500 episodes; the equivalent model in the original DP repo scores 64.2%)"],
   ["HF 仓库自带 eval_info.json（500 回合）", "eval_info.json shipped in the HF repo (500 episodes)"],
+  ["π0.5 需要实时的腕部画面，涂黑、屏蔽、冻结都接近 0；π0 去掉腕部相机后成功率不变。", "π0.5 needs the live wrist image: black, dropped and frozen all bring it close to 0. Removing the wrist camera does not change π0's success rate."],
+  ["每个条件 500 回合（10 个任务 × 50 个初始状态，各条件初始状态相同；π0.5 腕部涂黑一项是同一组 100 个初始状态跑 5 次）。“屏蔽”指在模型内部把这一路相机的槽位换成空相机占位、掩码置 0；“冻结”指整个回合只给第一帧的真实画面。π0 与双相机按初始状态配对，各条件差值的 95% 区间都在预设的 ±8 个百分点以内。逐回合结果见仓库的 results/single_camera.csv。", "500 episodes per condition (10 tasks × 50 initial states, the same initial states for every condition; π0.5 wrist black is the same 100 initial states run 5 times). \"Dropped\" fills the camera's slot inside the model with the empty-camera placeholder and sets its mask to 0; \"frozen\" gives the real first-frame image for the whole episode. Paired by initial state against both cameras, every π0 difference has a 95% interval inside the pre-set ±8-point margin. Per-episode results are in results/single_camera.csv in the repository."],
+  ["去掉腕部相机：每个条件 500 回合", "Wrist camera removed: 500 episodes per condition"],
+  ["测试时去掉一路相机后的成功率", "Success rate with one camera removed at test time"],
   ["策略的输入，以及各实验改了哪一项", "What the policy receives and what each experiment changes"],
   ["π0 有无相机输入时的末端路线", "End-effector paths of π0 with and without camera input"],
   ["正常与全涂黑成功率对比", "Normal vs. all-black success rate"], ["各模型成功率对比", "Success rate by model"],
@@ -294,7 +305,7 @@ function trNode(n) {
 $("langBtn").textContent = LANG === "en" ? "中文" : "English";
 $("langBtn").onclick = () => { location.search = "?lang=" + (LANG === "en" ? "zh" : "en"); };
 // README 用的两张图：线上在仓库的 media/ 下；本地没有这些文件时整块隐藏
-for (const [id, name] of [["figInputs", "inputs"], ["figTraj", "trajectory"]]) {
+for (const [id, name] of [["figInputs", "inputs"], ["figTraj", "trajectory"], ["figSingle", "single_camera"]]) {
   $(id).onerror = () => $(id).closest(".fig").classList.add("hidden");
   $(id).src = `../media/${LANG === "en" ? "" : "zh/"}${name}.svg`;
 }

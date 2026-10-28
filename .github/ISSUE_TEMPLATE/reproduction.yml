@@ -1,0 +1,32 @@
+name: Reproduction problem
+description: A script fails, or your numbers differ from the ones in the README
+labels: ["reproduction"]
+body:
+  - type: input
+    id: result
+    attributes:
+      label: Which result
+      description: README section or file, for example "section 1.4" or results/single_camera.csv
+    validations:
+      required: true
+  - type: textarea
+    id: command
+    attributes:
+      label: What you ran
+      description: The command, and any changes to the scripts or settings
+      render: bash
+    validations:
+      required: true
+  - type: textarea
+    id: observed
+    attributes:
+      label: What happened
+      description: The error message, or your numbers next to the published ones
+    validations:
+      required: true
+  - type: textarea
+    id: env
+    attributes:
+      label: Environment
+      description: GPU, driver, OS, LeRobot / OpenVLA version, MuJoCo version
+      placeholder: "RTX 4090, driver 550, Ubuntu 22.04, lerobot 0.6.1, mujoco 3.3.2"

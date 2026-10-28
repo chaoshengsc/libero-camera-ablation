@@ -1,12 +1,19 @@
+<div align="center">
+
 # 四个机器人策略在 LIBERO-Spatial 上的相机输入消融
 
 **四个策略里有三个离开实时相机画面就无法完成任务；一个公开的 π0 权重在所有相机涂黑后仍有 53–56% 的成功率。**
 
 [![CI](https://github.com/chaoshengsc/libero-camera-ablation/actions/workflows/ci.yml/badge.svg)](https://github.com/chaoshengsc/libero-camera-ablation/actions/workflows/ci.yml)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Release](https://img.shields.io/github/v/release/chaoshengsc/libero-camera-ablation?color=2563eb)](https://github.com/chaoshengsc/libero-camera-ablation/releases)
 [![Dashboard](https://img.shields.io/badge/results-live%20dashboard-2563eb)](https://chaoshengsc.github.io/libero-camera-ablation/dashboard/?lang=zh)
+[![LeRobot](https://img.shields.io/badge/LeRobot-v0.6.1-ffcc4d)](https://github.com/huggingface/lerobot/tree/v0.6.1)
+[![Python](https://img.shields.io/badge/python-3.10%2B-3776ab)](pyproject.toml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-lightgrey)](LICENSE)
 
-[English](README.md) | 中文
+[English](README.md) | **中文**
+
+</div>
 
 <p align="center">
   <img src="media/zh/blackout_demo.gif" width="720" alt="同一个 LIBERO 任务的三次运行:π0.5 正常画面成功,π0.5 相机涂黑失败,π0 相机涂黑仍然成功">
@@ -20,7 +27,13 @@
 
 做消融之前，先把五个公开权重复现到了基准成功率的抽样误差范围内（[第 2 节](#2-公开权重的复现)）。全部在一台工作站上完成（RTX A5000 24 GB，Ubuntu 24.04，EGL 无头渲染），所有改动都是包装脚本，不改上游源码。本页的结果表由 CI 从 `dashboard/data/` 里的原始评测文件重新计算并核对。
 
-**目录：** [相机消融](#1-相机消融) · [复现](#2-公开权重的复现) · [快速开始](#快速开始) · [仓库结构](#仓库结构) · [局限](#局限) · [致谢与许可证](#致谢与许可证)
+## 更新动态
+
+- **2026-10-28** · 单相机实验，每个条件 500 回合（[1.4 节](#14-只去掉腕部相机500-回合)）。搭实验时发现 LeRobot 在缺一路相机时会悄悄错位相机槽位：已报告为 [lerobot#5118](https://github.com/huggingface/lerobot/issues/5118)，修复提交为 [lerobot#5129](https://github.com/huggingface/lerobot/pull/5129)。
+- **2026-10-14** · [v1.3](https://github.com/chaoshengsc/libero-camera-ablation/releases/tag/v1.3)：所有消融各重跑一次；撤回了“π0 依赖腕部相机”的结论。
+- **2026-10-07** · [v1.2](https://github.com/chaoshengsc/libero-camera-ablation/releases/tag/v1.2)：仓库改名；SmolVLA 消融改用复现表里的同一个权重重跑。
+
+**目录：** [相机消融](#1-相机消融) · [复现](#2-公开权重的复现) · [快速开始](#快速开始) · [仓库结构](#仓库结构) · [局限](#局限) · [致谢与许可证](#致谢与许可证) · [引用](#引用)
 
 ## 1. 相机消融
 
@@ -39,7 +52,7 @@ LIBERO 上的策略收到两路相机画面、机械臂状态（末端位姿与�
 | SmolVLA | 83% | 0% |
 | **π0** | 76% | **56%** |
 
-三个模型没有画面就完全不能动作，各自重跑一次仍是 0%。π0 仍有 56% 的回合成功：七个任务上 10 次成功 6 到 9 次，另外三个任务上 0 或 1 次。另外四次运行是 54%、56%、54% 和 53%，lerobot issue #3591 对同一个权重报告的是约 60%。
+三个模型没有画面就完全不能动作，各自重跑一次仍是 0%。π0 仍有 56% 的回合成功：七个任务上 10 次成功 6 到 9 次，另外三个任务上 0 或 1 次。另外四次运行是 54%、56%、54% 和 53%，[lerobot#3591](https://github.com/huggingface/lerobot/issues/3591) 对同一个权重报告的是约 60%。
 
 ### 1.2 单路相机、噪声、冻结画面
 
@@ -107,14 +120,17 @@ OpenVLA 只接收主视角画面和指令，所以对它只有“全涂黑”这
 
 每回合的结果与首帧哈希在 `results/single_camera.csv`，汇总与配对统计在 `results/single_camera_summary.csv`。
 
-### 关于这些数字
+<details>
+<summary><b>关于这些数字</b>：π0 权重、“正常”一列、置信区间、两次运行之间的波动、噪声、相关工作</summary>
 
-- **π0 权重。** `lerobot/pi0_libero_finetuned_v044` 500 回合的正常成功率是 73.4%。OpenPI 旧版 README 给出过自家 π0 微调结果 96.8%，但那个权重没有发布，所以没有官方的 π0 LIBERO 权重可以对照。LeRobot 维护者说过公开的这个权重训练不足（lerobot issue #2114）。
+- **π0 权重。** `lerobot/pi0_libero_finetuned_v044` 500 回合的正常成功率是 73.4%。OpenPI 旧版 README 给出过自家 π0 微调结果 96.8%，但那个权重没有发布，所以没有官方的 π0 LIBERO 权重可以对照。LeRobot 维护者说过公开的这个权重训练不足（[lerobot#2114](https://github.com/huggingface/lerobot/issues/2114)）。
 - **“正常”一列。** 第一个数取自各模型 500 回合评测里每个任务的前 10 回合，它们与消融实验用的是同一批初始状态。第二个数是另外单独跑的 100 回合；SmolVLA 没有跑。π0 的五次正常运行是 76%、73%、76%、72% 和 71%。
 - **置信区间。** 单个数字的 95% 置信区间最宽约 ±10 个百分点。同一任务的回合之间相关，所以这些区间偏乐观。
 - **两次运行之间的波动。** 同一个种子的两次运行并不完全相同：评测固定了随机种子，但没有让 GPU 计算确定化，π0 两次运行的末端路线从第一步起就不一样，重跑一次实际上是重新抽样。π0.5 和 SmolVLA 两次相差不超过 6 个百分点；π0 在同一个条件上最多相差 18 个百分点。
 - **噪声。** 高斯噪声，标准差 0.1，像素范围 [0, 1]。
 - **相关工作。** [LIBERO-PRO](https://arxiv.org/abs/2510.03827) 和 [LIBERO-Plus](https://arxiv.org/abs/2510.13626) 用范围大得多的扰动研究了 LIBERO 策略的鲁棒性。
+
+</details>
 
 ## 2. 公开权重的复现
 
@@ -179,6 +195,7 @@ python3 scripts/analysis/make_figures.py
 | `env/` | 环境文件、pip 约束、导出的包清单 |
 | `tests/` | 指标的单元测试、已发布数字的一致性检查、入口脚本的回归测试 |
 | `viewer/` | 在本地用 MuJoCo 交互查看器回放策略轨迹 |
+| `.github/` | CI 工作流与 issue 模板 |
 
 ## 局限
 
@@ -207,4 +224,16 @@ python3 scripts/analysis/make_figures.py
 
 ## 引用
 
-见 [`CITATION.cff`](CITATION.cff)，或用 GitHub 页面上的 “Cite this repository” 按钮。
+如果用到了这里的结果或脚本，请引用：
+
+```bibtex
+@software{shengchao2026liberocameraablation,
+  author  = {ShengChao},
+  title   = {libero-camera-ablation: Camera-input ablations of four robot policies on LIBERO-Spatial},
+  year    = {2026},
+  version = {1.4.0},
+  url     = {https://github.com/chaoshengsc/libero-camera-ablation}
+}
+```
+
+同样的条目也在 [`CITATION.cff`](CITATION.cff) 里，GitHub 页面上的 “Cite this repository” 按钮读的就是它。

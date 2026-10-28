@@ -1,12 +1,19 @@
+<div align="center">
+
 # Camera-input ablations of four robot policies on LIBERO-Spatial
 
 **Three of the four policies fail without a live camera image. One public π0 checkpoint still succeeds 53–56% of the time with every camera blacked out.**
 
 [![CI](https://github.com/chaoshengsc/libero-camera-ablation/actions/workflows/ci.yml/badge.svg)](https://github.com/chaoshengsc/libero-camera-ablation/actions/workflows/ci.yml)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Release](https://img.shields.io/github/v/release/chaoshengsc/libero-camera-ablation?color=2563eb)](https://github.com/chaoshengsc/libero-camera-ablation/releases)
 [![Dashboard](https://img.shields.io/badge/results-live%20dashboard-2563eb)](https://chaoshengsc.github.io/libero-camera-ablation/dashboard/)
+[![LeRobot](https://img.shields.io/badge/LeRobot-v0.6.1-ffcc4d)](https://github.com/huggingface/lerobot/tree/v0.6.1)
+[![Python](https://img.shields.io/badge/python-3.10%2B-3776ab)](pyproject.toml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-lightgrey)](LICENSE)
 
-English | [中文](README_CN.md)
+**English** | [中文](README_CN.md)
+
+</div>
 
 <p align="center">
   <img src="media/blackout_demo.gif" width="720" alt="Three rollouts of the same LIBERO task: pi0.5 with cameras succeeds, pi0.5 with black camera input fails, pi0 with black camera input still succeeds">
@@ -20,7 +27,13 @@ English | [中文](README_CN.md)
 
 Before the ablations, five public checkpoints were reproduced to within sampling error of their reference success rates ([section 2](#2-reproduction-of-the-public-checkpoints)). Everything runs on one workstation (RTX A5000 24 GB, Ubuntu 24.04, headless EGL rendering), with wrapper scripts that leave upstream source untouched. CI recomputes the result tables on this page from the raw evaluation files in `dashboard/data/`.
 
-**Contents:** [Camera ablations](#1-camera-ablations) · [Reproduction](#2-reproduction-of-the-public-checkpoints) · [Quick start](#quick-start) · [Layout](#repository-layout) · [Limitations](#limitations) · [Acknowledgements](#acknowledgements-and-licenses)
+## News
+
+- **2026-10-28** · Single-camera experiment, 500 episodes per condition ([section 1.4](#14-wrist-camera-removed-500-episodes)). While setting it up, found that LeRobot silently shifts camera slots when a camera is missing: reported as [lerobot#5118](https://github.com/huggingface/lerobot/issues/5118), fix proposed in [lerobot#5129](https://github.com/huggingface/lerobot/pull/5129).
+- **2026-10-14** · [v1.3](https://github.com/chaoshengsc/libero-camera-ablation/releases/tag/v1.3): every ablation run a second time; the claim that π0 depends on the wrist camera was withdrawn.
+- **2026-10-07** · [v1.2](https://github.com/chaoshengsc/libero-camera-ablation/releases/tag/v1.2): repository renamed; SmolVLA ablations re-run with the checkpoint used in the reproduction table.
+
+**Contents:** [Camera ablations](#1-camera-ablations) · [Reproduction](#2-reproduction-of-the-public-checkpoints) · [Quick start](#quick-start) · [Layout](#repository-layout) · [Limitations](#limitations) · [Acknowledgements](#acknowledgements-and-licenses) · [Citation](#citation)
 
 ## 1. Camera ablations
 
@@ -39,7 +52,7 @@ Except in section 1.4, every number in this section is a success rate over 100 e
 | SmolVLA | 83% | 0% |
 | **π0** | 76% | **56%** |
 
-Three models cannot act without images, and a second run of each gave 0% again. π0 succeeds in 56% of episodes: 6 to 9 out of 10 on seven tasks, and 0 or 1 out of 10 on the other three. Four more runs gave 54%, 56%, 54% and 53%, and lerobot issue #3591 reports about 60% for the same checkpoint.
+Three models cannot act without images, and a second run of each gave 0% again. π0 succeeds in 56% of episodes: 6 to 9 out of 10 on seven tasks, and 0 or 1 out of 10 on the other three. Four more runs gave 54%, 56%, 54% and 53%, and [lerobot#3591](https://github.com/huggingface/lerobot/issues/3591) reports about 60% for the same checkpoint.
 
 ### 1.2 One camera, noise, frozen image
 
@@ -107,14 +120,17 @@ The design, acceptance checks and expected results were written down before the 
 
 Per-episode results and first-frame hashes are in `results/single_camera.csv`; the summary and paired statistics are in `results/single_camera_summary.csv`.
 
-### Notes on these numbers
+<details>
+<summary><b>Notes on these numbers</b>: the π0 checkpoint, the normal column, confidence intervals, run-to-run variation, noise, related work</summary>
 
-- **π0 checkpoint.** `lerobot/pi0_libero_finetuned_v044` scores 73.4% over 500 normal episodes. An earlier OpenPI README gave 96.8% for its own π0 fine-tuning run, but that checkpoint was never released, so there is no official π0 LIBERO checkpoint to compare against. A LeRobot maintainer has said the public one is under-trained (lerobot issue #2114).
+- **π0 checkpoint.** `lerobot/pi0_libero_finetuned_v044` scores 73.4% over 500 normal episodes. An earlier OpenPI README gave 96.8% for its own π0 fine-tuning run, but that checkpoint was never released, so there is no official π0 LIBERO checkpoint to compare against. A LeRobot maintainer has said the public one is under-trained ([lerobot#2114](https://github.com/huggingface/lerobot/issues/2114)).
 - **Normal column.** The first number is the first 10 episodes per task of each model's 500-episode run, which use the same initial states as the ablation runs. The second is a separate 100-episode run; SmolVLA has none. π0's five normal runs gave 76%, 73%, 76%, 72% and 71%.
 - **Confidence intervals.** The 95% interval of a single number is up to ±10 points. Episodes of one task are correlated, which makes these intervals optimistic.
 - **Run-to-run variation.** Runs with the same seed are not identical: the evaluation fixes the random seed but does not make GPU computation deterministic, the end-effector paths of two π0 runs differ from the first step, and a repeat is in effect a new sample. π0.5 and SmolVLA repeat within 6 points; π0 differs by up to 18 points on the same condition.
 - **Noise.** Gaussian, standard deviation 0.1, on pixels in [0, 1].
 - **Related work.** [LIBERO-PRO](https://arxiv.org/abs/2510.03827) and [LIBERO-Plus](https://arxiv.org/abs/2510.13626) study the robustness of LIBERO policies under a much wider set of perturbations.
+
+</details>
 
 ## 2. Reproduction of the public checkpoints
 
@@ -179,6 +195,7 @@ python3 scripts/analysis/make_figures.py
 | `env/` | Environment file, pip constraints, exported package lists |
 | `tests/` | Unit tests for the metrics, consistency checks on the published numbers, entry-script regression tests |
 | `viewer/` | Replay a policy trajectory locally in the interactive MuJoCo viewer |
+| `.github/` | CI workflow and issue templates |
 
 ## Limitations
 
@@ -207,4 +224,16 @@ Papers: [ACT](https://arxiv.org/abs/2304.13705) · [Diffusion Policy](https://ar
 
 ## Citation
 
-See [`CITATION.cff`](CITATION.cff), or use GitHub's "Cite this repository" button.
+If you use these results or scripts, please cite:
+
+```bibtex
+@software{shengchao2026liberocameraablation,
+  author  = {ShengChao},
+  title   = {libero-camera-ablation: Camera-input ablations of four robot policies on LIBERO-Spatial},
+  year    = {2026},
+  version = {1.4.0},
+  url     = {https://github.com/chaoshengsc/libero-camera-ablation}
+}
+```
+
+The same entry is in [`CITATION.cff`](CITATION.cff), which GitHub's "Cite this repository" button reads.

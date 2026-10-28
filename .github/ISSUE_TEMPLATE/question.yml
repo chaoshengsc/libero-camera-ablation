@@ -1,0 +1,11 @@
+name: Question or discussion
+description: About the method, the analysis or how to read a result
+labels: ["question"]
+body:
+  - type: textarea
+    id: question
+    attributes:
+      label: Question
+      description: Name the section or figure it is about
+    validations:
+      required: true

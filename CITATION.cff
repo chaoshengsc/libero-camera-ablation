@@ -7,5 +7,12 @@ authors:
 repository-code: "https://github.com/chaoshengsc/libero-camera-ablation"
 url: "https://chaoshengsc.github.io/libero-camera-ablation/dashboard/"
 license: MIT
-version: "1.3.0"
-date-released: "2026-10-14"
+abstract: "Camera-input ablations (blackout, frozen frame, noise, single camera) of four public LIBERO-Spatial checkpoints (π0, π0.5, OpenVLA, SmolVLA), and reproduction of five public robot-policy checkpoints in simulation."
+keywords:
+  - robot learning
+  - vision-language-action
+  - LIBERO
+  - ablation
+  - LeRobot
+version: "1.4.0"
+date-released: "2026-10-28"

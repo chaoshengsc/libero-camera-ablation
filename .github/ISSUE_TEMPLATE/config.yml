@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Results dashboard
+    url: https://chaoshengsc.github.io/libero-camera-ablation/dashboard/
+    about: Per-task numbers for every run
+  - name: Troubleshooting
+    url: https://github.com/chaoshengsc/libero-camera-ablation/blob/main/docs/TROUBLESHOOTING.md
+    about: Every setup and evaluation problem met so far, with cause and fix
