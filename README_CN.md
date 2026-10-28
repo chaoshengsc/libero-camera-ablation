@@ -123,7 +123,7 @@ OpenVLA 只接收主视角画面和指令，所以对它只有“全涂黑”这
 <details>
 <summary><b>关于这些数字</b>：π0 权重、“正常”一列、置信区间、两次运行之间的波动、噪声、相关工作</summary>
 
-- **π0 权重。** `lerobot/pi0_libero_finetuned_v044` 500 回合的正常成功率是 73.4%。OpenPI 旧版 README 给出过自家 π0 微调结果 96.8%，但那个权重没有发布，所以没有官方的 π0 LIBERO 权重可以对照。LeRobot 维护者说过公开的这个权重训练不足（[lerobot#2114](https://github.com/huggingface/lerobot/issues/2114)）。
+- **π0 权重。** `lerobot/pi0_libero_finetuned_v044` 500 回合的正常成功率是 73.4%。OpenPI 旧版 README 给出过按 `pi0_libero` 配置训练的 π0 在 Spatial 上 96.8%。这个权重从没写进 OpenPI 的 README，但可以从 OpenPI 的公开存储桶下载（`gs://openpi-assets/checkpoints/pi0_libero`）；[LIBERO-Plus](https://arxiv.org/abs/2510.13626) 报告它不加扰动时 94.2%，所有相机涂黑后不超过 2%（其 Table 1 与图 2，本仓库尚未复测）。本 README 旧版写过“没有发布官方 π0 LIBERO 权重”，这是错的（见 [`docs/NOTES_CN.md`](docs/NOTES_CN.md) 的更正）。LeRobot 维护者说过 LeRobot 这个权重训练不足（[lerobot#2114](https://github.com/huggingface/lerobot/issues/2114)）。
 - **“正常”一列。** 第一个数取自各模型 500 回合评测里每个任务的前 10 回合，它们与消融实验用的是同一批初始状态。第二个数是另外单独跑的 100 回合；SmolVLA 没有跑。π0 的五次正常运行是 76%、73%、76%、72% 和 71%。
 - **置信区间。** 单个数字的 95% 置信区间最宽约 ±10 个百分点。同一任务的回合之间相关，所以这些区间偏乐观。
 - **两次运行之间的波动。** 同一个种子的两次运行并不完全相同：评测固定了随机种子，但没有让 GPU 计算确定化，π0 两次运行的末端路线从第一步起就不一样，重跑一次实际上是重新抽样。π0.5 和 SmolVLA 两次相差不超过 6 个百分点；π0 在同一个条件上最多相差 18 个百分点。

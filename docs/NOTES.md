@@ -73,7 +73,7 @@ Source: Table 2 of the paper and the experimental setup in the main text.
 - Diagnosis (2026-10-03): rendering at 256×256 (matching the training data) gives 74/100; three runs at 360×360 gave 73, 76 and 76; paired by episode 11 vs 10, no effect.
 - Training this checkpoint for 10k more steps (action expert only, batch 16; the control arm of the fine-tuning section below) leaves normal success at 73%.
 - Not done: evaluating OpenPI's own π0 LIBERO checkpoint here to check that it reaches 97%.
-- Correction (2026-10-06): the premise of the previous item is wrong. OpenPI never released a π0 LIBERO checkpoint. The 96.8% comes from an earlier README (`examples/libero/README.md@7cf5f609`), which says that training with the `pi0_libero` config should give similar results; commit `35106c9b` (2025-09) replaced that row with π0.5, and only `pi05_libero` is public. There is therefore no official π0 checkpoint to compare against. Training one here as the maintainer suggests (batch 256, 20k steps or more) is not practical: at batch 16 a step takes 4.2 s and 10k steps took 11.7 h, so a linear extrapolation gives about 15 days (an estimate, not measured). The 10k-step run above trained the action expert only, on `lerobot/libero`, which is not the maintainer's recipe, so it does not show that more training is useless.
+- Correction (2026-10-06): the premise of the previous item is wrong. OpenPI never released a π0 LIBERO checkpoint. *[This correction is itself wrong; see the correction of 2026-10-28 at the end.]* The 96.8% comes from an earlier README (`examples/libero/README.md@7cf5f609`), which says that training with the `pi0_libero` config should give similar results; commit `35106c9b` (2025-09) replaced that row with π0.5, and only `pi05_libero` is public. There is therefore no official π0 checkpoint to compare against. Training one here as the maintainer suggests (batch 256, 20k steps or more) is not practical: at batch 16 a step takes 4.2 s and 10k steps took 11.7 h, so a linear extrapolation gives about 15 days (an estimate, not measured). The 10k-step run above trained the action expert only, on `lerobot/libero`, which is not the maintainer's recipe, so it does not show that more training is useless.
 
 ## Vision-dependence test: all cameras blacked out (2026-09-30)
 
@@ -265,3 +265,11 @@ Success rate (%), 500 episodes each, Wilson 95% interval in brackets; the differ
 - **Scope.** These two checkpoints on LIBERO-Spatial only; a model trained with two cameras with one removed at test time, not a policy trained on one camera.
 - **Raw data.** Each run's `eval_info.json` and first-frame hashes are in `dashboard/data/s500/`; `scripts/analysis/make_figures.py` derives `results/single_camera.csv` (per episode) and `results/single_camera_summary.csv` (the statistics in the table above) from them.
 - **Note.** The pre-registration was written before the results but was not committed before them; its timing rests on the dates in the text.
+
+## Correction (2026-10-28): an official π0 LIBERO checkpoint does exist
+
+The correction of 2026-10-06 above says that OpenPI never released a π0 LIBERO checkpoint. That is wrong. It was based only on OpenPI's README, and none of the 22 versions of the README lists one, but OpenPI's public bucket holds `gs://openpi-assets/checkpoints/pi0_libero` (uploaded 2025-05-28, checked through the bucket listing), next to `pi0_fast_libero` and `pi05_libero`. `pi0_libero` is also a config in `src/openpi/training/config.py`.
+
+- [LIBERO-Plus](https://arxiv.org/abs/2510.13626) evaluated this checkpoint (their Table 6 lists the address): 94.2% unperturbed (Table 1), and at most 2% with every camera black (Figure 2, which does not say which suite). It has not been re-run here.
+- So "π0 still succeeds with black cameras" is very likely a property of LeRobot's under-trained checkpoint and not of π0. The README and the dashboard said "there is no official π0 LIBERO checkpoint to compare against"; that sentence is replaced.
+- Next: evaluate OpenPI's `pi0_libero` and `pi05_libero` here with every camera black and with the wrist camera removed.

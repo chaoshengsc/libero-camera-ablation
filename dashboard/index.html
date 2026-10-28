@@ -149,7 +149,7 @@ footer { margin-top: 80px; padding-top: 20px; border-top: 1px solid var(--border
     <h2>相机消融</h2>
     <p class="intro">LIBERO 上的策略收到两路相机画面、机械臂状态和一句任务指令。每个实验只改相机输入。</p>
     <p class="intro">每次运行 100 回合（10 个任务 × 10 个初始状态，同一个种子）。只算抽样误差，两个条件要相差约 13 个百分点以上才有意义；对 π0，同一个条件跑两次最多相差 18 个百分点。</p>
-    <p class="intro">本节的 π0 是 LeRobot 的公开权重，500 回合的正常成功率是 73%。它训练不足，也没有官方的 π0 LIBERO 权重可以对照，所以下面的现象只说明这个权重，不代表所有 π0。</p>
+    <p class="intro">本节的 π0 是 LeRobot 的公开权重，500 回合的正常成功率是 73%。它训练不足；OpenPI 官方的 π0 LIBERO 权重在 LIBERO-Plus 的测试里所有相机涂黑后不超过 2%，所以下面的现象只说明这个权重，不代表所有 π0。</p>
     <div class="block"><div class="fig"><img id="figInputs" alt="策略的输入，以及各实验改了哪一项"></div></div>
 
     <div class="block">
@@ -246,7 +246,7 @@ const DICT = [
   ["四个策略里有三个离开实时相机画面就无法完成任务；一个公开的 π0 权重在所有相机涂黑后仍有 53–56% 的成功率。做消融之前，先复现了五个公开权重。", "Three of the four policies fail without a live camera image. One public π0 checkpoint still succeeds 53–56% of the time with every camera blacked out. Five public checkpoints were reproduced first."],
   ["每个模型评测 500 回合，与原作者公布的基准对比。两个 95% 置信区间有重叠即算复现。", "Each model is evaluated for 500 episodes and compared with the reference published by its authors. A result counts as reproduced when the two 95% confidence intervals overlap."],
   ["SmolVLA 用的是只在 LIBERO-Spatial 上训练的公开权重，评测时 n_action_steps=10。把鼠标移到图上可以看基准出处。", "SmolVLA uses a public checkpoint trained on LIBERO-Spatial only, evaluated with n_action_steps=10. Hover over the chart for the source of each reference."],
-  ["本节的 π0 是 LeRobot 的公开权重，500 回合的正常成功率是 73%。它训练不足，也没有官方的 π0 LIBERO 权重可以对照，所以下面的现象只说明这个权重，不代表所有 π0。", "π0 in this section is LeRobot's public checkpoint, which scores 73% over 500 normal episodes. It is under-trained and there is no official π0 LIBERO checkpoint to compare against, so the behaviour below describes this checkpoint, not π0 in general."],
+  ["本节的 π0 是 LeRobot 的公开权重，500 回合的正常成功率是 73%。它训练不足；OpenPI 官方的 π0 LIBERO 权重在 LIBERO-Plus 的测试里所有相机涂黑后不超过 2%，所以下面的现象只说明这个权重，不代表所有 π0。", "π0 in this section is LeRobot's public checkpoint, which scores 73% over 500 normal episodes. It is under-trained, and OpenPI's own π0 LIBERO checkpoint scores at most 2% with every camera black in LIBERO-Plus's tests, so the behaviour below describes this checkpoint, not π0 in general."],
   ["每格是该任务 50 回合的成功率（%）。列标题是“拿起黑碗并放到盘子上”里碗的初始位置。", "Each cell is the success rate (%) over 50 episodes of that task. Column headers give where the bowl starts in \"pick up the black bowl and place it on the plate\"."],
   ["LIBERO 上的策略收到两路相机画面、机械臂状态和一句任务指令。每个实验只改相机输入。", "A LIBERO policy receives two camera images, the robot state and a language instruction. Each experiment changes only the camera input."],
   ["每次运行 100 回合（10 个任务 × 10 个初始状态，同一个种子）。只算抽样误差，两个条件要相差约 13 个百分点以上才有意义；对 π0，同一个条件跑两次最多相差 18 个百分点。", "Each run is 100 episodes (10 tasks × 10 initial states, same seed). Sampling error alone means two conditions have to differ by about 13 points; for π0, the same condition run twice differed by up to 18 points."],
