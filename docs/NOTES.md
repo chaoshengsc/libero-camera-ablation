@@ -273,3 +273,31 @@ The correction of 2026-10-06 above says that OpenPI never released a π0 LIBERO 
 - [LIBERO-Plus](https://arxiv.org/abs/2510.13626) evaluated this checkpoint (their Table 6 lists the address): 94.2% unperturbed (Table 1), and at most 2% with every camera black (Figure 2, which does not say which suite). It has not been re-run here.
 - So "π0 still succeeds with black cameras" is very likely a property of LeRobot's under-trained checkpoint and not of π0. The README and the dashboard said "there is no official π0 LIBERO checkpoint to compare against"; that sentence is replaced.
 - Next: evaluate OpenPI's `pi0_libero` and `pi05_libero` here with every camera black and with the wrist camera removed.
+
+## Pre-registration: does the official π0 succeed without vision? (written 2026-10-28 15:00, before the results; translated the same day)
+
+A translation of the Chinese original in [NOTES_CN.md](NOTES_CN.md).
+
+- **Question.** LeRobot's π0 (`lerobot/pi0_libero_finetuned_v044`) still reaches 53–56% with both cameras black (five runs). Is that a property of π0 or of this checkpoint? Method: swap in the LeRobot conversion of OpenPI's official `pi0_libero`, `lerobot/pi0_libero_base@98ac51b8` (sha256 of `model.safetensors` checked against the HF record), with the same environment, seed (1000), suite (LIBERO-Spatial) and initial states. Only the weights change.
+- **How much it matters.** The README headline says "a public π0 checkpoint", which holds whatever the result; this experiment only makes the scope of the conclusion precise.
+- **Running the conversion faithfully (all checked in the source).** The converted repository has no normalization statistics; OpenPI's official `norm_stats.json` is injected (mean/std; first 8 state dims, first 7 action dims). `pi0_libero` was trained with `extra_delta_transform`: the first 6 action dims are deltas from the state, so after unnormalization the first 6 dims of the raw (unnormalized) state are added back; the gripper is unchanged. Each inference executes 5 steps (as OpenPI's LIBERO script with `replan_steps=5` and the earlier LeRobot π0 runs; the converted config defaults to 10 and is set to 5). The tokenizer points to the local copy on the workstation. The environment side (180° image rotation, 8-dim state, initial wait steps) is kept as in the earlier LeRobot π0 runs.
+- **Conditions and episodes.**
+
+| Checkpoint | Normal | All black | Both slots masked | Both frozen at frame 1 (auxiliary) |
+|---|---|---|---|---|
+| Official π0 | 500 (gate) | 100 | 100 | 100 |
+| LeRobot π0 | existing 5 × 100, 500 | existing 5 × 100 | new 100 | existing 2 × 100 |
+
+  "Both slots masked" is a new mode: both cameras are handled as empty cameras in their own slots (filled with -1, mask 0), the same method as `drop_wrist` / `drop_agent`. 100 episodes = 10 tasks × 10 initial states; 500 = 10 tasks × 50.
+- **Smoke test (not reported).** Before the gate, 50 normal episodes. The log must show: normalized state of order 1; actions after unnormalization and delta restoration within [-1, 1]; the delta actually added back (actions printed before and after). If not, fix before the gate.
+- **Gate.** Official π0, normal, 500 episodes ≥ 92% (references: 96.8% on Spatial in OpenPI's old README for this config; 94.2% reported by LIBERO-Plus). Below that, stop, report no ablation results, and check normalization, delta restoration and executed steps; if needed, switch to OpenPI's original JAX implementation.
+- **Acceptance per run (not reported otherwise).** Exit code 0; right number of episodes; in masked runs every image slot's mask is 0 in the log; each episode records a hash of its first agent-view frame, compared episode by episode with the existing LeRobot π0 500-episode normal run (`dashboard/data/s500/`; 100-episode runs against the first 10 per task), to confirm the same initial states.
+- **Reading (only all-black and both-slots-masked, the two treatments that actually remove visual information).**
+  - Official π0 ≤ 10% under both, and LeRobot π0 ≥ 40% under the matching treatment → confirmed as a property of this checkpoint; "very likely" in the README becomes a definite statement. If LeRobot π0 with both slots masked is below 40%, this rests on all-black alone, and that is stated.
+  - Official π0 ≥ 30% under either → reported as is for that treatment, and the general "property of this checkpoint" claim is withdrawn.
+  - 10–30% → that treatment is run once more (100 episodes); if it stays in this range, reported as "uncertain".
+- **Freezing is a separate, auxiliary result.** The frozen first frame shows where the objects are, so it measures "no visual feedback after frame 1", not "no vision"; the image also drifts out of step with the robot state. It is not part of the reading rule and is reported on its own.
+- **Statistics.** Success rates with Wilson 95% intervals.
+- **Expectation.** LIBERO-Plus (arXiv:2510.13626) evaluated the same official checkpoint: ≤ 2% with every camera black (suite and episode count not stated, so only a weak reference). Expected: official π0 near 0 under both treatments.
+- **What can and cannot be said.** Only whether this is a property of this checkpoint, not why: the two checkpoints differ in training data, steps, normalization and action representation. The 2026-10-28 correction above calls LeRobot's checkpoint "under-trained"; this experiment cannot test that, and the wording will be corrected with the results.
+- **Not done now.** Official π0.5 (the conversion is still downloading; not scheduled yet); why LeRobot's π0 succeeds without vision; other suites.
