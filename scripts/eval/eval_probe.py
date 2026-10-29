@@ -12,7 +12,8 @@ DELTA_REF=chunk(默认)| step(诊断用:保留 LeRobot 原本的做法,用当前
 POLICY_SERVER=<端口>:不用 LeRobot 的策略,改向本机 OpenPI 原版服务端(scripts/openpi/serve_pi0_libero.py)要动作块,
            每块执行前 --policy.n_action_steps 步;需要 OPENPI_AUTHKEY。环境、初始状态、BLACKOUT 处理都不变,
            drop_* 由服务端把对应槽位的 image_mask 置 0。--policy.path 仍要给一个 π0 权重目录,只用来解析配置,不加载权重。
-TRAJ_OUT=<npz 路径>:每回合一条轨迹,字段 eef[T,3]、grip[T,2];按 rollout 调用顺序(batch_size=1 时即 任务0回合0..9, 任务1…)。"""
+TRAJ_OUT=<npz 路径>:每回合一条轨迹,字段 eef[T,3]、grip[T,2]、act[T,7](实际送进环境 step 的动作,开环回放用);
+         按 rollout 调用顺序(batch_size=1 时即 任务0回合0..9, 任务1…)。"""
 import atexit
 import hashlib
 import os
@@ -36,7 +37,7 @@ _dropped = []  # drop_* 模式下要屏蔽的相机键
 _masked = []  # π0/π0.5 的包装确实按槽位屏蔽过一次后置位;其他策略没有这层包装
 _chunk = {}  # 增量动作还原的参考状态:本段动作块开始那一步的原始状态;另记动作越界次数等证据
 _pre, _roll, _shown = E.preprocess_observation, E.rollout, False
-episodes = []  # 每项:{"eef": [...], "grip": [...]}
+episodes = []  # 每项:{"eef": [...], "grip": [...], "act": [...]}
 
 
 def _hit(k):
@@ -194,7 +195,10 @@ def _remote():
         def select_action(self, batch, **kwargs):
             if not self.queue:
                 assert len(batch["task"]) == 1, "POLICY_SERVER requires --eval.batch_size=1"
-                req = {"image": pack(u8(batch["observation.images.image"])), "wrist_image": pack(u8(batch["observation.images.image2"])),
+                img, wrist = u8(batch["observation.images.image"]), u8(batch["observation.images.image2"])
+                for nm, x in (("agent", img), ("wrist", wrist)):  # 证据:每回合送出的每路画面有几种(冻结的那路应只有 1 种)
+                    episodes[-1].setdefault(nm + "_sent", set()).add(hashlib.md5(x.tobytes()).hexdigest())
+                req = {"image": pack(img), "wrist_image": pack(wrist),
                        "state": pack(batch["observation.state"][0].double().cpu().numpy()), "prompt": batch["task"][0],
                        "drop": [SLOT[k] for k in _dropped]}
                 conn.send(req)
@@ -220,21 +224,37 @@ def _remote():
 
 
 def roll(*a, **k):
-    episodes.append({"eef": [], "grip": []})
+    episodes.append({"eef": [], "grip": [], "act": []})
     _chunk.pop("ref", None)
     _first.clear()
     _step[0] = 0
-    return _roll(*a, **k)
+    env = k["env"] if "env" in k else a[0]
+    step = env.step
+
+    def logged(action):  # 记录实际送进环境的动作(batch_size=1),供 scripts/analysis/replay_open_loop.py 开环回放
+        episodes[-1]["act"].append(np.asarray(action)[0].copy())
+        return step(action)
+
+    env.step = logged
+    try:
+        return _roll(*a, **k)
+    finally:
+        del env.step  # 去掉实例上的包装,恢复类方法
 
 
 def _save():
     if "n" in _chunk:
         print(f"[probe] DELTA_REF={DELTA_REF}, actions logged on {_chunk['n']} steps; steps with |action[:6]| > 1: {_chunk['over']}; "
               f"max |normalized state| at inference: {_chunk.get('state_absmax', float('nan')):.3f}", flush=True)
+    if POLICY_SERVER and episodes:
+        for nm in ("agent", "wrist"):
+            n = [len(e.get(nm + "_sent", ())) for e in episodes]
+            print(f"[probe] distinct {nm} images sent per episode: min {min(n)}, max {max(n)}", flush=True)
     if TRAJ_OUT and episodes:
         np.savez_compressed(TRAJ_OUT, n=len(episodes),
                             **{f"eef_{i}": np.array(e["eef"]) for i, e in enumerate(episodes)},
                             **{f"grip_{i}": np.array(e["grip"]) for i, e in enumerate(episodes)},
+                            **{f"act_{i}": np.array(e["act"]) for i, e in enumerate(episodes)},
                             h0=np.array([e.get("h0", "") for e in episodes]))
         print(f"[probe] saved {len(episodes)} episodes -> {TRAJ_OUT}", flush=True)
 
