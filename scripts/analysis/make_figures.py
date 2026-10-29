@@ -40,6 +40,11 @@ TXT = {
         "op_models": {"official": "Official π0 (OpenPI pipeline)", "lerobot": "LeRobot π0 v044"},
         "op_conds": ["Both cameras", "All black", "Both slots masked", "Both frozen at frame 1", "Wrist masked", "Agent view masked"],
         "op_n": "{k}/{n}",
+        "rp_title": "Open-loop replay: one fixed action sequence per task, no model, no vision",
+        "rp_bars": ["Best fixed sequence (on the other 9 states)", "All cross-replays"],
+        "rp_band": "LeRobot π0 all black, 53–56%",
+        "rp_all": "Mean",
+        "rp_task": "Task {i}",
     },
     "zh": {
         "rep_title": "公开权重复现：本机成功率 vs 基准",
@@ -64,6 +69,11 @@ TXT = {
         "op_models": {"official": "官方 π0（OpenPI 管线）", "lerobot": "LeRobot π0 v044"},
         "op_conds": ["两路都给", "全涂黑", "两路槽位都屏蔽", "两路冻结在第 1 帧", "只屏蔽腕部", "只屏蔽主视角"],
         "op_n": "{k}/{n}",
+        "rp_title": "开环回放：每个任务重复一套固定动作，不用模型、不看画面",
+        "rp_bars": ["最好的一套固定动作（在另外 9 个状态上）", "全部交叉回放"],
+        "rp_band": "LeRobot π0 全涂黑 53–56%",
+        "rp_all": "平均",
+        "rp_task": "任务 {i}",
     },
 }
 COND_KEYS = ["normal", "noise", "freeze", "agent_black", "wrist_black", "all_black"]
@@ -89,6 +99,7 @@ OP_RUNS = {"official": {"both": ["official_pi0/ojx_none"], "all_black": ["offici
            # LeRobot 转换版官方权重在 LeRobot 管线下的冒烟与三组对照（没跑通，留作记录，不进图）
            "conversion": {"smoke": ["official_pi0/opi0_smoke"], "diag_a": ["official_pi0/opi0_diag_a"],
                           "diag_b": ["official_pi0/opi0_diag_b"], "diag_c": ["official_pi0/opi0_diag_c"]}}
+RP_RUN = "official_pi0/ojx360_replay"  # 开环回放的动作来源（官方 π0，360 渲染，正常条件）与回放结果
 OP_BARS = ["both", "all_black", "both_masked", "both_frozen", "wrist_masked", "agent_masked"]
 OP_COL = ["#9ca3af", "#111827", "#2563eb", "#14b8a6", "#f59e0b", "#7c3aed"]
 OP_EEF_REF = "s500/pi0_none"  # 初始状态核对的参照：LeRobot π0 的 500 回合正常运行
@@ -202,6 +213,53 @@ def official_pi0_summary():
                 eef = round(100 * max(abs(a - b) for i, p in enumerate(e) for a, b in zip(p, ref[i // per * 50 + i % per], strict=True)), 4)
             rows.append([side, cond, len(runs), n, k, round(100 * k / n, 1), round(max(lo, 0.0), 1), round(hi, 1), eef])
     return rows
+
+
+def replay_summary():
+    """开环回放基线（docs/NOTES.md 2026-10-29 事前记录）：每任务自回放、全部交叉回放、最好的一套固定动作，以及物体位置的变化范围（cm）。"""
+    r = json.loads((ROOT / "dashboard" / "data" / RP_RUN / "replay.json").read_text())
+    rows = []
+    for t in r["tasks"]:
+        cross = {e: (sum(d.values()), len(d)) for e, d in t["cross"].items()}
+        best = max(cross, key=lambda e: cross[e][0])
+        span = [100 * (max(o[k][a] for o in t["objects"]) - min(o[k][a] for o in t["objects"])) for k in t["objects"][0] for a in (0, 1)]
+        rows.append([t["task"], sum(t["source_success"]), sum(t["self"].values()), len(t["self"]),
+                     sum(k for k, _ in cross.values()), sum(n for _, n in cross.values()), int(best), cross[best][0], cross[best][1],
+                     round(max(span), 1)])
+    tot = [sum(c) for c in list(zip(*rows, strict=True))[1:6]]
+    best_pc = sum(r[7] / r[8] for r in rows) / len(rows)
+    rows.append(["all", *tot, "", round(100 * best_pc, 1), "", max(r[9] for r in rows)])
+    return rows
+
+
+def fig_replay(rows, t):
+    w, left, top, bh, gap = 760, 90, 92, 11, 9
+    tasks = rows[:-1]
+    h = top + (len(tasks) + 1) * (2 * bh + gap) + 40
+    pw = w - left - 70
+    x = lambda v: left + pw * v / 100
+    out = [title(t["rp_title"])]
+    out.append(f'<rect x="{x(53):.1f}" y="{top - 10}" width="{x(56) - x(53):.1f}" height="{h - top - 22}" fill="#fde68a"/>')
+    out.append(f'<text x="{x(54.5):.1f}" y="{top - 14}" text-anchor="middle" font-size="11" fill="{MUTED}">{t["rp_band"]}</text>')
+    for v in range(0, 101, 25):
+        out.append(f'<line x1="{x(v):.1f}" y1="{top - 8}" x2="{x(v):.1f}" y2="{h - 30}" stroke="{GRID}"/>')
+        out.append(f'<text x="{x(v):.1f}" y="{h - 12}" text-anchor="middle" fill="{MUTED}">{v}%</text>')
+    for i, (lab, col) in enumerate(zip(t["rp_bars"], ("#111827", "#93c5fd"), strict=True)):
+        out.append(f'<rect x="{left + i * 330}" y="{top - 50}" width="12" height="12" fill="{col}"/>')
+        out.append(f'<text x="{left + i * 330 + 18}" y="{top - 40}" font-size="12">{lab}</text>')
+    best_all = rows[-1][7]
+    pool_all = 100 * rows[-1][4] / rows[-1][5]
+    vals = [(t["rp_task"].format(i=r[0]), 100 * r[7] / r[8], f"{r[7]}/{r[8]}", 100 * r[4] / r[5], f"{r[4]}/{r[5]}") for r in tasks]
+    vals.append((t["rp_all"], best_all, "", pool_all, f"{rows[-1][4]}/{rows[-1][5]}"))
+    for j, (lab, b, bl, p, pl) in enumerate(vals):
+        y = top + j * (2 * bh + gap) + (8 if j == len(tasks) else 0)
+        out.append(f'<text x="{left - 10}" y="{y + bh + 4}" text-anchor="end" font-weight="{600 if j == len(tasks) else 400}">{lab}</text>')
+        for k, (v, vl, col) in enumerate(((b, bl, "#111827"), (p, pl, "#93c5fd"))):
+            yy = y + k * bh
+            out.append(f'<rect x="{x(0):.1f}" y="{yy}" width="{max(x(v) - x(0), 1.5):.1f}" height="{bh - 1}" fill="{col}"/>')
+            out.append(f'<text x="{x(v) + 5:.1f}" y="{yy + bh - 2}" font-size="11"><tspan font-weight="600">{v:.1f}</tspan>'
+                       f'<tspan fill="{MUTED}">{" (" + vl + ")" if vl else ""}</tspan></text>')
+    return svg(w, h, out)
 
 
 def fig_official_pi0(summary, t):
@@ -427,6 +485,9 @@ if __name__ == "__main__":
     op_sum = official_pi0_summary()
     write_csv("official_pi0_summary.csv", ["side", "condition", "runs", "episodes", "successes", "success_pc", "wilson_lo", "wilson_hi",
                                            "first_eef_max_diff_cm"], op_sum)
+    rp_sum = replay_summary()
+    write_csv("open_loop_replay.csv", ["task", "source_successes", "self_successes", "self_replays", "cross_successes", "cross_replays",
+                                       "best_source", "best_successes", "best_replays", "object_max_span_cm"], rp_sum)
     traj = [json.loads((RES / f"trajectories_task{i}.json").read_text()) for i in TRAJ_TASKS]
     for lang, out in (("en", MEDIA), ("zh", MEDIA / "zh")):
         t = TXT[lang]
@@ -436,4 +497,5 @@ if __name__ == "__main__":
         (out / "inputs.svg").write_text(fig_inputs(t))
         (out / "single_camera.svg").write_text(fig_single_camera(sc_sum, t))
         (out / "official_pi0.svg").write_text(fig_official_pi0(op_sum, t))
-    print(f"wrote {len(list(RES.glob('*.csv')))} csv -> results/, 6 svg -> media/ and media/zh/")
+        (out / "open_loop_replay.svg").write_text(fig_replay(rp_sum, t))
+    print(f"wrote {len(list(RES.glob('*.csv')))} csv -> results/, 7 svg -> media/ and media/zh/")

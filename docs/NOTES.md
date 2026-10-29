@@ -396,3 +396,16 @@ A translation of the Chinese original in [NOTES_CN.md](NOTES_CN.md).
 - **Reading.** ≤ 50% → official π0 needs a wrist image that updates over time, and the 0% under masking is not caused by the input form. Paired against `ojx_drop_wrist`: both 0/100, 0 discordant pairs, McNemar p = 1. As expected; 0 deviations.
 - **Side by side (not part of the reading; different pipelines).** LeRobot π0 v044 with only the wrist frozen scores 72.8% (500 episodes); π0.5 v044 scores 0.0%.
 - Raw data are in `dashboard/data/official_pi0/ojx_freeze_wrist`.
+
+## Open-loop replay baseline: results (2026-10-29, read by the 18:20 advance record, which was pushed before the run in commit `c7e9023`)
+
+- **Source run.** Official π0, 360 rendering, normal condition: 97/100 on the same 100 initial states; first-frame hashes match `s500/pi0_none` episode by episode (100/100).
+- **Validity.** Self-replay 95/97 = 97.9% ≥ 80%, so replay is valid (both failures are in task 4, as in the pilot: millimetre drift during contact).
+- **Result.** The best fixed sequence per task scores **77.8%** on average on the other 9 states (per task 89, 67, 78, 78, 78, 100, 67, 100, 56, 67); all cross-replays together score **348/873 = 39.9%** (24–54% per task). Across the 50 initial states of a task, object positions vary by at most 3.0–8.6 cm (the object and axis that vary most in each task).
+- **Reading.** 77.8% ≥ 40% → the benchmark lets one fixed action sequence per task reach most of the success without vision; LeRobot π0's 53–56% all black mainly reflects the benchmark, not a "blind" ability of the policy. The expectation (10–40%) was wrong: I underestimated it, and the advance record said "not confident". 0 deviations.
+- **Caveats.** The best sequence is chosen from 10 after the fact, so it is optimistic; the unselected pooled rate, 39.9%, is itself close to 40%. Replay only shows that fixed sequences suffice, not that LeRobot's π0 actually repeats one without vision; whether it uses the robot state was not tested. Conversely, official π0 at 0% without vision did not fall back to a fixed sequence.
+- Raw data are in `dashboard/data/official_pi0/ojx360_replay/` (`replay.json` holds every replay pair and the object positions), the summary in `results/open_loop_replay.csv`.
+
+## Correction (2026-10-29): title of the wrist-freeze advance record
+
+- The heading "Official π0 with only the wrist camera frozen: advance record" above says "local only, not pushed". It was in fact pushed before the results in commit `c7e9023` and has a public timestamp. The original entry is left unchanged.

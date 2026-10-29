@@ -146,6 +146,10 @@ LeRobot's π0 still scores 53–56% with every camera black. Is that π0 in gene
 - **Resolution is not the cause.** Official π0 re-run at 360, the same rendering as the LeRobot side (advance record, local only): normal 99/100, all black 0/100, both slots masked 0/100; first-frame hashes match section 1.4 episode by episode. What remains is the weights plus the inference pipeline.
 - **On the same LeRobot checkpoint, the way vision is removed matters.** Slot-masked, 35%, is below each of the five all-black runs (53–56%). The five all-black runs use the same 100 initial states, not 500 independent episodes, so they are not pooled into one test; only the range of the per-run paired comparisons is reported: McNemar p 0.0015–0.0064.
 
+**Open-loop replay baseline: fixed sequences reach most of the success.** With no model and no vision, the actions logged in official π0's normal run are replayed unchanged on the other initial states of the same task (design and reading pushed before the run, commit `c7e9023`). Self-replay is 95/97, so replay is valid. The best fixed sequence per task scores **77.8%** on average on the other 9 states, and all cross-replays together **348/873 = 39.9%**; within a task, object positions differ by at most 3–9 cm. By the rule set in advance (≥ 40%), LeRobot π0's 53–56% all black mainly reflects how little LIBERO-Spatial scenes vary, not a "blind" ability of the policy. The best sequence is picked from 10 after the fact, so it is optimistic; replay also does not show that LeRobot's π0 actually repeats a fixed sequence.
+
+![Open-loop replay: one fixed sequence per task](media/open_loop_replay.svg)
+
 Raw data are in `dashboard/data/official_pi0/`, the summary and the initial-state check in `results/official_pi0_summary.csv` (its LeRobot all-black row sums five runs on the same 100 states), and the process and deviations in the 2026-10-28/29 sections of [docs/NOTES.md](docs/NOTES.md).
 
 <details>

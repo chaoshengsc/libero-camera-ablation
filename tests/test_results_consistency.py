@@ -215,3 +215,22 @@ def test_official_pi0_summary_matches_raw_and_readme():
     for md in READMES:
         for x in ("482/500", "96.4%", "77/100", "35/100", "0/100", "0.0025", "99/100"):
             assert x in md, x
+
+
+def test_open_loop_replay_matches_raw_and_readme():
+    """1.5 节开环回放:汇总与 replay.json、来源运行一致;来源运行的初始状态与 1.4 节相同;README 引用的数字一致。"""
+    raw = json.loads((DATA / "official_pi0" / "ojx360_replay" / "replay.json").read_text())
+    succ = per_task("official_pi0/ojx360_replay")
+    summ = rows("open_loop_replay.csv")
+    for t, s in zip(raw["tasks"], summ, strict=False):
+        assert sum(t["source_success"]) == int(s["source_successes"]) == succ[t["task"]]
+        assert len(t["objects"]) == 50 and all(len(d) == 9 for d in t["cross"].values())
+    total = summ[-1]
+    assert (total["self_successes"], total["self_replays"], total["cross_successes"], total["cross_replays"]) == ("95", "97", "348", "873")
+    assert total["best_successes"] == "77.8"
+    hr = json.loads((DATA / "s500" / "pi0_none" / "first_frame_hash.json").read_text())
+    h = json.loads((DATA / "official_pi0" / "ojx360_replay" / "first_frame_hash.json").read_text())
+    assert h == [hr[i // 10 * 50 + i % 10] for i in range(100)]
+    for md in READMES:
+        for s in ("95/97", "77.8%", "348/873", "39.9%", "c7e9023"):
+            assert s in md, s
