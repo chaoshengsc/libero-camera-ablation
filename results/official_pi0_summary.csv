@@ -5,6 +5,7 @@ official,both_masked,1,100,0,0.0,0.0,3.7,0.0
 official,both_frozen,1,100,0,0.0,0.0,3.7,0.0
 official,wrist_masked,1,100,0,0.0,0.0,3.7,0.0
 official,agent_masked,1,100,77,77.0,67.8,84.2,0.0
+official,wrist_frozen,1,100,0,0.0,0.0,3.7,0.0
 official_360,both,1,100,99,99.0,94.6,99.8,0.0
 official_360,all_black,1,100,0,0.0,0.0,3.7,0.0
 official_360,both_masked,1,100,0,0.0,0.0,3.7,0.0
@@ -14,6 +15,7 @@ lerobot,both_masked,1,100,35,35.0,26.4,44.7,
 lerobot,both_frozen,2,200,151,75.5,69.1,80.9,
 lerobot,wrist_masked,1,500,356,71.2,67.1,75.0,
 lerobot,agent_masked,1,500,371,74.2,70.2,77.8,
+lerobot,wrist_frozen,1,500,364,72.8,68.7,76.5,
 conversion,smoke,1,50,0,0.0,0.0,7.1,
 conversion,diag_a,1,20,0,0.0,0.0,16.1,
 conversion,diag_b,1,20,0,0.0,0.0,16.1,

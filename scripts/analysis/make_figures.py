@@ -77,14 +77,15 @@ SC_COL = ["#9ca3af", "#f59e0b", "#2563eb", "#14b8a6", "#7c3aed"]
 # 官方 π0 对照（docs/NOTES.md 2026-10-28/29 的预先登记与结果）：路径相对 dashboard/data/，列表为多次运行合计
 OP_RUNS = {"official": {"both": ["official_pi0/ojx_none"], "all_black": ["official_pi0/ojx_all"], "both_masked": ["official_pi0/ojx_drop_all"],
                         "both_frozen": ["official_pi0/ojx_freeze"], "wrist_masked": ["official_pi0/ojx_drop_wrist"],
-                        "agent_masked": ["official_pi0/ojx_drop_agent"]},
+                        "agent_masked": ["official_pi0/ojx_drop_agent"], "wrist_frozen": ["official_pi0/ojx_freeze_wrist"]},
            # 同一官方 π0 改用 360 渲染（与 LeRobot 一侧相同），排除分辨率这一混杂；不进图
            "official_360": {"both": ["official_pi0/ojx360_none"], "all_black": ["official_pi0/ojx360_all"],
                             "both_masked": ["official_pi0/ojx360_drop_all"]},
            "lerobot": {"both": ["s500/pi0_none"],
                        "all_black": ["pi0_black_all", "traj_pi0_black", "run2/pi0_black_all", "run2/traj_pi0_black", "run3/pi0_black_all"],
                        "both_masked": ["official_pi0/pi0_drop_all"], "both_frozen": ["pert_pi0_freeze", "run2/pert_pi0_freeze"],
-                       "wrist_masked": ["s500/pi0_drop_wrist"], "agent_masked": ["s500/pi0_drop_agent"]},
+                       "wrist_masked": ["s500/pi0_drop_wrist"], "agent_masked": ["s500/pi0_drop_agent"],
+                       "wrist_frozen": ["s500/pi0_freeze_wrist"]},
            # LeRobot 转换版官方权重在 LeRobot 管线下的冒烟与三组对照（没跑通，留作记录，不进图）
            "conversion": {"smoke": ["official_pi0/opi0_smoke"], "diag_a": ["official_pi0/opi0_diag_a"],
                           "diag_b": ["official_pi0/opi0_diag_b"], "diag_c": ["official_pi0/opi0_diag_c"]}}

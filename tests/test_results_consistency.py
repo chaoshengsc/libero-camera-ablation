@@ -190,9 +190,9 @@ def test_official_pi0_summary_matches_raw_and_readme():
     """1.5 节:汇总与原始 eval_info.json 一致;官方运行的初始状态与 1.4 节 π0 正常运行逐回合相同;README 引用的数字一致。"""
     summary = {(r["side"], r["condition"]): r for r in rows("official_pi0_summary.csv")}
     off = {"both": "ojx_none", "all_black": "ojx_all", "both_masked": "ojx_drop_all", "both_frozen": "ojx_freeze",
-           "wrist_masked": "ojx_drop_wrist", "agent_masked": "ojx_drop_agent"}
+           "wrist_masked": "ojx_drop_wrist", "agent_masked": "ojx_drop_agent", "wrist_frozen": "ojx_freeze_wrist"}
     want = {"both": (500, 482), "all_black": (100, 0), "both_masked": (100, 0), "both_frozen": (100, 0),
-            "wrist_masked": (100, 0), "agent_masked": (100, 77)}
+            "wrist_masked": (100, 0), "agent_masked": (100, 77), "wrist_frozen": (100, 0)}
     ref = json.loads((DATA / "s500" / "pi0_none" / "first_eef.json").read_text())
     for cond, run in off.items():
         succ = per_task(f"official_pi0/{run}")

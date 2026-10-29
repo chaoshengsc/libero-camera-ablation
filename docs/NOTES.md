@@ -389,3 +389,10 @@ A translation of the Chinese original in [NOTES_CN.md](NOTES_CN.md).
 - **Reading.** Against LeRobot π0's 53–56% all black: best fixed sequence ≥ 40% on average → the benchmark lets fixed sequences reach most of the success without vision, and LeRobot's result mainly reflects the benchmark; ≤ 10% → fixed sequences are not enough, and LeRobot's π0 without vision still uses the robot state to act differently per state; 10–40% → partial, no conclusion.
 - **Expectation.** 10–40%: objects are only slightly perturbed within a task, so some cross-replays succeed, but fewer than with all cameras black. Not confident.
 - **Limits.** The actions come from official π0 with vision; replay only tests whether that trajectory still works in other states, and is not the best blind policy. The best of 10 sequences is selected after the fact, so it is optimistic.
+
+## Official π0 with only the wrist camera frozen: results (2026-10-29, read by the 17:41 advance record, which was pushed before the results in commit `c7e9023`)
+
+- **Result (100 episodes).** **0/100** (Wilson 0–3.7%, 0 in all 10 tasks). The smoke evidence is complete: the server reports both the wrist and main-view masks as True; at step 20 the wrist image differs from frame 1 by 0 and the main view by 0.62; each episode sends 1 distinct wrist image and 56 main-view images. First-frame hashes and end-effector positions match `ojx_drop_wrist` episode by episode (100/100).
+- **Reading.** ≤ 50% → official π0 needs a wrist image that updates over time, and the 0% under masking is not caused by the input form. Paired against `ojx_drop_wrist`: both 0/100, 0 discordant pairs, McNemar p = 1. As expected; 0 deviations.
+- **Side by side (not part of the reading; different pipelines).** LeRobot π0 v044 with only the wrist frozen scores 72.8% (500 episodes); π0.5 v044 scores 0.0%.
+- Raw data are in `dashboard/data/official_pi0/ojx_freeze_wrist`.
