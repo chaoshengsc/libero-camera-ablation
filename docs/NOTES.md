@@ -409,3 +409,4 @@ A translation of the Chinese original in [NOTES_CN.md](NOTES_CN.md).
 ## Correction (2026-10-29): title of the wrist-freeze advance record
 
 - The heading "Official π0 with only the wrist camera frozen: advance record" above says "local only, not pushed". It was in fact pushed before the results in commit `c7e9023` and has a public timestamp. The original entry is left unchanged.
+- Same kind of error: the "18:20" in the heading "Open-loop replay baseline: advance record" is wrong. The section is already in commit `c7e9023` at 18:01, so it was written before 18:01; the replay run started only after the push, so the reading is unaffected. The original entry is left unchanged.
