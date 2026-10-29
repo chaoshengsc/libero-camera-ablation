@@ -228,9 +228,12 @@ def test_open_loop_replay_matches_raw_and_readme():
     total = summ[-1]
     assert (total["self_successes"], total["self_replays"], total["cross_successes"], total["cross_replays"]) == ("95", "97", "348", "873")
     assert total["best_successes"] == "77.8"
+    assert (total["best_expected_if_equal_pc"], total["lerobot_black_pc"]) == ("64.8", "54.6")
+    lr = {s["task"]: s["lerobot_black_pc"] for s in summ}
+    assert (lr["5"], lr["7"]) == ("30.0", "0.0")
     hr = json.loads((DATA / "s500" / "pi0_none" / "first_frame_hash.json").read_text())
     h = json.loads((DATA / "official_pi0" / "ojx360_replay" / "first_frame_hash.json").read_text())
     assert h == [hr[i // 10 * 50 + i % 10] for i in range(100)]
     for md in READMES:
-        for s in ("95/97", "77.8%", "348/873", "39.9%", "c7e9023"):
+        for s in ("95/97", "77.8%", "348/873", "39.9%", "64.8%", "c7e9023"):
             assert s in md, s

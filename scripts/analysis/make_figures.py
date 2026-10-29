@@ -43,6 +43,8 @@ TXT = {
         "rp_title": "Open-loop replay: one fixed action sequence per task, no model, no vision",
         "rp_bars": ["Best fixed sequence (on the other 9 states)", "All cross-replays"],
         "rp_band": "LeRobot π0 all black, 53–56%",
+        "rp_null": "Best of k if every sequence scored {p:.1f}%: {v:.1f}%",
+        "rp_lr": "LeRobot π0 all black, same task (mean of 5 runs)",
         "rp_all": "Mean",
         "rp_task": "Task {i}",
     },
@@ -72,6 +74,8 @@ TXT = {
         "rp_title": "开环回放：每个任务重复一套固定动作，不用模型、不看画面",
         "rp_bars": ["最好的一套固定动作（在另外 9 个状态上）", "全部交叉回放"],
         "rp_band": "LeRobot π0 全涂黑 53–56%",
+        "rp_null": "若每套都只有 {p:.1f}%，挑最好一套的期望：{v:.1f}%",
+        "rp_lr": "LeRobot π0 同一任务全涂黑（5 次平均）",
         "rp_all": "平均",
         "rp_task": "任务 {i}",
     },
@@ -216,26 +220,34 @@ def official_pi0_summary():
 
 
 def replay_summary():
-    """开环回放基线（docs/NOTES.md 2026-10-29 事前记录）：每任务自回放、全部交叉回放、最好的一套固定动作，以及物体位置的变化范围（cm）。"""
+    """开环回放基线（docs/NOTES.md 2026-10-29 事前记录）：每任务自回放、全部交叉回放、最好的一套固定动作，以及物体位置的变化范围（cm）。
+    另算两项更正用的对照（docs/NOTES.md 2026-10-29 更正）：每套真实成功率都等于全部交叉回放合计时，从 k 套里挑最好一套的期望成功率
+    （k 为该任务成功来源数，每套在 9 个状态上二项分布，精确计算）；LeRobot π0 同一任务全涂黑的成功率（5 次运行平均）。"""
     r = json.loads((ROOT / "dashboard" / "data" / RP_RUN / "replay.json").read_text())
-    rows = []
+    pool = sum(sum(d.values()) for t in r["tasks"] for d in t["cross"].values()) / sum(len(d) for t in r["tasks"] for d in t["cross"].values())
+    cdf = lambda m: sum(math.comb(9, i) * pool ** i * (1 - pool) ** (9 - i) for i in range(m + 1))
+    black = [_succ(run) for run in OP_RUNS["lerobot"]["all_black"]]
+    rows, null = [], []
     for t in r["tasks"]:
         cross = {e: (sum(d.values()), len(d)) for e, d in t["cross"].items()}
         best = max(cross, key=lambda e: cross[e][0])
+        null.append(100 * sum(1 - cdf(m - 1) ** len(cross) for m in range(1, 10)) / 9)
         span = [100 * (max(o[k][a] for o in t["objects"]) - min(o[k][a] for o in t["objects"])) for k in t["objects"][0] for a in (0, 1)]
         rows.append([t["task"], sum(t["source_success"]), sum(t["self"].values()), len(t["self"]),
                      sum(k for k, _ in cross.values()), sum(n for _, n in cross.values()), int(best), cross[best][0], cross[best][1],
-                     round(max(span), 1)])
+                     round(max(span), 1), round(null[-1], 1),
+                     round(100 * sum(sum(b[t["task"] * 10:(t["task"] + 1) * 10]) for b in black) / (10 * len(black)), 1)])
     tot = [sum(c) for c in list(zip(*rows, strict=True))[1:6]]
     best_pc = sum(r[7] / r[8] for r in rows) / len(rows)
-    rows.append(["all", *tot, "", round(100 * best_pc, 1), "", max(r[9] for r in rows)])
+    rows.append(["all", *tot, "", round(100 * best_pc, 1), "", max(r[9] for r in rows),
+                 round(sum(null) / len(null), 1), round(sum(r[11] for r in rows) / len(rows), 1)])
     return rows
 
 
 def fig_replay(rows, t):
-    w, left, top, bh, gap = 760, 90, 92, 11, 9
+    w, left, top, bh, gap = 760, 90, 112, 11, 9
     tasks = rows[:-1]
-    h = top + (len(tasks) + 1) * (2 * bh + gap) + 40
+    h = top + (len(tasks) + 1) * (2 * bh + gap) + 58
     pw = w - left - 70
     x = lambda v: left + pw * v / 100
     out = [title(t["rp_title"])]
@@ -247,6 +259,8 @@ def fig_replay(rows, t):
     for i, (lab, col) in enumerate(zip(t["rp_bars"], ("#111827", "#93c5fd"), strict=True)):
         out.append(f'<rect x="{left + i * 330}" y="{top - 50}" width="12" height="12" fill="{col}"/>')
         out.append(f'<text x="{left + i * 330 + 18}" y="{top - 40}" font-size="12">{lab}</text>')
+    out.append(f'<path d="M{left + 6} {top - 70} l6 6 l-6 6 l-6 -6 z" fill="#dc2626"/>')
+    out.append(f'<text x="{left + 18}" y="{top - 60}" font-size="12">{t["rp_lr"]}</text>')
     best_all = rows[-1][7]
     pool_all = 100 * rows[-1][4] / rows[-1][5]
     vals = [(t["rp_task"].format(i=r[0]), 100 * r[7] / r[8], f"{r[7]}/{r[8]}", 100 * r[4] / r[5], f"{r[4]}/{r[5]}") for r in tasks]
@@ -259,6 +273,13 @@ def fig_replay(rows, t):
             out.append(f'<rect x="{x(0):.1f}" y="{yy}" width="{max(x(v) - x(0), 1.5):.1f}" height="{bh - 1}" fill="{col}"/>')
             out.append(f'<text x="{x(v) + 5:.1f}" y="{yy + bh - 2}" font-size="11"><tspan font-weight="600">{v:.1f}</tspan>'
                        f'<tspan fill="{MUTED}">{" (" + vl + ")" if vl else ""}</tspan></text>')
+        lr = rows[j][11]
+        out.append(f'<path d="M{x(lr):.1f} {y + bh - 6} l6 6 l-6 6 l-6 -6 z" fill="#dc2626" stroke="#ffffff" stroke-width="1"/>')
+    y = top + len(tasks) * (2 * bh + gap) + 8
+    null = rows[-1][10]
+    out.append(f'<line x1="{x(null):.1f}" y1="{y - 4}" x2="{x(null):.1f}" y2="{y + bh + 2}" stroke="#f59e0b" stroke-width="3" stroke-dasharray="3 2"/>')
+    out.append(f'<text x="{x(null) - 4:.1f}" y="{y + 2 * bh + 14}" text-anchor="middle" font-size="11" fill="#b45309">'
+               f'{t["rp_null"].format(p=pool_all, v=null)}</text>')
     return svg(w, h, out)
 
 
@@ -487,7 +508,8 @@ if __name__ == "__main__":
                                            "first_eef_max_diff_cm"], op_sum)
     rp_sum = replay_summary()
     write_csv("open_loop_replay.csv", ["task", "source_successes", "self_successes", "self_replays", "cross_successes", "cross_replays",
-                                       "best_source", "best_successes", "best_replays", "object_max_span_cm"], rp_sum)
+                                       "best_source", "best_successes", "best_replays", "object_max_span_cm",
+                                       "best_expected_if_equal_pc", "lerobot_black_pc"], rp_sum)
     traj = [json.loads((RES / f"trajectories_task{i}.json").read_text()) for i in TRAJ_TASKS]
     for lang, out in (("en", MEDIA), ("zh", MEDIA / "zh")):
         t = TXT[lang]

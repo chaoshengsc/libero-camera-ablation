@@ -1,75 +1,90 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 473" width="760" height="473" font-family="-apple-system,'Segoe UI','PingFang SC','Microsoft YaHei','Noto Sans CJK SC',sans-serif" font-size="13" fill="#1f2933">
-<rect width="760" height="473" rx="8" fill="#ffffff"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 511" width="760" height="511" font-family="-apple-system,'Segoe UI','PingFang SC','Microsoft YaHei','Noto Sans CJK SC',sans-serif" font-size="13" fill="#1f2933">
+<rect width="760" height="511" rx="8" fill="#ffffff"/>
 <text x="20" y="28" font-size="16" font-weight="600">开环回放：每个任务重复一套固定动作，不用模型、不看画面</text>
-<rect x="408.0" y="82" width="18.0" height="359" fill="#fde68a"/>
-<text x="417.0" y="78" text-anchor="middle" font-size="11" fill="#6b7280">LeRobot π0 全涂黑 53–56%</text>
-<line x1="90.0" y1="84" x2="90.0" y2="443" stroke="#e5e7eb"/>
-<text x="90.0" y="461" text-anchor="middle" fill="#6b7280">0%</text>
-<line x1="240.0" y1="84" x2="240.0" y2="443" stroke="#e5e7eb"/>
-<text x="240.0" y="461" text-anchor="middle" fill="#6b7280">25%</text>
-<line x1="390.0" y1="84" x2="390.0" y2="443" stroke="#e5e7eb"/>
-<text x="390.0" y="461" text-anchor="middle" fill="#6b7280">50%</text>
-<line x1="540.0" y1="84" x2="540.0" y2="443" stroke="#e5e7eb"/>
-<text x="540.0" y="461" text-anchor="middle" fill="#6b7280">75%</text>
-<line x1="690.0" y1="84" x2="690.0" y2="443" stroke="#e5e7eb"/>
-<text x="690.0" y="461" text-anchor="middle" fill="#6b7280">100%</text>
-<rect x="90" y="42" width="12" height="12" fill="#111827"/>
-<text x="108" y="52" font-size="12">最好的一套固定动作（在另外 9 个状态上）</text>
-<rect x="420" y="42" width="12" height="12" fill="#93c5fd"/>
-<text x="438" y="52" font-size="12">全部交叉回放</text>
-<text x="80" y="107" text-anchor="end" font-weight="400">任务 0</text>
-<rect x="90.0" y="92" width="533.3" height="10" fill="#111827"/>
-<text x="628.3" y="101" font-size="11"><tspan font-weight="600">88.9</tspan><tspan fill="#6b7280"> (8/9)</tspan></text>
-<rect x="90.0" y="103" width="260.0" height="10" fill="#93c5fd"/>
-<text x="355.0" y="112" font-size="11"><tspan font-weight="600">43.3</tspan><tspan fill="#6b7280"> (39/90)</tspan></text>
-<text x="80" y="138" text-anchor="end" font-weight="400">任务 1</text>
-<rect x="90.0" y="123" width="400.0" height="10" fill="#111827"/>
-<text x="495.0" y="132" font-size="11"><tspan font-weight="600">66.7</tspan><tspan fill="#6b7280"> (6/9)</tspan></text>
-<rect x="90.0" y="134" width="240.0" height="10" fill="#93c5fd"/>
-<text x="335.0" y="143" font-size="11"><tspan font-weight="600">40.0</tspan><tspan fill="#6b7280"> (36/90)</tspan></text>
-<text x="80" y="169" text-anchor="end" font-weight="400">任务 2</text>
-<rect x="90.0" y="154" width="466.7" height="10" fill="#111827"/>
-<text x="561.7" y="163" font-size="11"><tspan font-weight="600">77.8</tspan><tspan fill="#6b7280"> (7/9)</tspan></text>
-<rect x="90.0" y="165" width="313.3" height="10" fill="#93c5fd"/>
-<text x="408.3" y="174" font-size="11"><tspan font-weight="600">52.2</tspan><tspan fill="#6b7280"> (47/90)</tspan></text>
-<text x="80" y="200" text-anchor="end" font-weight="400">任务 3</text>
-<rect x="90.0" y="185" width="466.7" height="10" fill="#111827"/>
-<text x="561.7" y="194" font-size="11"><tspan font-weight="600">77.8</tspan><tspan fill="#6b7280"> (7/9)</tspan></text>
-<rect x="90.0" y="196" width="325.0" height="10" fill="#93c5fd"/>
-<text x="420.0" y="205" font-size="11"><tspan font-weight="600">54.2</tspan><tspan fill="#6b7280"> (39/72)</tspan></text>
-<text x="80" y="231" text-anchor="end" font-weight="400">任务 4</text>
-<rect x="90.0" y="216" width="466.7" height="10" fill="#111827"/>
-<text x="561.7" y="225" font-size="11"><tspan font-weight="600">77.8</tspan><tspan fill="#6b7280"> (7/9)</tspan></text>
-<rect x="90.0" y="227" width="206.7" height="10" fill="#93c5fd"/>
-<text x="301.7" y="236" font-size="11"><tspan font-weight="600">34.4</tspan><tspan fill="#6b7280"> (31/90)</tspan></text>
-<text x="80" y="262" text-anchor="end" font-weight="400">任务 5</text>
-<rect x="90.0" y="247" width="600.0" height="10" fill="#111827"/>
-<text x="695.0" y="256" font-size="11"><tspan font-weight="600">100.0</tspan><tspan fill="#6b7280"> (9/9)</tspan></text>
-<rect x="90.0" y="258" width="296.3" height="10" fill="#93c5fd"/>
-<text x="391.3" y="267" font-size="11"><tspan font-weight="600">49.4</tspan><tspan fill="#6b7280"> (40/81)</tspan></text>
-<text x="80" y="293" text-anchor="end" font-weight="400">任务 6</text>
-<rect x="90.0" y="278" width="400.0" height="10" fill="#111827"/>
-<text x="495.0" y="287" font-size="11"><tspan font-weight="600">66.7</tspan><tspan fill="#6b7280"> (6/9)</tspan></text>
-<rect x="90.0" y="289" width="226.7" height="10" fill="#93c5fd"/>
-<text x="321.7" y="298" font-size="11"><tspan font-weight="600">37.8</tspan><tspan fill="#6b7280"> (34/90)</tspan></text>
-<text x="80" y="324" text-anchor="end" font-weight="400">任务 7</text>
-<rect x="90.0" y="309" width="600.0" height="10" fill="#111827"/>
-<text x="695.0" y="318" font-size="11"><tspan font-weight="600">100.0</tspan><tspan fill="#6b7280"> (9/9)</tspan></text>
-<rect x="90.0" y="320" width="240.0" height="10" fill="#93c5fd"/>
-<text x="335.0" y="329" font-size="11"><tspan font-weight="600">40.0</tspan><tspan fill="#6b7280"> (36/90)</tspan></text>
-<text x="80" y="355" text-anchor="end" font-weight="400">任务 8</text>
-<rect x="90.0" y="340" width="333.3" height="10" fill="#111827"/>
-<text x="428.3" y="349" font-size="11"><tspan font-weight="600">55.6</tspan><tspan fill="#6b7280"> (5/9)</tspan></text>
-<rect x="90.0" y="351" width="146.7" height="10" fill="#93c5fd"/>
-<text x="241.7" y="360" font-size="11"><tspan font-weight="600">24.4</tspan><tspan fill="#6b7280"> (22/90)</tspan></text>
-<text x="80" y="386" text-anchor="end" font-weight="400">任务 9</text>
-<rect x="90.0" y="371" width="400.0" height="10" fill="#111827"/>
-<text x="495.0" y="380" font-size="11"><tspan font-weight="600">66.7</tspan><tspan fill="#6b7280"> (6/9)</tspan></text>
-<rect x="90.0" y="382" width="160.0" height="10" fill="#93c5fd"/>
-<text x="255.0" y="391" font-size="11"><tspan font-weight="600">26.7</tspan><tspan fill="#6b7280"> (24/90)</tspan></text>
-<text x="80" y="425" text-anchor="end" font-weight="600">平均</text>
-<rect x="90.0" y="410" width="466.8" height="10" fill="#111827"/>
-<text x="561.8" y="419" font-size="11"><tspan font-weight="600">77.8</tspan><tspan fill="#6b7280"></tspan></text>
-<rect x="90.0" y="421" width="239.2" height="10" fill="#93c5fd"/>
-<text x="334.2" y="430" font-size="11"><tspan font-weight="600">39.9</tspan><tspan fill="#6b7280"> (348/873)</tspan></text>
+<rect x="408.0" y="102" width="18.0" height="377" fill="#fde68a"/>
+<text x="417.0" y="98" text-anchor="middle" font-size="11" fill="#6b7280">LeRobot π0 全涂黑 53–56%</text>
+<line x1="90.0" y1="104" x2="90.0" y2="481" stroke="#e5e7eb"/>
+<text x="90.0" y="499" text-anchor="middle" fill="#6b7280">0%</text>
+<line x1="240.0" y1="104" x2="240.0" y2="481" stroke="#e5e7eb"/>
+<text x="240.0" y="499" text-anchor="middle" fill="#6b7280">25%</text>
+<line x1="390.0" y1="104" x2="390.0" y2="481" stroke="#e5e7eb"/>
+<text x="390.0" y="499" text-anchor="middle" fill="#6b7280">50%</text>
+<line x1="540.0" y1="104" x2="540.0" y2="481" stroke="#e5e7eb"/>
+<text x="540.0" y="499" text-anchor="middle" fill="#6b7280">75%</text>
+<line x1="690.0" y1="104" x2="690.0" y2="481" stroke="#e5e7eb"/>
+<text x="690.0" y="499" text-anchor="middle" fill="#6b7280">100%</text>
+<rect x="90" y="62" width="12" height="12" fill="#111827"/>
+<text x="108" y="72" font-size="12">最好的一套固定动作（在另外 9 个状态上）</text>
+<rect x="420" y="62" width="12" height="12" fill="#93c5fd"/>
+<text x="438" y="72" font-size="12">全部交叉回放</text>
+<path d="M96 42 l6 6 l-6 6 l-6 -6 z" fill="#dc2626"/>
+<text x="108" y="52" font-size="12">LeRobot π0 同一任务全涂黑（5 次平均）</text>
+<text x="80" y="127" text-anchor="end" font-weight="400">任务 0</text>
+<rect x="90.0" y="112" width="533.3" height="10" fill="#111827"/>
+<text x="628.3" y="121" font-size="11"><tspan font-weight="600">88.9</tspan><tspan fill="#6b7280"> (8/9)</tspan></text>
+<rect x="90.0" y="123" width="260.0" height="10" fill="#93c5fd"/>
+<text x="355.0" y="132" font-size="11"><tspan font-weight="600">43.3</tspan><tspan fill="#6b7280"> (39/90)</tspan></text>
+<path d="M510.0 117 l6 6 l-6 6 l-6 -6 z" fill="#dc2626" stroke="#ffffff" stroke-width="1"/>
+<text x="80" y="158" text-anchor="end" font-weight="400">任务 1</text>
+<rect x="90.0" y="143" width="400.0" height="10" fill="#111827"/>
+<text x="495.0" y="152" font-size="11"><tspan font-weight="600">66.7</tspan><tspan fill="#6b7280"> (6/9)</tspan></text>
+<rect x="90.0" y="154" width="240.0" height="10" fill="#93c5fd"/>
+<text x="335.0" y="163" font-size="11"><tspan font-weight="600">40.0</tspan><tspan fill="#6b7280"> (36/90)</tspan></text>
+<path d="M570.0 148 l6 6 l-6 6 l-6 -6 z" fill="#dc2626" stroke="#ffffff" stroke-width="1"/>
+<text x="80" y="189" text-anchor="end" font-weight="400">任务 2</text>
+<rect x="90.0" y="174" width="466.7" height="10" fill="#111827"/>
+<text x="561.7" y="183" font-size="11"><tspan font-weight="600">77.8</tspan><tspan fill="#6b7280"> (7/9)</tspan></text>
+<rect x="90.0" y="185" width="313.3" height="10" fill="#93c5fd"/>
+<text x="408.3" y="194" font-size="11"><tspan font-weight="600">52.2</tspan><tspan fill="#6b7280"> (47/90)</tspan></text>
+<path d="M606.0 179 l6 6 l-6 6 l-6 -6 z" fill="#dc2626" stroke="#ffffff" stroke-width="1"/>
+<text x="80" y="220" text-anchor="end" font-weight="400">任务 3</text>
+<rect x="90.0" y="205" width="466.7" height="10" fill="#111827"/>
+<text x="561.7" y="214" font-size="11"><tspan font-weight="600">77.8</tspan><tspan fill="#6b7280"> (7/9)</tspan></text>
+<rect x="90.0" y="216" width="325.0" height="10" fill="#93c5fd"/>
+<text x="420.0" y="225" font-size="11"><tspan font-weight="600">54.2</tspan><tspan fill="#6b7280"> (39/72)</tspan></text>
+<path d="M546.0 210 l6 6 l-6 6 l-6 -6 z" fill="#dc2626" stroke="#ffffff" stroke-width="1"/>
+<text x="80" y="251" text-anchor="end" font-weight="400">任务 4</text>
+<rect x="90.0" y="236" width="466.7" height="10" fill="#111827"/>
+<text x="561.7" y="245" font-size="11"><tspan font-weight="600">77.8</tspan><tspan fill="#6b7280"> (7/9)</tspan></text>
+<rect x="90.0" y="247" width="206.7" height="10" fill="#93c5fd"/>
+<text x="301.7" y="256" font-size="11"><tspan font-weight="600">34.4</tspan><tspan fill="#6b7280"> (31/90)</tspan></text>
+<path d="M498.0 241 l6 6 l-6 6 l-6 -6 z" fill="#dc2626" stroke="#ffffff" stroke-width="1"/>
+<text x="80" y="282" text-anchor="end" font-weight="400">任务 5</text>
+<rect x="90.0" y="267" width="600.0" height="10" fill="#111827"/>
+<text x="695.0" y="276" font-size="11"><tspan font-weight="600">100.0</tspan><tspan fill="#6b7280"> (9/9)</tspan></text>
+<rect x="90.0" y="278" width="296.3" height="10" fill="#93c5fd"/>
+<text x="391.3" y="287" font-size="11"><tspan font-weight="600">49.4</tspan><tspan fill="#6b7280"> (40/81)</tspan></text>
+<path d="M270.0 272 l6 6 l-6 6 l-6 -6 z" fill="#dc2626" stroke="#ffffff" stroke-width="1"/>
+<text x="80" y="313" text-anchor="end" font-weight="400">任务 6</text>
+<rect x="90.0" y="298" width="400.0" height="10" fill="#111827"/>
+<text x="495.0" y="307" font-size="11"><tspan font-weight="600">66.7</tspan><tspan fill="#6b7280"> (6/9)</tspan></text>
+<rect x="90.0" y="309" width="226.7" height="10" fill="#93c5fd"/>
+<text x="321.7" y="318" font-size="11"><tspan font-weight="600">37.8</tspan><tspan fill="#6b7280"> (34/90)</tspan></text>
+<path d="M570.0 303 l6 6 l-6 6 l-6 -6 z" fill="#dc2626" stroke="#ffffff" stroke-width="1"/>
+<text x="80" y="344" text-anchor="end" font-weight="400">任务 7</text>
+<rect x="90.0" y="329" width="600.0" height="10" fill="#111827"/>
+<text x="695.0" y="338" font-size="11"><tspan font-weight="600">100.0</tspan><tspan fill="#6b7280"> (9/9)</tspan></text>
+<rect x="90.0" y="340" width="240.0" height="10" fill="#93c5fd"/>
+<text x="335.0" y="349" font-size="11"><tspan font-weight="600">40.0</tspan><tspan fill="#6b7280"> (36/90)</tspan></text>
+<path d="M90.0 334 l6 6 l-6 6 l-6 -6 z" fill="#dc2626" stroke="#ffffff" stroke-width="1"/>
+<text x="80" y="375" text-anchor="end" font-weight="400">任务 8</text>
+<rect x="90.0" y="360" width="333.3" height="10" fill="#111827"/>
+<text x="428.3" y="369" font-size="11"><tspan font-weight="600">55.6</tspan><tspan fill="#6b7280"> (5/9)</tspan></text>
+<rect x="90.0" y="371" width="146.7" height="10" fill="#93c5fd"/>
+<text x="241.7" y="380" font-size="11"><tspan font-weight="600">24.4</tspan><tspan fill="#6b7280"> (22/90)</tspan></text>
+<path d="M390.0 365 l6 6 l-6 6 l-6 -6 z" fill="#dc2626" stroke="#ffffff" stroke-width="1"/>
+<text x="80" y="406" text-anchor="end" font-weight="400">任务 9</text>
+<rect x="90.0" y="391" width="400.0" height="10" fill="#111827"/>
+<text x="495.0" y="400" font-size="11"><tspan font-weight="600">66.7</tspan><tspan fill="#6b7280"> (6/9)</tspan></text>
+<rect x="90.0" y="402" width="160.0" height="10" fill="#93c5fd"/>
+<text x="255.0" y="411" font-size="11"><tspan font-weight="600">26.7</tspan><tspan fill="#6b7280"> (24/90)</tspan></text>
+<path d="M126.0 396 l6 6 l-6 6 l-6 -6 z" fill="#dc2626" stroke="#ffffff" stroke-width="1"/>
+<text x="80" y="445" text-anchor="end" font-weight="600">平均</text>
+<rect x="90.0" y="430" width="466.8" height="10" fill="#111827"/>
+<text x="561.8" y="439" font-size="11"><tspan font-weight="600">77.8</tspan><tspan fill="#6b7280"></tspan></text>
+<rect x="90.0" y="441" width="239.2" height="10" fill="#93c5fd"/>
+<text x="334.2" y="450" font-size="11"><tspan font-weight="600">39.9</tspan><tspan fill="#6b7280"> (348/873)</tspan></text>
+<path d="M417.6 435 l6 6 l-6 6 l-6 -6 z" fill="#dc2626" stroke="#ffffff" stroke-width="1"/>
+<line x1="478.8" y1="426" x2="478.8" y2="443" stroke="#f59e0b" stroke-width="3" stroke-dasharray="3 2"/>
+<text x="474.8" y="466" text-anchor="middle" font-size="11" fill="#b45309">若每套都只有 39.9%，挑最好一套的期望：64.8%</text>
 </svg>
