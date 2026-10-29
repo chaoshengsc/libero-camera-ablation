@@ -149,7 +149,7 @@ footer { margin-top: 80px; padding-top: 20px; border-top: 1px solid var(--border
     <h2>相机消融</h2>
     <p class="intro">LIBERO 上的策略收到两路相机画面、机械臂状态和一句任务指令。每个实验只改相机输入。</p>
     <p class="intro">每次运行 100 回合（10 个任务 × 10 个初始状态，同一个种子）。只算抽样误差，两个条件要相差约 13 个百分点以上才有意义；对 π0，同一个条件跑两次最多相差 18 个百分点。</p>
-    <p class="intro">本节的 π0 是 LeRobot 的公开权重，500 回合的正常成功率是 73%。它训练不足；OpenPI 官方的 π0 LIBERO 权重在 LIBERO-Plus 的测试里所有相机涂黑后不超过 2%，所以下面的现象只说明这个权重，不代表所有 π0。</p>
+    <p class="intro">本节的 π0 是 LeRobot 的公开权重，500 回合的正常成功率是 73%。官方 π0 在 OpenPI 原版管线下去掉视觉后是 0%（1.5 节），所以下面的现象只说明这个权重（连同它的推理管线），不代表所有 π0。</p>
     <div class="block"><div class="fig"><img id="figInputs" alt="策略的输入，以及各实验改了哪一项"></div></div>
 
     <div class="block">
@@ -187,6 +187,13 @@ footer { margin-top: 80px; padding-top: 20px; border-top: 1px solid var(--border
       <p class="take">π0.5 需要实时的腕部画面，涂黑、屏蔽、冻结都接近 0；π0 去掉腕部相机后成功率不变。</p>
       <div class="fig"><img id="figSingle" alt="测试时去掉一路相机后的成功率"></div>
       <p class="note">每个条件 500 回合（10 个任务 × 50 个初始状态，各条件初始状态相同；π0.5 腕部涂黑一项是同一组 100 个初始状态跑 5 次）。“屏蔽”指在模型内部把这一路相机的槽位换成空相机占位、掩码置 0；“冻结”指整个回合只给第一帧的真实画面。π0 与双相机按初始状态配对，各条件差值的 95% 区间都在预设的 ±8 个百分点以内。逐回合结果见仓库的 results/single_camera.csv。</p>
+    </div>
+
+    <div class="block">
+      <h3><span class="n">1.5</span>官方 π0 对照</h3>
+      <p class="take">官方 π0 离开视觉就不能完成任务，只屏蔽腕部也是 0%；只屏蔽主视角还剩 77%。看不见也能成功的只有 LeRobot 这个权重。</p>
+      <div class="fig"><img id="figOfficial" alt="官方 π0 与 LeRobot π0 去掉相机后的成功率"></div>
+      <p class="note">官方 π0 为 Physical Intelligence 的 pi0_libero 检查点，在 OpenPI 原版管线下运行（渲染 256），正常 500 回合 96.4%，初始状态与 1.4 节逐回合相同；去视觉的各条件 100 回合。LeRobot π0 在 LeRobot 管线下运行（渲染 360）；官方 π0 改用 360 渲染复测，正常 99/100，去视觉仍为 0/100，分辨率不是原因。两边管线不同，差别不能单独归因到权重。LeRobot 转换版的官方权重在 LeRobot 管线下 0/50，没能跑通。设计与判读规则在运行前写好，见仓库 docs/NOTES_CN.md；汇总在 results/official_pi0_summary.csv。</p>
     </div>
 
   </section>
@@ -246,7 +253,7 @@ const DICT = [
   ["四个策略里有三个离开实时相机画面就无法完成任务；一个公开的 π0 权重在所有相机涂黑后仍有 53–56% 的成功率。做消融之前，先复现了五个公开权重。", "Three of the four policies fail without a live camera image. One public π0 checkpoint still succeeds 53–56% of the time with every camera blacked out. Five public checkpoints were reproduced first."],
   ["每个模型评测 500 回合，与原作者公布的基准对比。两个 95% 置信区间有重叠即算复现。", "Each model is evaluated for 500 episodes and compared with the reference published by its authors. A result counts as reproduced when the two 95% confidence intervals overlap."],
   ["SmolVLA 用的是只在 LIBERO-Spatial 上训练的公开权重，评测时 n_action_steps=10。把鼠标移到图上可以看基准出处。", "SmolVLA uses a public checkpoint trained on LIBERO-Spatial only, evaluated with n_action_steps=10. Hover over the chart for the source of each reference."],
-  ["本节的 π0 是 LeRobot 的公开权重，500 回合的正常成功率是 73%。它训练不足；OpenPI 官方的 π0 LIBERO 权重在 LIBERO-Plus 的测试里所有相机涂黑后不超过 2%，所以下面的现象只说明这个权重，不代表所有 π0。", "π0 in this section is LeRobot's public checkpoint, which scores 73% over 500 normal episodes. It is under-trained, and OpenPI's own π0 LIBERO checkpoint scores at most 2% with every camera black in LIBERO-Plus's tests, so the behaviour below describes this checkpoint, not π0 in general."],
+  ["本节的 π0 是 LeRobot 的公开权重，500 回合的正常成功率是 73%。官方 π0 在 OpenPI 原版管线下去掉视觉后是 0%（1.5 节），所以下面的现象只说明这个权重（连同它的推理管线），不代表所有 π0。", "π0 in this section is LeRobot's public checkpoint, which scores 73% over 500 normal episodes. Official π0 in OpenPI's own pipeline scores 0% without vision (section 1.5), so the behaviour below describes this checkpoint (together with its inference pipeline), not π0 in general."],
   ["每格是该任务 50 回合的成功率（%）。列标题是“拿起黑碗并放到盘子上”里碗的初始位置。", "Each cell is the success rate (%) over 50 episodes of that task. Column headers give where the bowl starts in \"pick up the black bowl and place it on the plate\"."],
   ["LIBERO 上的策略收到两路相机画面、机械臂状态和一句任务指令。每个实验只改相机输入。", "A LIBERO policy receives two camera images, the robot state and a language instruction. Each experiment changes only the camera input."],
   ["每次运行 100 回合（10 个任务 × 10 个初始状态，同一个种子）。只算抽样误差，两个条件要相差约 13 个百分点以上才有意义；对 π0，同一个条件跑两次最多相差 18 个百分点。", "Each run is 100 episodes (10 tasks × 10 initial states, same seed). Sampling error alone means two conditions have to differ by about 13 points; for π0, the same condition run twice differed by up to 18 points."],
@@ -272,6 +279,10 @@ const DICT = [
   ["HF 仓库自带 eval_info.json（500 回合）", "eval_info.json shipped in the HF repo (500 episodes)"],
   ["π0.5 需要实时的腕部画面，涂黑、屏蔽、冻结都接近 0；π0 去掉腕部相机后成功率不变。", "π0.5 needs the live wrist image: black, dropped and frozen all bring it close to 0. Removing the wrist camera does not change π0's success rate."],
   ["每个条件 500 回合（10 个任务 × 50 个初始状态，各条件初始状态相同；π0.5 腕部涂黑一项是同一组 100 个初始状态跑 5 次）。“屏蔽”指在模型内部把这一路相机的槽位换成空相机占位、掩码置 0；“冻结”指整个回合只给第一帧的真实画面。π0 与双相机按初始状态配对，各条件差值的 95% 区间都在预设的 ±8 个百分点以内。逐回合结果见仓库的 results/single_camera.csv。", "500 episodes per condition (10 tasks × 50 initial states, the same initial states for every condition; π0.5 wrist black is the same 100 initial states run 5 times). \"Dropped\" fills the camera's slot inside the model with the empty-camera placeholder and sets its mask to 0; \"frozen\" gives the real first-frame image for the whole episode. Paired by initial state against both cameras, every π0 difference has a 95% interval inside the pre-set ±8-point margin. Per-episode results are in results/single_camera.csv in the repository."],
+  ["官方 π0 离开视觉就不能完成任务，只屏蔽腕部也是 0%；只屏蔽主视角还剩 77%。看不见也能成功的只有 LeRobot 这个权重。", "Official π0 cannot do the tasks without vision, and scores 0% with only the wrist camera masked; with only the main view masked it keeps 77%. Only LeRobot's checkpoint succeeds without vision."],
+  ["官方 π0 为 Physical Intelligence 的 pi0_libero 检查点，在 OpenPI 原版管线下运行（渲染 256），正常 500 回合 96.4%，初始状态与 1.4 节逐回合相同；去视觉的各条件 100 回合。LeRobot π0 在 LeRobot 管线下运行（渲染 360）；官方 π0 改用 360 渲染复测，正常 99/100，去视觉仍为 0/100，分辨率不是原因。两边管线不同，差别不能单独归因到权重。LeRobot 转换版的官方权重在 LeRobot 管线下 0/50，没能跑通。设计与判读规则在运行前写好，见仓库 docs/NOTES_CN.md；汇总在 results/official_pi0_summary.csv。", "Official π0 is Physical Intelligence's pi0_libero checkpoint, run in OpenPI's own pipeline (256 rendering): 96.4% over 500 normal episodes, with initial states identical episode by episode to section 1.4; 100 episodes per vision-removal condition. LeRobot π0 runs in the LeRobot pipeline (360 rendering); official π0 re-run at 360 scores 99/100 normally and still 0/100 without vision, so resolution is not the cause. The pipelines differ, so the difference cannot be attributed to the weights alone. The LeRobot conversion of the official checkpoint scored 0/50 in the LeRobot pipeline and did not run. The design and reading rule were written before running, see docs/NOTES.md in the repository; the summary is in results/official_pi0_summary.csv."],
+  ["官方 π0 与 LeRobot π0 去掉相机后的成功率", "Official π0 vs. LeRobot π0 with cameras removed"],
+  ["官方 π0 对照", "Official π0 control"],
   ["去掉腕部相机：每个条件 500 回合", "Wrist camera removed: 500 episodes per condition"],
   ["测试时去掉一路相机后的成功率", "Success rate with one camera removed at test time"],
   ["策略的输入，以及各实验改了哪一项", "What the policy receives and what each experiment changes"],
@@ -305,7 +316,7 @@ function trNode(n) {
 $("langBtn").textContent = LANG === "en" ? "中文" : "English";
 $("langBtn").onclick = () => { location.search = "?lang=" + (LANG === "en" ? "zh" : "en"); };
 // README 用的两张图：线上在仓库的 media/ 下；本地没有这些文件时整块隐藏
-for (const [id, name] of [["figInputs", "inputs"], ["figTraj", "trajectory"], ["figSingle", "single_camera"]]) {
+for (const [id, name] of [["figInputs", "inputs"], ["figTraj", "trajectory"], ["figSingle", "single_camera"], ["figOfficial", "official_pi0"]]) {
   $(id).onerror = () => $(id).closest(".fig").classList.add("hidden");
   $(id).src = `../media/${LANG === "en" ? "" : "zh/"}${name}.svg`;
 }

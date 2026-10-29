@@ -36,6 +36,10 @@ TXT = {
         "sc_title": "One camera removed at test time (500 episodes per bar, 95% Wilson interval)",
         "sc_conds": ["Both cameras", "Wrist black", "Wrist dropped", "Wrist frozen at frame 1", "Agent view dropped"],
         "sc_note": "π0.5 wrist black: same 100 initial states run 5 times, 0/500",
+        "op_title": "Official π0 vs. LeRobot π0 with cameras removed (95% Wilson interval)",
+        "op_models": {"official": "Official π0 (OpenPI pipeline)", "lerobot": "LeRobot π0 v044"},
+        "op_conds": ["Both cameras", "All black", "Both slots masked", "Both frozen at frame 1", "Wrist masked", "Agent view masked"],
+        "op_n": "{k}/{n}",
     },
     "zh": {
         "rep_title": "公开权重复现：本机成功率 vs 基准",
@@ -56,6 +60,10 @@ TXT = {
         "sc_title": "测试时去掉一路相机（每根柱 500 回合，误差线为 Wilson 95% 区间）",
         "sc_conds": ["两路都给", "腕部涂黑", "去掉腕部", "腕部冻结在第 1 帧", "去掉主视角"],
         "sc_note": "π0.5 腕部涂黑：同一批 100 个初始状态跑 5 次，0/500",
+        "op_title": "官方 π0 与 LeRobot π0 去掉相机后的成功率（误差线为 Wilson 95% 区间）",
+        "op_models": {"official": "官方 π0（OpenPI 管线）", "lerobot": "LeRobot π0 v044"},
+        "op_conds": ["两路都给", "全涂黑", "两路槽位都屏蔽", "两路冻结在第 1 帧", "只屏蔽腕部", "只屏蔽主视角"],
+        "op_n": "{k}/{n}",
     },
 }
 COND_KEYS = ["normal", "noise", "freeze", "agent_black", "wrist_black", "all_black"]
@@ -66,6 +74,23 @@ SC_RUNS = {"π0.5": {"both": "pi05_none", "wrist_dropped": "pi05_drop_wrist", "w
                   "wrist_dropped_rerun": "pi0_drop_wrist_r2", "wrist_frozen": "pi0_freeze_wrist", "agent_dropped": "pi0_drop_agent"}}
 SC_BARS = ["both", "wrist_black", "wrist_dropped", "wrist_frozen", "agent_dropped"]
 SC_COL = ["#9ca3af", "#f59e0b", "#2563eb", "#14b8a6", "#7c3aed"]
+# 官方 π0 对照（docs/NOTES.md 2026-10-28/29 的预先登记与结果）：路径相对 dashboard/data/，列表为多次运行合计
+OP_RUNS = {"official": {"both": ["official_pi0/ojx_none"], "all_black": ["official_pi0/ojx_all"], "both_masked": ["official_pi0/ojx_drop_all"],
+                        "both_frozen": ["official_pi0/ojx_freeze"], "wrist_masked": ["official_pi0/ojx_drop_wrist"],
+                        "agent_masked": ["official_pi0/ojx_drop_agent"]},
+           # 同一官方 π0 改用 360 渲染（与 LeRobot 一侧相同），排除分辨率这一混杂；不进图
+           "official_360": {"both": ["official_pi0/ojx360_none"], "all_black": ["official_pi0/ojx360_all"],
+                            "both_masked": ["official_pi0/ojx360_drop_all"]},
+           "lerobot": {"both": ["s500/pi0_none"],
+                       "all_black": ["pi0_black_all", "traj_pi0_black", "run2/pi0_black_all", "run2/traj_pi0_black", "run3/pi0_black_all"],
+                       "both_masked": ["official_pi0/pi0_drop_all"], "both_frozen": ["pert_pi0_freeze", "run2/pert_pi0_freeze"],
+                       "wrist_masked": ["s500/pi0_drop_wrist"], "agent_masked": ["s500/pi0_drop_agent"]},
+           # LeRobot 转换版官方权重在 LeRobot 管线下的冒烟与三组对照（没跑通，留作记录，不进图）
+           "conversion": {"smoke": ["official_pi0/opi0_smoke"], "diag_a": ["official_pi0/opi0_diag_a"],
+                          "diag_b": ["official_pi0/opi0_diag_b"], "diag_c": ["official_pi0/opi0_diag_c"]}}
+OP_BARS = ["both", "all_black", "both_masked", "both_frozen", "wrist_masked", "agent_masked"]
+OP_COL = ["#9ca3af", "#111827", "#2563eb", "#14b8a6", "#f59e0b", "#7c3aed"]
+OP_EEF_REF = "s500/pi0_none"  # 初始状态核对的参照：LeRobot π0 的 500 回合正常运行
 TRAJ_TASKS = [4, 7]  # 轨迹图展示的任务：一个全涂黑仍成功的，一个全涂黑后失败的
 PAIR_IDS = ["pi0_normal_vs_rerun", "pi0_all_black_vs_normal", "pi05_vs_pi0_normal"]  # 与 traj_analyze.json 里 pairs 的顺序一致
 SRC_EN = {"ACT": "eval_info.json shipped in the Hugging Face repo (500 episodes)", "OpenVLA": "openvla README (3 seeds x 500 episodes)",
@@ -150,6 +175,58 @@ def fig_single_camera(summary, t):
             for e in (lo, hi):
                 out.append(f'<line x1="{x(e):.1f}" y1="{y + 6}" x2="{x(e):.1f}" y2="{y + bh - 6}" stroke="{INK}" stroke-width="1.4"/>')
             out.append(f'<text x="{x(hi) + 6:.1f}" y="{y + bh / 2 + 4:.1f}" font-size="12" font-weight="600">{pc:.1f}</text>')
+    return svg(w, h, out)
+
+
+def _succ(run):
+    per = sorted(json.loads((ROOT / "dashboard" / "data" / run / "eval_info.json").read_text())["per_task"], key=lambda t: t["task_id"])
+    return [int(x) for t in per for x in t["metrics"]["successes"]]
+
+
+def official_pi0_summary():
+    """每个条件：回合数、成功数、Wilson 区间；官方运行另算第 1 步末端位置与参照运行同一初始状态的最大差（cm）。"""
+    data = ROOT / "dashboard" / "data"
+    ref = json.loads((data / OP_EEF_REF / "first_eef.json").read_text())
+    rows = []
+    for side, conds in OP_RUNS.items():
+        for cond, runs in conds.items():
+            succ = [x for r in runs for x in _succ(r)]
+            n, k = len(succ), sum(succ)
+            lo, hi = wilson(k, n)
+            eef = ""
+            if side.startswith("official"):
+                e = json.loads((data / runs[0] / "first_eef.json").read_text())
+                per = len(e) // 10  # 每任务回合数；参照每任务 50 回合，取前 per 个
+                assert per * 10 == len(e) and len(ref) == 500
+                eef = round(100 * max(abs(a - b) for i, p in enumerate(e) for a, b in zip(p, ref[i // per * 50 + i % per], strict=True)), 4)
+            rows.append([side, cond, len(runs), n, k, round(100 * k / n, 1), round(max(lo, 0.0), 1), round(hi, 1), eef])
+    return rows
+
+
+def fig_official_pi0(summary, t):
+    w, left, top, bh, gap = 760, 160, 70, 20, 5
+    gh = len(OP_BARS) * (bh + gap) + 34
+    h = top + gh * 2 + 30
+    pw = w - left - 90
+    x = lambda v: left + pw * v / 100
+    by = {(r[0], r[1]): r for r in summary}
+    out = [title(t["op_title"])]
+    for v in range(0, 101, 25):
+        out.append(f'<line x1="{x(v):.1f}" y1="{top - 8}" x2="{x(v):.1f}" y2="{h - 30}" stroke="{GRID}"/>')
+        out.append(f'<text x="{x(v):.1f}" y="{h - 12}" text-anchor="middle" fill="{MUTED}">{v}%</text>')
+    for g, side in enumerate(("official", "lerobot")):
+        y0 = top + g * gh
+        out.append(f'<text x="20" y="{y0 + 6}" font-size="14" font-weight="600">{t["op_models"][side]}</text>')
+        for i, (cond, col, lab) in enumerate(zip(OP_BARS, OP_COL, t["op_conds"], strict=True)):
+            y = y0 + 16 + i * (bh + gap)
+            _, _, _, n, k, pc, lo, hi, _ = by[side, cond]
+            out.append(f'<text x="{left - 10}" y="{y + bh / 2 + 4:.1f}" text-anchor="end">{lab}</text>')
+            out.append(f'<rect x="{x(0):.1f}" y="{y}" width="{max(x(pc) - x(0), 1.5):.1f}" height="{bh}" rx="2" fill="{col}"/>')
+            out.append(f'<line x1="{x(lo):.1f}" y1="{y + bh / 2}" x2="{x(hi):.1f}" y2="{y + bh / 2}" stroke="{INK}" stroke-width="1.4"/>')
+            for e in (lo, hi):
+                out.append(f'<line x1="{x(e):.1f}" y1="{y + 5}" x2="{x(e):.1f}" y2="{y + bh - 5}" stroke="{INK}" stroke-width="1.4"/>')
+            out.append(f'<text x="{x(hi) + 6:.1f}" y="{y + bh / 2 + 4:.1f}" font-size="12"><tspan font-weight="600">{pc:.1f}</tspan>'
+                       f'<tspan fill="{MUTED}"> ({t["op_n"].format(k=k, n=n)})</tspan></text>')
     return svg(w, h, out)
 
 
@@ -346,6 +423,9 @@ if __name__ == "__main__":
     sc_sum = single_camera_summary(sc)
     write_csv("single_camera_summary.csv", ["model", "condition", "episodes", "successes", "success_pc", "wilson_lo", "wilson_hi",
                                             "paired_diff_pp", "diff_ci95_pp", "lost", "gained", "mcnemar_p"], sc_sum)
+    op_sum = official_pi0_summary()
+    write_csv("official_pi0_summary.csv", ["side", "condition", "runs", "episodes", "successes", "success_pc", "wilson_lo", "wilson_hi",
+                                           "first_eef_max_diff_cm"], op_sum)
     traj = [json.loads((RES / f"trajectories_task{i}.json").read_text()) for i in TRAJ_TASKS]
     for lang, out in (("en", MEDIA), ("zh", MEDIA / "zh")):
         t = TXT[lang]
@@ -354,4 +434,5 @@ if __name__ == "__main__":
         (out / "trajectory.svg").write_text(fig_trajectory(traj, t))
         (out / "inputs.svg").write_text(fig_inputs(t))
         (out / "single_camera.svg").write_text(fig_single_camera(sc_sum, t))
-    print(f"wrote {len(list(RES.glob('*.csv')))} csv -> results/, 5 svg -> media/ and media/zh/")
+        (out / "official_pi0.svg").write_text(fig_official_pi0(op_sum, t))
+    print(f"wrote {len(list(RES.glob('*.csv')))} csv -> results/, 6 svg -> media/ and media/zh/")

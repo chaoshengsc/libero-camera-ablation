@@ -21,14 +21,15 @@
 </p>
 
 - **What was done.** Four public LIBERO checkpoints (π0, π0.5, OpenVLA, SmolVLA) were evaluated with the camera input blacked out, frozen at the first frame, noised, or with one of the two cameras removed. Robot state and instruction were left unchanged.
-- **Result.** π0.5, OpenVLA and SmolVLA drop to 0% with black cameras, and π0.5 and SmolVLA also drop to 0% when the image is frozen. LeRobot's public π0 checkpoint scores 71–76% normally, 53–56% with black cameras (five runs each), and 71% and 80% in two runs with a frozen image. With the wrist camera dropped (500 episodes each), π0.5 falls from 98.4% to 4.6% and π0 is unchanged (71.2% vs. 72.0% with both cameras).
+- **Result.** π0.5, OpenVLA and SmolVLA drop to 0% with black cameras, and π0.5 and SmolVLA also drop to 0% when the image is frozen. LeRobot's public π0 checkpoint scores 71–76% normally, 53–56% with black cameras (five runs each), and 71% and 80% in two runs with a frozen image. With the wrist camera dropped (500 episodes each), π0.5 falls from 98.4% to 4.6% and π0 is unchanged (71.2% vs. 72.0% with both cameras). Official π0 (OpenPI itself, 96.4% normally) scores 0/100 with both cameras black or masked in their slots, 0/100 with only the wrist camera masked, and 77/100 with only the main view masked ([section 1.5](#15-official-π0-control)).
 - **What follows from it.** On LIBERO-Spatial, a success rate alone does not show whether a policy uses its cameras. Blacking out or freezing the image is a cheap way to check.
-- **Scope.** One suite, one seed, 100 episodes per run (500 in section 1.4); the single-camera, noise and frozen-image conditions were each run twice. The π0 checkpoint is under-trained, so its result describes this checkpoint and not π0 in general.
+- **Scope.** One suite, one seed, 100 episodes per run (500 in section 1.4); the single-camera, noise and frozen-image conditions were each run twice. Succeeding without vision shows up only in LeRobot's π0 checkpoint; official π0 in OpenPI's own pipeline scores 0% without vision (section 1.5). The two inference pipelines differ, and the cause was not tested.
 
 Before the ablations, five public checkpoints were reproduced to within sampling error of their reference success rates ([section 2](#2-reproduction-of-the-public-checkpoints)). Everything runs on one workstation (RTX A5000 24 GB, Ubuntu 24.04, headless EGL rendering), with wrapper scripts that leave upstream source untouched. CI recomputes the result tables on this page from the raw evaluation files in `dashboard/data/`.
 
 ## News
 
+- **2026-10-29** · Official π0 control ([section 1.5](#15-official-π0-control)): OpenPI itself scores 96.4% normally and 0% without vision; 0% with only the wrist camera masked, 77% with only the main view masked. Earlier versions called LeRobot's π0 checkpoint "under-trained"; this repository never tested that, and the wording is replaced by facts.
 - **2026-10-28** · Single-camera experiment, 500 episodes per condition ([section 1.4](#14-wrist-camera-removed-500-episodes)). While setting it up, found that LeRobot silently shifts camera slots when a camera is missing: reported as [lerobot#5118](https://github.com/huggingface/lerobot/issues/5118), fix proposed in [lerobot#5129](https://github.com/huggingface/lerobot/pull/5129).
 - **2026-10-14** · [v1.3](https://github.com/chaoshengsc/libero-camera-ablation/releases/tag/v1.3): every ablation run a second time; the claim that π0 depends on the wrist camera was withdrawn.
 - **2026-10-07** · [v1.2](https://github.com/chaoshengsc/libero-camera-ablation/releases/tag/v1.2): repository renamed; SmolVLA ablations re-run with the checkpoint used in the reproduction table.
@@ -120,10 +121,36 @@ The design, acceptance checks and expected results were written down before the 
 
 Per-episode results and first-frame hashes are in `results/single_camera.csv`; the summary and paired statistics are in `results/single_camera_summary.csv`.
 
+### 1.5 Official π0 control
+
+LeRobot's π0 still scores 53–56% with every camera black. Is that π0 in general or this checkpoint? This section repeats the vision removal with Physical Intelligence's own `pi0_libero` checkpoint, in the same environment and on the same initial states. The design, the gate (normal ≥ 92%) and the reading rule were written before the runs and pushed to the repository (commit `6c54c5d`); the single-camera conditions added later were also written before their runs, but only recorded locally, without a public timestamp.
+
+- **The LeRobot conversion did not run.** `lerobot/pi0_libero_base` in the LeRobot v0.6.1 pipeline scored 0/50 in the smoke test and 0/20 in each of three diagnostics. A LeRobot maintainer has said that porting OpenPI's image processing and normalization into LeRobot is not straightforward ([lerobot#2533](https://github.com/huggingface/lerobot/issues/2533)). Following the fallback written in advance, OpenPI itself serves action chunks as a local server in its own environment, with LeRobot's LIBERO environment as the client (`scripts/openpi/`).
+- **Gate and initial states.** Normal, 500 episodes: 482/500 = 96.4%, matching the 96.8% in the earlier OpenPI README. The first-step end-effector position matches section 1.4's π0 normal run episode by episode (500/500).
+
+![Official π0 vs. LeRobot π0 with cameras removed](media/official_pi0.svg)
+
+| Condition | Official π0 (OpenPI, 256 rendering) | LeRobot π0 v044 (LeRobot, 360 rendering) |
+|---|---|---|
+| Both cameras | 96.4% (500 episodes) | 72.0% (500 episodes) |
+| All black | **0/100** | 53–56% (five runs of 100) |
+| Both slots masked | **0/100** | 35/100 |
+| Both frozen at frame 1 (auxiliary) | 0/100 | 71%, 80% |
+| Wrist masked only | **0/100** | 71.2% (500 episodes) |
+| Main view masked only | **77/100** | 74.2% (500 episodes) |
+
+- **Official π0 cannot do the tasks without vision.** By the rule set in advance, succeeding without vision is a property of LeRobot's checkpoint, not of π0 in general. LeRobot π0 slot-masked is only 35%, below the rule's 40%, so this conclusion rests on the all-black comparison only.
+- **Official π0 cannot do without the wrist camera and partly depends on the main view.** Wrist masked: 0/100. Main view masked: 77% (interval 68–84%); on the same 100 initial states it scores 93/100 normally (paired McNemar p = 0.0025). That is below the 85% set in advance, so the main view does not count as removable (both thresholds were set after seeing 0% with both cameras removed). This removes a camera at test time; it is not training with one camera.
+- **Not attributable to the weights.** The two sides differ not only in weights but also in inference pipeline (JAX vs. PyTorch, image resizing, normalization and delta restoration) and rendering resolution (resolution was later ruled out, see the next point). The same official weights score 0/50 in the LeRobot pipeline and 50/50 in OpenPI's, so the pipeline alone can make a large difference. "This checkpoint" therefore means the checkpoint together with its inference pipeline. Supporting evidence: π0.5 scores 0% all black in the same LeRobot pipeline, so the pipeline by itself does not make a policy succeed without vision. Why LeRobot's π0 succeeds without vision was not tested.
+- **Resolution is not the cause.** Official π0 re-run at 360, the same rendering as the LeRobot side (registered in advance): normal 99/100, all black 0/100, both slots masked 0/100; first-frame hashes match section 1.4 episode by episode. What remains is the weights plus the inference pipeline.
+- **On the same LeRobot checkpoint, the way vision is removed matters.** Slot-masked, 35%, is below all black, 53–56%; paired by initial state against each of the five all-black runs, McNemar p is between 0.0015 and 0.0064.
+
+Raw data are in `dashboard/data/official_pi0/`, the summary and the initial-state check in `results/official_pi0_summary.csv`, and the process and deviations in the 2026-10-28/29 sections of [docs/NOTES.md](docs/NOTES.md).
+
 <details>
 <summary><b>Notes on these numbers</b>: the π0 checkpoint, the normal column, confidence intervals, run-to-run variation, noise, related work</summary>
 
-- **π0 checkpoint.** `lerobot/pi0_libero_finetuned_v044` scores 73.4% over 500 normal episodes. An earlier OpenPI README gave 96.8% on Spatial for π0 trained with its `pi0_libero` config. OpenPI's README never listed that checkpoint, but it can be downloaded from OpenPI's public bucket (`gs://openpi-assets/checkpoints/pi0_libero`), and [LIBERO-Plus](https://arxiv.org/abs/2510.13626) reports 94.2% for it unperturbed and at most 2% with every camera black (their Table 1 and Figure 2; not yet re-run here). An earlier version of this README said that no official π0 LIBERO checkpoint had been released; that was wrong (see the correction in [`docs/NOTES.md`](docs/NOTES.md)). A LeRobot maintainer has said the LeRobot one is under-trained ([lerobot#2114](https://github.com/huggingface/lerobot/issues/2114)).
+- **π0 checkpoint.** `lerobot/pi0_libero_finetuned_v044` scores 73.4% over 500 normal episodes. An earlier OpenPI README gave 96.8% on Spatial for π0 trained with its `pi0_libero` config. OpenPI's README never listed that checkpoint, but it can be downloaded from OpenPI's public bucket (`gs://openpi-assets/checkpoints/pi0_libero`), and [LIBERO-Plus](https://arxiv.org/abs/2510.13626) reports 94.2% for it unperturbed and at most 2% with every camera black (their Table 1 and Figure 2); re-run here in OpenPI's own pipeline it scores 96.4% normally (section 1.5). An earlier version of this README said that no official π0 LIBERO checkpoint had been released; that was wrong (see the correction in [`docs/NOTES.md`](docs/NOTES.md)). In [lerobot#2114](https://github.com/huggingface/lerobot/issues/2114) a LeRobot maintainer said an earlier LeRobot π0 checkpoint needed more training; whether that holds for v044 was not tested here, and the cause of its gap to the official checkpoint is unknown.
 - **Normal column.** The first number is the first 10 episodes per task of each model's 500-episode run, which use the same initial states as the ablation runs. The second is a separate 100-episode run; SmolVLA has none. π0's five normal runs gave 76%, 73%, 76%, 72% and 71%.
 - **Confidence intervals.** The 95% interval of a single number is up to ±10 points. Episodes of one task are correlated, which makes these intervals optimistic.
 - **Run-to-run variation.** Runs with the same seed are not identical: the evaluation fixes the random seed but does not make GPU computation deterministic, the end-effector paths of two π0 runs differ from the first step, and a repeat is in effect a new sample. π0.5 and SmolVLA repeat within 6 points; π0 differs by up to 18 points on the same condition.
@@ -185,6 +212,7 @@ python3 scripts/analysis/make_figures.py
 | Path | Content |
 |---|---|
 | `scripts/eval/` | Evaluation entry scripts; blackout, perturbation and trajectory-logging wrappers |
+| `scripts/openpi/` | Local server that runs official π0 in the OpenPI environment, checkpoint download script (section 1.5) |
 | `scripts/analysis/` | Metrics, summaries, figure generation |
 | `scripts/checks/` | Self-checks for GPU, headless EGL rendering and video decoding |
 | `scripts/train/` | π0 fine-tuning scripts for an experiment recorded in `docs/NOTES.md` (not part of the results above) |
@@ -201,7 +229,7 @@ python3 scripts/analysis/make_figures.py
 
 - One benchmark suite (LIBERO-Spatial) and one seed.
 - The ablations in sections 1.1–1.3 use 100 episodes per run (section 1.4 uses 500), so differences under about 13 points are not meaningful; for π0, repeated runs of one condition differed by up to 18 points.
-- The π0 checkpoint is under-trained. A properly trained π0 may behave differently.
+- The π0 ablation results come from LeRobot's v044 checkpoint. Official π0 was tested only in OpenPI's own pipeline; the two sides differ in pipeline (rendering resolution was ruled out by a re-run at 360), so the difference cannot be attributed to the weights alone. Each official π0 ablation condition was run once, 100 episodes.
 - How much the scene varies between initial states of a task was not measured, so nothing here says how much vision the benchmark itself requires.
 - Diffusion Policy was evaluated on PushT (2-D physics), not in MuJoCo.
 

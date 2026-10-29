@@ -17,7 +17,7 @@ def emb(tmp_path):
     (tmp_path / "logs" / "eval" / "old_run").mkdir(parents=True)
     (tmp_path / "logs" / "train" / "old_run").mkdir(parents=True)
     (tmp_path / "env.sh").write_text('cd "$EMB_ROOT"\nconda() { :; }\nexport PATH="$EMB_ROOT/bin:$PATH"\n')
-    stub = "#!/bin/bash\necho \"$(basename $0) $*\" > $EMB_ROOT/call.txt\nenv | grep -E \"^(BLACKOUT|TRAJ_OUT|WRAP)=\" >> $EMB_ROOT/call.txt\nexit 0\n"
+    stub = "#!/bin/bash\necho \"$(basename $0) $*\" > $EMB_ROOT/call.txt\nenv | grep -E \"^(BLACKOUT|TRAJ_OUT|WRAP|POLICY_SERVER)=\" >> $EMB_ROOT/call.txt\nexit 0\n"
     for name in ("lerobot-eval", "python"):
         p = tmp_path / "bin" / name
         p.write_text(stub)
@@ -58,6 +58,19 @@ def test_run_libero_passes_arguments_and_wrapper(emb):
     assert run("bash scripts/eval/run_libero.sh demo 10 /ckpt/x 1", emb, WRAP="typo").returncode == 2
 
 
+def test_run_official_pi0_single_stage(emb):
+    """官方 π0 单路阶段:两个条件都走 OpenPI 服务端(POLICY_SERVER)、256 渲染;未知阶段直接退出,不碰结果目录。"""
+    (emb / "tmp").mkdir()
+    (emb / "tmp" / "openpi_authkey").write_text("k")
+    r = run("bash scripts/eval/run_official_pi0.sh single", emb)
+    assert r.returncode == 0, r.stderr
+    call = (emb / "call.txt").read_text()  # 桩每次覆盖,留下的是最后一个条件
+    assert "BLACKOUT=drop_agent" in call and "POLICY_SERVER=18765" in call and "--env.observation_height=256" in call
+    assert (emb / "logs" / "eval" / "ojx_drop_wrist").exists()
+    r = run("bash scripts/eval/run_official_pi0.sh nope", emb)
+    assert r.returncode == 2 and (emb / "logs" / "eval" / "old_run").exists()
+
+
 def test_run_ovla_rejects_unknown_blackout(emb):
     r = run("bash scripts/eval/run_ovla.sh demo 10", emb, BLACKOUT="agent")
     assert r.returncode == 2 and not (emb / "logs" / "eval" / "demo").exists()
@@ -76,15 +89,21 @@ def fake_lerobot(tmp_path):
         d.mkdir(parents=True)
         for f in (d.parent / "__init__.py", d / "__init__.py"):
             f.write_text("")
-        (d / f"modeling_{sub}.py").write_text(f"class {cls}:\n    _preprocess_images = None\n")
+        (d / f"modeling_{sub}.py").write_text(f"class {cls}:\n    _preprocess_images = select_action = None\n")
+    proc = pkg.parent / "processor"  # eval_probe.py 修正 π0 增量动作还原时用的参考状态
+    proc.mkdir()
+    (proc / "__init__.py").write_text("")
+    (proc / "relative_action_processor.py").write_text("class AbsoluteActionsProcessorStep:\n    __call__ = None\n"
+                                                       "class RelativeActionsProcessorStep:\n    get_cached_state = None\n")
     for mod in ("torch", "numpy"):
         (tmp_path / "stub" / f"{mod}.py").write_text("")
     return str(tmp_path / "stub")
 
 
 @pytest.mark.parametrize("script,good,bad", [("eval_blackout.py", ["all", "agent", "wrist"], ["none", "noise", "agnet"]),
-                                             ("eval_probe.py", ["none", "all", "agent", "wrist", "noise", "freeze", "drop_wrist", "drop_agent", "freeze_wrist", "freeze_agent"],
-                                              ["agnet", "black", "drop", "drop_all"])])
+                                             ("eval_probe.py", ["none", "all", "agent", "wrist", "noise", "freeze", "drop_wrist", "drop_agent", "drop_all",
+                                                                "freeze_wrist", "freeze_agent"],
+                                              ["agnet", "black", "drop", "drop_both"])])
 def test_wrappers_validate_blackout(fake_lerobot, script, good, bad):
     def rc(mode):
         return subprocess.run([sys.executable, "-B", str(ROOT / "scripts" / "eval" / script)], capture_output=True,

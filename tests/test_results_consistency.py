@@ -184,3 +184,34 @@ def test_pi05_wrist_black_five_runs_all_zero():
     assert [sum(per_task(r)) for r in runs] == [0] * 5
     assert all(len([s for t in json.loads((DATA / r / "eval_info.json").read_text())["per_task"] for s in t["metrics"]["successes"]]) == 100
                for r in runs)
+
+
+def test_official_pi0_summary_matches_raw_and_readme():
+    """1.5 节:汇总与原始 eval_info.json 一致;官方运行的初始状态与 1.4 节 π0 正常运行逐回合相同;README 引用的数字一致。"""
+    summary = {(r["side"], r["condition"]): r for r in rows("official_pi0_summary.csv")}
+    off = {"both": "ojx_none", "all_black": "ojx_all", "both_masked": "ojx_drop_all", "both_frozen": "ojx_freeze",
+           "wrist_masked": "ojx_drop_wrist", "agent_masked": "ojx_drop_agent"}
+    want = {"both": (500, 482), "all_black": (100, 0), "both_masked": (100, 0), "both_frozen": (100, 0),
+            "wrist_masked": (100, 0), "agent_masked": (100, 77)}
+    ref = json.loads((DATA / "s500" / "pi0_none" / "first_eef.json").read_text())
+    for cond, run in off.items():
+        succ = per_task(f"official_pi0/{run}")
+        s = summary["official", cond]
+        assert (int(s["episodes"]), int(s["successes"])) == want[cond] and sum(succ) == want[cond][1]
+        eef = json.loads((DATA / "official_pi0" / run / "first_eef.json").read_text())
+        per = len(eef) // 10
+        assert eef == [ref[i // per * 50 + i % per] for i in range(len(eef))] and float(s["first_eef_max_diff_cm"]) == 0
+    # LeRobot 一侧新跑的槽位屏蔽(360 渲染):首帧哈希与 1.4 节同一批初始状态相同
+    h = json.loads((DATA / "official_pi0" / "pi0_drop_all" / "first_frame_hash.json").read_text())
+    hr = json.loads((DATA / "s500" / "pi0_none" / "first_frame_hash.json").read_text())
+    assert h == [hr[i // 10 * 50 + i % 10] for i in range(100)]
+    assert int(summary["lerobot", "both_masked"]["successes"]) == sum(per_task("official_pi0/pi0_drop_all")) == 35
+    assert int(summary["lerobot", "all_black"]["successes"]) == 273
+    # 360 渲染的官方运行：首帧哈希与 LeRobot 一侧逐回合相同
+    for run, k in (("ojx360_none", 99), ("ojx360_all", 0), ("ojx360_drop_all", 0)):
+        assert json.loads((DATA / "official_pi0" / run / "first_frame_hash.json").read_text()) == [hr[i // 10 * 50 + i % 10] for i in range(100)]
+        assert sum(per_task(f"official_pi0/{run}")) == k
+    assert int(summary["official_360", "both"]["successes"]) == 99
+    for md in READMES:
+        for x in ("482/500", "96.4%", "77/100", "35/100", "0/100", "0.0025", "99/100"):
+            assert x in md, x

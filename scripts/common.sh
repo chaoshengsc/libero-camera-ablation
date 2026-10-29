@@ -13,3 +13,11 @@ CK_SMOL2=$CK/lerobot__smolvla_libero@31d453f7
 SMOL2_ARGS=(--policy.n_action_steps=10 '--rename_map={"observation.images.image": "observation.images.camera1", "observation.images.image2": "observation.images.camera2"}')
 CK_PI0=$CK/pi0_libero_finetuned_v044@45dcc8fc
 CK_PI05=$CK/pi05_libero_finetuned_v044@8e174154
+# OpenPI 官方 pi0_libero 的 LeRobot 转换版,经 eval/adapt_openpi_pi0.py 注入官方归一化统计量与增量动作还原后的本地副本
+CK_PI0_OPENPI=$CK/pi0_libero_base@98ac51b8_openpi
+# 诊断用:同一转换版,改用权重文件里夹带的统计量、不加增量还原(adapt_openpi_pi0.py ... embedded)
+CK_PI0_OPENPI_EMB=$CK/pi0_libero_base@98ac51b8_embedded
+# OpenPI 原版服务端(scripts/openpi/serve_pi0_libero.py)的检查点、端口与口令文件
+CK_OPENPI_PI0=$CK/openpi_pi0_libero
+OPENPI_PORT=${OPENPI_PORT:-18765}
+OPENPI_KEYFILE=${EMB_ROOT}/tmp/openpi_authkey
