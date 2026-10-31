@@ -1,6 +1,6 @@
 # 安装步骤
 
-[English](INSTALL.md) | 中文
+[English](INSTALL.md) · [项目首页](../README_CN.md) · [文档导航](README_CN.md)
 
 按当时在工作站上实际执行的步骤整理（Ubuntu 24.04，RTX A5000，驱动 570，无 sudo、不用 apt）。
 **没有在全新机器上从头重跑验证过**；版本号与 `constraints-*.txt` 一致。

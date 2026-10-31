@@ -1,6 +1,6 @@
 # Installation
 
-English | [中文](INSTALL_CN.md)
+[中文](INSTALL_CN.md) · [Project overview](../README.md) · [Docs & data](README.md)
 
 These are the steps that were actually run on the workstation (Ubuntu 24.04, RTX A5000, driver 570, no sudo, no apt).
 **They have not been re-run from scratch on a clean machine.** Version numbers match `constraints-*.txt`.

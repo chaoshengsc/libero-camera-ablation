@@ -1,6 +1,6 @@
 # Troubleshooting
 
-English | [中文](TROUBLESHOOTING_CN.md)
+[中文](TROUBLESHOOTING_CN.md) · [Project overview](../README.md) · [Docs & data](README.md)
 
 Organised as symptom → cause → fix. Everything here was actually hit during this reproduction.
 

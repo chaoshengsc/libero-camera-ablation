@@ -1,4 +1,4 @@
-"""仓库里的派生结果必须能从原始评测 JSON 重算出来,README 里的数字必须与派生结果一致。"""
+"""仓库里的派生结果必须能从原始评测 JSON 重算出来,README 与完整实验说明的数字必须与派生结果一致。"""
 import csv
 import json
 from pathlib import Path
@@ -10,6 +10,7 @@ from metrics import ci95
 ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "dashboard" / "data"
 READMES = [(ROOT / "README.md").read_text(), (ROOT / "README_CN.md").read_text()]
+REPORTS = [(ROOT / "docs/EXPERIMENTS.md").read_text(), (ROOT / "docs/EXPERIMENTS_CN.md").read_text()]
 
 
 def rows(name):
@@ -34,7 +35,7 @@ def test_reproduction_csv_matches_raw_eval_info():
         assert len(succ) == int(r["episodes"]) == 500
         assert round(pc, 1) == float(r["success_pc"])
         assert round(ci95(pc, len(succ)), 1) == float(r["ci95"])
-        assert all(f"{float(r['success_pc']):.1f}%" in md for md in READMES)
+        assert all(f"{float(r['success_pc']):.1f}%" in md for md in READMES + REPORTS)
 
 
 def test_act_baseline_matches_file_shipped_with_checkpoint():
@@ -63,8 +64,24 @@ def test_blackout_csv_matches_raw_eval_info():
     assert seen == set(raw)
 
 
-def test_perturbations_csv_matches_raw_and_readme():
-    """1.2 节:每个条件两次运行,CSV、原始数据、README 表格三方一致。"""
+def test_readme_blackout_overview_matches_result_table():
+    expected = {(r["model"], r["condition"]): int(r["total"]) for r in rows("blackout_per_task.csv")}
+    for md in READMES:
+        found = {}
+        for line in md.splitlines():
+            cells = [c.strip().replace("**", "") for c in line.strip("|").split("|")]
+            if len(cells) != 3:
+                continue
+            model = cells[0].split(" · ")[0]
+            if (model, "normal") in expected:
+                found[model] = tuple(float(c.rstrip("%")) for c in cells[1:])
+        assert set(found) == {model for model, _ in expected}
+        for model, (normal, black) in found.items():
+            assert (normal, black) == (expected[model, "normal"], expected[model, "black"])
+
+
+def test_perturbations_csv_matches_raw_and_report():
+    """1.2 节:每个条件两次运行,CSV、原始数据、实验说明 表格三方一致。"""
     key = {"π0": ("pi0_spatial_500", "pi0", "pi0_black_all"), "π0.5": ("pi05_spatial_500", "pi05", "pi05_black_all"),
            "SmolVLA": ("smolvla2_spatial_500", "smol2", "smol2_black_all")}
     conds = ("normal", "noise", "freeze", "agent_black", "wrist_black", "all_black")
@@ -85,7 +102,7 @@ def test_perturbations_csv_matches_raw_and_readme():
         else:
             assert int(r2["normal"]) == sum(per_task(f"run2/traj_{k}_normal"))
         line = f"| {model} | " + " | ".join(f"{r1[c]} / {r2[c] or '–'}" for c in conds) + " |"
-        assert all(line in md for md in READMES), line
+        assert all(line in md for md in REPORTS), line
 
 
 def test_blind_models_stay_at_zero_in_second_run():
@@ -93,32 +110,32 @@ def test_blind_models_stay_at_zero_in_second_run():
         assert sum(per_task(run)) == sum(per_task(f"run2/{run}")) == 0 and len(per_task(f"run2/{run}")) == 10
 
 
-def test_pi0_repeated_runs_in_readme():
-    """README 里 π0 的重复运行数字:正常 5 次、全涂黑 5 次,以及同一条件两次运行的最大差。"""
+def test_pi0_repeated_runs_in_report():
+    """实验说明 里 π0 的重复运行数字:正常 5 次、全涂黑 5 次,以及同一条件两次运行的最大差。"""
     normal = [sum(per_task("pi0_spatial_500", 10))] + [sum(per_task(r)) for r in ("traj_pi0_normal", "traj_pi0_normal2", "run2/traj_pi0_normal", "run2/traj_pi0_normal2")]
     black = [sum(per_task(r)) for r in ("pi0_black_all", "traj_pi0_black", "run2/pi0_black_all", "run2/traj_pi0_black", "run3/pi0_black_all")]
     assert normal == [76, 73, 76, 72, 71] and black == [56, 54, 56, 54, 53]
     wrist = [sum(per_task("traj_pi0_wrist"))] + [sum(per_task(f"run{i}/traj_pi0_wrist")) for i in (2, 3, 4, 5)]
     assert wrist == [59, 77, 72, 67, 70] and round(sum(wrist) / 5) == 69 and round(sum(normal) / 5) == 74
-    assert all("77%, 72%, 67% and 70%" in md or "77%、72%、67% 和 70%" in md for md in READMES)
+    assert all("77%, 72%, 67% and 70%" in md or "77%、72%、67% 和 70%" in md for md in REPORTS)
     by = {(r["model"], r["run"]): r for r in rows("perturbations.csv")}
     gap = lambda m: [abs(int(by[m, "1"][c]) - int(by[m, "2"][c])) for c in ("noise", "freeze", "agent_black", "wrist_black")]
     assert sorted(gap("π0")) == [9, 10, 12, 18] and max(gap("π0.5") + gap("SmolVLA")) == 6
     single = [int(by["π0", n][c]) for n in "12" for c in ("noise", "freeze", "agent_black", "wrist_black")]
     assert (min(single), max(single)) == (59, 80)
-    for md in READMES:
+    for md in REPORTS:
         assert "53–56%" in md and "71–76%" in md
 
 
-def test_section2_checkpoint_rates_in_readme():
-    """README 第 2 节注明的 π0 权重 500 回合成功率 73.4%。"""
+def test_section2_checkpoint_rates_in_report():
+    """实验说明 第 2 节注明的 π0 权重 500 回合成功率 73.4%。"""
     for run, pc in (("pi0_spatial_500", "73.4%"),):
         s = per_task(run)
-        assert f"{sum(s) / 5:.1f}%" == pc and all(pc in md for md in READMES)
+        assert f"{sum(s) / 5:.1f}%" == pc and all(pc in md for md in REPORTS)
 
 
-def test_trajectory_summary_numbers_in_readme():
-    """README 1.3 的分层数字,两次运行都核对:全涂黑仍成功的任务、噪声底线、任务 7、9、5。"""
+def test_trajectory_summary_numbers_in_report():
+    """实验说明 1.3 的分层数字,两次运行都核对:全涂黑仍成功的任务、噪声底线、任务 7、9、5。"""
     t = {(r["run"], r["metric"], r["pair"]): [float(r[f"task{i}"]) for i in range(10)] for r in rows("trajectory.csv")}
     cell = {"dtw_ok": [], "grasp_ok": [], "dtw_05": [], "grasp_05": [], "dtw_noise": [], "grasp_noise": [], "dtw_7": [], "grasp_7": []}
     for run, ok_expected, same_expected in (("1", [0, 1, 2, 3, 4, 6, 8], [0, 1, 2, 3]), ("2", [0, 1, 2, 3, 4, 6], [0])):
@@ -137,7 +154,7 @@ def test_trajectory_summary_numbers_in_readme():
     expected = {"dtw_ok": "2.8 / 3.2", "grasp_ok": "2.4 / 2.2", "dtw_05": "2.9 / 3.0", "grasp_05": "2.6 / 2.5",
                 "dtw_noise": "3.4 / 3.3", "grasp_noise": "2.4 / 2.4", "dtw_7": "10.9 / 10.3", "grasp_7": "24.1 / 23.7"}
     for key, (a, b) in cell.items():
-        assert f"{a:.1f} / {b:.1f}" == expected[key] and all(f"{expected[key]} cm" in md for md in READMES)
+        assert f"{a:.1f} / {b:.1f}" == expected[key] and all(f"{expected[key]} cm" in md for md in REPORTS)
     # 任务 7、9、5 的说明:全涂黑对正常,以及同一任务上两次正常运行之间
     two = lambda pair, i: tuple(f"{t[run, 'path_dtw_cm', pair][i]:.1f}" for run in ("1", "2"))
     assert two("pi0_normal_vs_rerun", 7) == ("2.6", "2.2")
@@ -154,8 +171,8 @@ def test_no_placeholder_left():
         assert "running" not in md and "在跑" not in md
 
 
-def test_single_camera_csv_matches_raw_and_readme():
-    """1.4 节:每回合结果与原始 eval_info.json 一致,同一模型各条件的初始状态相同,README 表格与汇总一致。"""
+def test_single_camera_csv_matches_raw_and_report():
+    """1.4 节:每回合结果与原始 eval_info.json 一致,同一模型各条件的初始状态相同,实验说明 表格与汇总一致。"""
     raw = DATA / "s500"
     rs = rows("single_camera.csv")
     summary = {(r["model"], r["condition"]): r for r in rows("single_camera_summary.csv")}
@@ -175,7 +192,7 @@ def test_single_camera_csv_matches_raw_and_readme():
         assert [e["first_frame_hash"] for e in eps] == [e["first_frame_hash"] for e in by[model, "both"]]
         s = summary[model, cond]
         assert int(s["successes"]) == sum(succ) and float(s["success_pc"]) == round(100 * sum(succ) / 500, 1)
-        assert all(f"{float(s['success_pc']):.1f}%" in md for md in READMES), (model, cond)
+        assert all(f"{float(s['success_pc']):.1f}%" in md for md in REPORTS), (model, cond)
 
 
 def test_pi05_wrist_black_five_runs_all_zero():
@@ -186,8 +203,8 @@ def test_pi05_wrist_black_five_runs_all_zero():
                for r in runs)
 
 
-def test_official_pi0_summary_matches_raw_and_readme():
-    """1.5 节:汇总与原始 eval_info.json 一致;官方运行的初始状态与 1.4 节 π0 正常运行逐回合相同;README 引用的数字一致。"""
+def test_official_pi0_summary_matches_raw_and_report():
+    """1.5 节:汇总与原始 eval_info.json 一致;官方运行的初始状态与 1.4 节 π0 正常运行逐回合相同;实验说明 引用的数字一致。"""
     summary = {(r["side"], r["condition"]): r for r in rows("official_pi0_summary.csv")}
     off = {"both": "ojx_none", "all_black": "ojx_all", "both_masked": "ojx_drop_all", "both_frozen": "ojx_freeze",
            "wrist_masked": "ojx_drop_wrist", "agent_masked": "ojx_drop_agent", "wrist_frozen": "ojx_freeze_wrist"}
@@ -212,13 +229,13 @@ def test_official_pi0_summary_matches_raw_and_readme():
         assert json.loads((DATA / "official_pi0" / run / "first_frame_hash.json").read_text()) == [hr[i // 10 * 50 + i % 10] for i in range(100)]
         assert sum(per_task(f"official_pi0/{run}")) == k
     assert int(summary["official_360", "both"]["successes"]) == 99
-    for md in READMES:
+    for md in REPORTS:
         for x in ("482/500", "96.4%", "77/100", "35/100", "0/100", "0.0025", "99/100"):
             assert x in md, x
 
 
-def test_open_loop_replay_matches_raw_and_readme():
-    """1.5 节开环回放:汇总与 replay.json、来源运行一致;来源运行的初始状态与 1.4 节相同;README 引用的数字一致。"""
+def test_open_loop_replay_matches_raw_and_report():
+    """1.5 节开环回放:汇总与 replay.json、来源运行一致;来源运行的初始状态与 1.4 节相同;实验说明 引用的数字一致。"""
     raw = json.loads((DATA / "official_pi0" / "ojx360_replay" / "replay.json").read_text())
     succ = per_task("official_pi0/ojx360_replay")
     summ = rows("open_loop_replay.csv")
@@ -234,6 +251,6 @@ def test_open_loop_replay_matches_raw_and_readme():
     hr = json.loads((DATA / "s500" / "pi0_none" / "first_frame_hash.json").read_text())
     h = json.loads((DATA / "official_pi0" / "ojx360_replay" / "first_frame_hash.json").read_text())
     assert h == [hr[i // 10 * 50 + i % 10] for i in range(100)]
-    for md in READMES:
+    for md in REPORTS:
         for s in ("95/97", "77.8%", "348/873", "39.9%", "64.8%", "c7e9023"):
             assert s in md, s

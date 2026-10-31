@@ -1,6 +1,6 @@
 # 踩坑与解决办法
 
-[English](TROUBLESHOOTING.md) | 中文
+[English](TROUBLESHOOTING.md) · [项目首页](../README_CN.md) · [文档导航](README_CN.md)
 
 按“现象 → 原因 → 解决”整理，都是这次复现里实际遇到的。
 
