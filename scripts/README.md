@@ -76,7 +76,8 @@ CK="$EMB_ROOT/ckpt/pi0_libero_finetuned_v044@45dcc8fc"
 RUN=pi0_camera_black_smoke
 WRAP=probe BLACKOUT=all bash scripts/eval/run_libero.sh \
   "$RUN" 1 "$CK" 1 --policy.n_action_steps=5 \
-  --env.observation_height=360 --env.observation_width=360
+  --env.observation_height=360 --env.observation_width=360 \
+  --env.max_parallel_tasks=1
 ```
 
 `CK` selects the checkpoint; `RUN` selects an unused output name. The entry point itself atomically rejects duplicate starts. This runs one episode per task, ten in total, batch1, five executed actions per chunk and all-black model images. It checks the entry point, not a new success-rate benchmark.
@@ -120,14 +121,25 @@ The entry gates engineering checks, cross-condition pairing and three formal rep
 
 ### P2 frozen-action replay
 
-P2's ten selected action arrays are bundled in [data/replay_holdout](../dashboard/data/replay_holdout/); no OpenPI server or source-trajectory regeneration is needed. From the checkout root in the configured simulation environment, the following runs all 410 episodes, not offline analysis:
+P2's ten selected action arrays are bundled in [data/replay_holdout](../dashboard/data/replay_holdout/); no OpenPI server or source-trajectory regeneration is needed. For a bounded entry check, run from the checkout root in the configured simulation environment:
+
+```bash
+python scripts/analysis/replay_holdout.py \
+  --output "$EMB_ROOT/logs/eval/p2_self_check" --self-only
+```
+
+`--self-only` runs ten self-replays and the original >=8/10 gate, then stops. Inspect `runtime.json` (`mode: self_only`), `self_gate.json`, `progress.json` (`status: self_completed`) and `self_done.json`. Formal outcomes must remain empty and `done.json` must not exist; this check is not a repeat of the 400-target result. A failed gate exits nonzero and retains its artifacts without a completion marker. Use an unused output name.
+
+Without this flag, the following runs all 410 episodes, not offline analysis:
 
 ```bash
 python scripts/analysis/replay_holdout.py \
   --output "$EMB_ROOT/logs/eval/p2_replay_check"
 ```
 
-The output directory must not exist. Inspect `self_gate.json`, `progress.json`, `done.json` and actual errors. Technical failures stop the run; sources are not reselected. The packaged entry retains the audited P2 replay loop; loading/directory checks have synthetic validation but no new simulation run during integration. Full NPZ files stay in the new output directory and outside Git; bundled [results](../results/README.md) are not overwritten. Recovery experiments and the original five-step-delay P3 remain deferred.
+The output directory must not exist. Inspect `self_gate.json`, `progress.json`, `done.json` and actual errors. Technical failures stop the run; sources are not reselected. The packaged entry retains the audited P2 replay loop. Full NPZ files stay in the new output directory and outside Git; bundled [results](../results/README.md) are not overwritten. Recovery experiments and the original five-step-delay P3 remain deferred.
+
+On 2026-11-01 the packaged `--self-only` entry passed 10/10 self-replays in the existing environment, with exact action prefixes and no formal episodes. The camera example above also passed ten engineering episodes and output-preservation checks. These checks do not validate a clean installation, repeat the full P2 result or add samples to its statistics; see [installation validation scope](../docs/INSTALL.md#7-validation-scope).
 
 ## Intervention configuration
 

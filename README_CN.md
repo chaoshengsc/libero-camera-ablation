@@ -159,11 +159,11 @@ OpenPI原版π0使用`gs://openpi-assets/checkpoints/pi0_libero`；[OpenPI指南
   author  = {ShengChao},
   title   = {libero-camera-ablation: Camera-input ablations of four robot policies on LIBERO-Spatial},
   year    = {2026},
-  version = {1.4.0},
+  version = {1.5.0},
   url     = {https://github.com/chaoshengsc/libero-camera-ablation}
 }
 ```
 
 同样的条目也在 [`CITATION.cff`](CITATION.cff) 里，GitHub 页面上的 “Cite this repository” 按钮读的就是它。
 
-v1.4标签是较早的单相机实验快照；P1/P2后来加入`main`，引用这些后续结果时应同时记录实际使用的提交。
+v1.5标签包含P1/P2结果、对应公开数据与复现指南；较早的v1.4标签保留单相机实验快照。引用v1.5之后的改动时，应同时记录实际使用的提交。

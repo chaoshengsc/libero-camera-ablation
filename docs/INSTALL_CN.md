@@ -168,15 +168,34 @@ LeRobot π0/π0.5仍按上一节配置本地分词器；OpenPI原版按独立指
 ## 5. 跑评测
 
 ```bash
-bash $REPO/scripts/eval/run_act.sh                             # ACT,500 回合约 17 分钟
-bash $REPO/scripts/eval/run_libero.sh pi05_spatial_500 50 <权重目录> 1 --policy.n_action_steps=10
-python3 $REPO/scripts/analysis/summarize_eval.py pi05_spatial_500      # 成功率与 95% 置信区间
+bash "$REPO/scripts/eval/run_act.sh"  # ACT,500回合约17分钟
+CK="$EMB_ROOT/ckpt/pi05_libero_finetuned_v044@8e174154"
+RUN=pi05_spatial_check
+bash "$REPO/scripts/eval/run_libero.sh" "$RUN" 50 "$CK" 1 \
+  --policy.n_action_steps=10
+python3 "$REPO/scripts/analysis/summarize_eval.py" "$RUN"
 ```
 
 输出在 `$EMB_ROOT/logs/eval/<run_name>/`；`stdout.log` 最后一行 `exit=0` 表示正常结束。各实验的入口见 `scripts/README_CN.md`。
+
+`CK`须指向已准备的权重，`RUN`须未被使用；该LIBERO命令每任务50回合、共500回合。只需十回合相机检查时，使用[最小示例](../scripts/README_CN.md#最小相机评测)。
 
 要让新结果进入看板和图表：把 `eval_info.json` 复制到 `dashboard/data/<run_name>/`，再运行 `python3 dashboard/build.py && python3 scripts/analysis/make_figures.py`。
 
 ## 6. 官方OpenPI π0
 
 接着阅读[独立指南](OPENPI_CN.md)：已有版本 → JAX独立环境 → 原生权重/缓存 → 纯配置客户端 → 本机服务端/客户端 → 分阶段验收。命令整理自历史管线与重建的安装步骤，本次文档更新未重新安装依赖或运行新实验；恢复实验和P3继续暂停。
+
+## 7. 验证范围
+
+2026-11-01在**既有**Ubuntu/RTX A5000客户端环境做了有界入口检查，复用已装包、权重及素材缓存；未执行安装或权重/分词器下载。
+
+| 入口 | 实际检查 | 范围 |
+|---|---|---|
+| 最小相机全黑示例 | 10回合、实际退出0、两路黑图、有限轨迹，十个首帧哈希均与旧实验匹配 | 工程验收，不并入正式结果表 |
+| P2打包后的`--self-only` | 自回放10/10、动作前缀精确一致、十个原始状态匹配、正式回合0 | 自检门槛与产物验收，不新增400目标结果 |
+| 无效输入/已有输出 | 返回非零，旧失败/成功工件均未改变 | 真实错误传播与覆盖保护 |
+
+已装`hf-libero` 0.1.4的BDDL/初始状态文件随包提供；本机另行缓存的网格/纹理经`Path.home() / ".cache/libero/assets"`解析，加载`env.sh`后对应`$EMB_ROOT/home/.cache/libero/assets`。运行前已核对`articulated_objects`、`stable_scanned_objects`、`turbosquid_objects`、`stable_hope_objects`及`scenes`五个目录均在，没有触发素材下载；只设置`HF_HOME`不等于准备了这份独立目录。
+
+这不构成干净机器安装验收。没有重跑完整P1、P2正式阶段或原生OpenPI服务；历史正式结果与区间保持不变。检查及一次已修正的stdout解析失败保留在[实验日志](NOTES_CN.md#有界入口验收与v15快照2026-11-01)。恢复实验和P3继续暂停。

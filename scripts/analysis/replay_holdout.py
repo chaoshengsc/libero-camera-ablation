@@ -3,6 +3,7 @@
 Run only in the configured LIBERO/EGL environment. Source selection and actions
 are bundled under dashboard/data/replay_holdout; output must be a new directory.
 The replay loop below is the loop used by the audited P2 run.
+Use --self-only for the ten self-replays without entering the formal stage.
 """
 
 import argparse
@@ -81,7 +82,7 @@ def replay(env, target, actions):
             "eef0": eef0.tolist(), "sent_action_hash": array_hash(sent)}, arrays
 
 
-def run(output):
+def run(output, self_only=False):
     output = Path(output)
     output.mkdir(parents=True, exist_ok=False)  # Reject existing output before importing the simulator.
     (output / "episodes").mkdir()
@@ -92,6 +93,7 @@ def run(output):
 
     assert mujoco.__version__ == "3.3.2", "P2 requires the recorded MuJoCo 3.3.2 runtime"
     runtime = {"started_utc": datetime.now(timezone.utc).isoformat(), "pid": os.getpid(),
+               "mode": "self_only" if self_only else "full",
                "python": sys.version, "mujoco": mujoco.__version__, "runner_sha256": sha(__file__),
                "libero_env_sha256": sha(inspect.getsourcefile(LiberoEnv)), "selection": selection}
     save(output / "runtime.json", runtime)
@@ -101,14 +103,7 @@ def run(output):
     active = None
     started = time.monotonic()
     try:
-        for stage in ("self", "formal"):
-            if stage == "formal":
-                try:
-                    count = check_self_gate(progress["self"])
-                except RuntimeError:
-                    progress["status"] = "gate_failed"
-                    raise
-                save(output / "self_gate.json", {"successes": count, "n": 10, "passed": True})
+        for stage in (("self",) if self_only else ("self", "formal")):
             for task, row in enumerate(selection["tasks"]):
                 if task not in environments:
                     env = LiberoEnv(suite, task, "libero_spatial", obs_type="pixels_agent_pos",
@@ -132,10 +127,18 @@ def run(output):
                     save(output / "progress.json", progress)
                     print(f"{stage} task={task} target={target} success={result['success']} "
                           f"completed={len(progress[stage])}", flush=True)
-                if stage == "formal":
+                if self_only or stage == "formal":
                     env.close()
                     del environments[task]
-        assert [(r["task"], r["target"]) for r in progress["formal"]] == [(t, i) for t in range(10) for i in range(10, 50)]
+            if stage == "self":
+                try:
+                    count = check_self_gate(progress["self"])
+                except RuntimeError:
+                    progress["status"] = "gate_failed"
+                    raise
+                save(output / "self_gate.json", {"successes": count, "n": 10, "passed": True})
+        expected = [] if self_only else [(t, i) for t in range(10) for i in range(10, 50)]
+        assert [(r["task"], r["target"]) for r in progress["formal"]] == expected
     except BaseException as error:
         if progress["status"] != "gate_failed":
             progress["status"] = "technical_failure"
@@ -145,13 +148,19 @@ def run(output):
     finally:
         for env in environments.values():
             env.close()
-    progress["status"] = "completed"
+    progress["status"] = "self_completed" if self_only else "completed"
     save(output / "progress.json", progress)
-    save(output / "done.json", {"n": 400, "successes": sum(r["success"] for r in progress["formal"])})
+    stage, marker = ("self", "self_done.json") if self_only else ("formal", "done.json")
+    save(output / marker, {"n": len(progress[stage]), "successes": sum(r["success"] for r in progress[stage])})
+
+
+def main(argv=None):
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--output", type=Path, required=True, help="New isolated output directory; existing paths are rejected")
+    parser.add_argument("--self-only", action="store_true", help="Run only ten self-replays and their gate; never start formal targets")
+    args = parser.parse_args(argv)
+    run(args.output, self_only=args.self_only)
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--output", type=Path, required=True, help="New isolated output directory; existing paths are rejected")
-    args = parser.parse_args()
-    run(args.output)
+    main()

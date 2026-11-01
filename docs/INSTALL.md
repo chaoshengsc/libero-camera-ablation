@@ -168,15 +168,34 @@ LeRobot π0/π0.5 still need the local tokenizer setup above; native OpenPI need
 ## 5. Running evaluations
 
 ```bash
-bash $REPO/scripts/eval/run_act.sh                             # ACT, 500 episodes, about 17 minutes
-bash $REPO/scripts/eval/run_libero.sh pi05_spatial_500 50 <checkpoint dir> 1 --policy.n_action_steps=10
-python3 $REPO/scripts/analysis/summarize_eval.py pi05_spatial_500      # success rate and 95% confidence interval
+bash "$REPO/scripts/eval/run_act.sh"  # ACT, 500 episodes, about 17 minutes
+CK="$EMB_ROOT/ckpt/pi05_libero_finetuned_v044@8e174154"
+RUN=pi05_spatial_check
+bash "$REPO/scripts/eval/run_libero.sh" "$RUN" 50 "$CK" 1 \
+  --policy.n_action_steps=10
+python3 "$REPO/scripts/analysis/summarize_eval.py" "$RUN"
 ```
 
 Outputs go to `$EMB_ROOT/logs/eval/<run_name>/`; a last line of `exit=0` in `stdout.log` means the run finished normally. Entry points for each experiment are listed in `scripts/README.md`.
+
+`CK` must be the prepared checkpoint; choose an unused `RUN`. The LIBERO command runs 50 episodes per task, 500 total. For the bounded ten-episode camera check, use [the minimal example](../scripts/README.md#minimal-camera-evaluation) instead.
 
 To bring a new result into the dashboard and figures, copy its `eval_info.json` to `dashboard/data/<run_name>/`, then run `python3 dashboard/build.py && python3 scripts/analysis/make_figures.py`.
 
 ## 6. Official OpenPI π0
 
 Continue with [the dedicated guide](OPENPI.md): recorded versions → separate JAX environment → native weights/cache → configuration-only client → local server/client → staged acceptance. Its commands document the historical pipeline and a reconstructed setup recipe; this documentation update did not reinstall dependencies or run new experiments. Recovery experiments and P3 remain paused.
+
+## 7. Validation scope
+
+On 2026-11-01, bounded entry checks ran in the **existing** Ubuntu/RTX A5000 client environment, reusing installed packages, weights and cached assets. No installation or weight/tokenizer download was performed.
+
+| Entry | Actual check | Scope |
+|---|---|---|
+| Minimal all-black camera example | 10 episodes, process exit 0, two black camera inputs, finite trajectories and all ten initial-frame hashes matching the earlier study | Engineering acceptance; excluded from formal result tables |
+| Packaged P2 `--self-only` | 10/10 self-replays, exact action prefixes, ten original initial-state matches, zero formal episodes | Self gate and output artifacts; no new 400-target result |
+| Invalid input / existing outputs | Nonzero exits; existing failed and successful artifacts unchanged | Runtime failure propagation and overwrite protection |
+
+The installed `hf-libero` 0.1.4 supplies BDDL/init files in its package. In this installation its separate mesh/texture assets resolve through `Path.home() / ".cache/libero/assets"`, which `env.sh` places at `$EMB_ROOT/home/.cache/libero/assets`. The `articulated_objects`, `stable_scanned_objects`, `turbosquid_objects`, `stable_hope_objects` and `scenes` directories were present before evaluation; no asset download was needed. Setting `HF_HOME` alone does not prepare this separate directory.
+
+These checks do not establish clean-machine installation acceptance. The full P1 pipeline, P2 formal stage and native OpenPI server were not rerun. Historical formal outcomes and intervals are unchanged; the checks and a corrected stdout-parsing failure are recorded in [the experiment log](NOTES.md#bounded-entry-point-acceptance-and-v15-snapshot-2026-11-01). Recovery experiments and P3 remain paused.

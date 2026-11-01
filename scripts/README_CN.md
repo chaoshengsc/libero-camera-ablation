@@ -76,7 +76,8 @@ CK="$EMB_ROOT/ckpt/pi0_libero_finetuned_v044@45dcc8fc"
 RUN=pi0_camera_black_smoke
 WRAP=probe BLACKOUT=all bash scripts/eval/run_libero.sh \
   "$RUN" 1 "$CK" 1 --policy.n_action_steps=5 \
-  --env.observation_height=360 --env.observation_width=360
+  --env.observation_height=360 --env.observation_width=360 \
+  --env.max_parallel_tasks=1
 ```
 
 `CK`定位权重；`RUN`指定本次独立输出，必须未被使用；入口本身会原子拒绝重复启动。
@@ -122,7 +123,16 @@ WRAP=probe BLACKOUT=all bash scripts/eval/run_libero.sh \
 ### P2冻结动作回放
 
 P2十条选定动作已保真导出在[data/replay_holdout](../dashboard/data/replay_holdout/)，不需要OpenPI服务或重新生成来源动作。
-在已激活的隔离仿真环境和仓库根目录执行下列命令，会运行完整410回合；不是离线统计命令：
+需要有界入口检查时，在已激活的隔离仿真环境和仓库根目录运行：
+
+```bash
+python scripts/analysis/replay_holdout.py \
+  --output "$EMB_ROOT/logs/eval/p2_self_check" --self-only
+```
+
+`--self-only`只跑十个自回放并核对原至少8/10门槛，随后结束。检查`runtime.json`中的`mode: self_only`、`self_gate.json`、`progress.json`中的`status: self_completed`及`self_done.json`；正式结果必须为空，且不得出现`done.json`。它不复测400目标结果；门槛失败返回非零，保留工件而不写完成标记。输出名必须未被使用。
+
+不加这个参数时，下列命令会运行完整410回合；不是离线统计命令：
 
 ```bash
 python scripts/analysis/replay_holdout.py \
@@ -130,9 +140,11 @@ python scripts/analysis/replay_holdout.py \
 ```
 
 `--output`必须不存在；查看`self_gate.json`、`progress.json`、`done.json`与实际异常。技术失败单列并停止，不重选动作。
-打包入口沿用已验收P2的回放循环；目录/数据加载代码经合成检查，本轮没有新增仿真验证。
+打包入口沿用已验收P2的回放循环。
 完整逐步NPZ只写新输出目录、不入Git；内置的[公开结果](../results/README_CN.md)不会被覆盖。
 恢复实验和原五步延迟P3不在本轮运行范围内。
+
+2026-11-01已在既有环境实跑打包后的`--self-only`入口，自回放10/10，动作前缀精确核对通过，正式回合为0；上方最小相机示例也通过十回合工程检查及输出保留核验。这不代表干净安装验收、完整P2复测或新增正式样本，详见[安装验证范围](../docs/INSTALL_CN.md#7-验证范围)。
 
 ## 干预怎样配置
 

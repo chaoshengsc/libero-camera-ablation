@@ -163,11 +163,11 @@ If you use these results or scripts, please cite:
   author  = {ShengChao},
   title   = {libero-camera-ablation: Camera-input ablations of four robot policies on LIBERO-Spatial},
   year    = {2026},
-  version = {1.4.0},
+  version = {1.5.0},
   url     = {https://github.com/chaoshengsc/libero-camera-ablation}
 }
 ```
 
 The same entry is in [`CITATION.cff`](CITATION.cff), which GitHub's "Cite this repository" button reads.
 
-The v1.4 tag is the earlier single-camera snapshot. P1/P2 were added later on `main`; record the commit used when citing those later results.
+The v1.5 tag includes P1/P2 results, their public data and reproduction guides. The earlier v1.4 tag records the single-camera snapshot. For changes after v1.5, also record the commit used.
