@@ -38,7 +38,7 @@
       <div class="hero-copy">
         <h1>Do robot policies actually use their cameras?</h1>
         <p class="subtitle">Camera ablations of four robot policies on LIBERO-Spatial</p>
-        <p class="lede">四个策略里有三个离开实时相机画面就无法完成任务；一个公开的 π0 权重在所有相机涂黑后仍有 53–56% 的成功率。做消融之前，先复现了五个公开权重。</p>
+        <p class="lede">在所测全黑回合中，三个检查点均未成功；LeRobot π0 v044及其管线五次成功率为53–56%。另对五个公开权重做了参考对照。</p>
         <div class="hero-actions"><a class="action-primary" href="#blackout">查看实验结果</a><a class="action-link" href="#resources">复现与数据入口</a></div>
       </div>
       <figure class="hero-demo">
@@ -54,8 +54,8 @@
     <p class="intro"><a id="followupReport" data-doc="docs/EXPERIMENTS" href="https://github.com/chaoshengsc/libero-camera-ablation/blob/main/docs/EXPERIMENTS_CN.md">已完成补充实验：状态更新与选择外固定动作回放</a></p>
     <p class="intro">相机消融只改变画面输入；OpenVLA只接收主视角和指令，其余三个检查点还接收腕部画面与状态。</p>
     <p class="intro">早期相机消融每次100回合，按相同初始状态比较。区间取决于配对与重复结构，不设统一的13点阈值；π0早期同条件重复最多相差18点。</p>
-    <p class="intro">本节的 π0 是 LeRobot 的公开权重，500 回合的正常成功率是 73%。官方 π0 在 OpenPI 原版管线下去掉视觉后是 0%（1.5 节），所以下面的现象只说明这个权重（连同它的推理管线），不代表所有 π0。</p>
-    <div class="block"><div class="fig"><picture><source id="figInputsMobile" width="420" height="500" srcset="../media/zh/inputs-mobile.svg?v=layout-4" media="(max-width: 600px)"><img id="figInputs" width="880" height="350" src="../media/zh/inputs.svg?v=layout-4" alt="策略的输入，以及各实验改了哪一项"></picture></div></div>
+    <p class="intro">早期π0相机实验使用LeRobot v044，一组500回合正常评测为73%。官方π0/OpenPI的全黑对照为0/100（1.5节）；结果限于各自所测检查点、管线和干预，不能推广到所有π0。</p>
+    <div class="block"><div class="fig"><picture><source id="figInputsMobile" width="420" height="500" srcset="../media/zh/inputs-mobile.svg?v=claims-1" media="(max-width: 600px)"><img id="figInputs" width="880" height="350" src="../media/zh/inputs.svg?v=claims-1" alt="策略的输入，以及各实验改了哪一项"></picture></div></div>
 
     <div class="block" id="blackout">
       <h3><span class="n">1.1</span>所有相机涂黑</h3>
@@ -76,46 +76,46 @@
 
     <div class="block" id="perturbations">
       <h3><span class="n">1.2</span>单路相机、噪声、冻结画面</h3>
-      <p class="take">π0.5 和 SmolVLA 需要实时画面；对 π0，只有两路相机都涂黑才有稳定的影响。</p>
+      <p class="take">所测π0.5和SmolVLA检查点对首帧冻结敏感；π0本组全黑运行的成功率低于正常运行。</p>
       <div class="panel"><div class="mx-wrap"><table class="mx" id="cammatrix" style="min-width:520px"></table></div></div>
       <div class="figure-tools"><a href="../results/perturbations.csv">结果 CSV</a></div>
-      <p class="note">每格是 100 回合里的成功次数，每个条件跑了两次（同样的脚本、同一个种子）。噪声是标准差 0.1 的高斯噪声；冻结首帧持续使用真实旧图像，也改变图像—状态同步，不能称整体分布内干预。对 π0.5 和 SmolVLA，腕部相机比主视角更重要。π0 的单路相机、噪声、冻结条件两次相差 9 到 18，说明不了它依赖哪一路相机。只涂黑腕部相机又跑了三次，是 72、67 和 70。</p>
+      <p class="note">各干预条件每次100回合、重复两次（同脚本、同种子）；SmolVLA未单独重跑正常条件。噪声标准差为0.1。冻结真实首帧同时改变内容更新和图像—状态同步，不能视为整体分布内干预。所测π0.5和SmolVLA腕部涂黑降幅较大；这不构成普遍的相机重要性排序。π0的单路涂黑、噪声和冻结两次相差9到18点；腕部涂黑另三次为72、67、70，尚不能据此认定其他干预没有作用。</p>
     </div>
 
     <div class="block" id="trajectories">
-      <h3><span class="n">1.3</span>看不见的 π0 在成功的任务上走的是同一条路线</h3>
-      <p class="take">在全涂黑仍能成功的任务上，它的路线和看得见时在噪声内无法区分；在从未成功的任务 7 上，它走到了别处。两次运行都是这样。</p>
-      <div class="fig"><img loading="lazy" id="figTraj" width="760" height="820" src="../media/zh/trajectory.svg?v=layout-4" alt="π0 有无相机输入时的末端路线"></div>
+      <h3><span class="n">1.3</span>末端轨迹的描述性比较</h3>
+      <p class="take">按全黑成功率事后筛选的任务组中，正常与全黑的平均轨迹差与正常重跑参考接近；任务7的差异较大。这是描述性比较，未证明轨迹等效。</p>
+      <div class="fig"><img loading="lazy" id="figTraj" width="760" height="820" src="../media/zh/trajectory.svg?v=claims-1" alt="π0 有无相机输入时的末端路线"></div>
       <div class="figure-tools"><a data-figure="trajectory" href="../media/zh/trajectory.svg" target="_blank" rel="noopener">查看原图 SVG</a><a href="../results/trajectory.csv">结果 CSV</a></div>
       <details class="evidence"><summary>查看两次运行的轨迹明细</summary>
       <p class="cap">各任务的末端路线差异（cm，动态时间规整后的平均点距）。整套比较跑了两次；标出的是全涂黑后成功不到一半的任务。</p>
       <div class="panel"><div class="mx-wrap"><table class="mx" id="trajmatrix" style="min-width:560px"></table></div></div>
       </details>
-      <p class="note">两次正常运行几乎重合的任务（第 1 次的任务 0–3，第 2 次的任务 0）是同一个种子下还没有分叉，不能反映噪声；其余任务上的噪声底线平均是 3.4 和 3.3 cm。全涂黑仍能成功的任务上，路线相差 2.8 和 3.2 cm。任务 9 第 1 次相差 7.8 cm，第 2 次只有 4.9 cm，不如任务 7 清楚。这种比较分不出策略是跟着碗走，还是每个任务重复一套动作；后续已测量场景变化并做开环回放，见仓库 README 第 1.5 节。</p>
+      <p class="note">正常重跑参考剔除了近乎重合的任务（第1次0–3，第2次0），其余任务平均差为3.4和3.3 cm；全黑成功至少一半的事后任务组为2.8和3.2 cm。两组任务构成不同，未做轨迹等效检验。任务9两次差为7.8和4.9 cm，结果没有任务7清楚。这不能识别跟随物体或固定动作机制；固定动作回放见完整实验1.6节。</p>
     </div>
 
     <div class="block" id="single-camera">
       <h3><span class="n">1.4</span>去掉腕部相机：每个条件 500 回合</h3>
-      <p class="take">π0.5对腕部涂黑、屏蔽和冻结均高度敏感；LeRobot π0 v044的变化落在预设等效范围内。</p>
-      <div class="fig"><img loading="lazy" id="figSingle" width="760" height="448" src="../media/zh/single_camera.svg?v=layout-4" alt="测试时去掉一路相机后的成功率"></div>
+      <p class="take">π0.5对所测腕部干预高度敏感；LeRobot π0 v044配对差的95%区间落在事前±8点范围内。</p>
+      <div class="fig"><img loading="lazy" id="figSingle" width="760" height="448" src="../media/zh/single_camera.svg?v=claims-1" alt="测试时去掉一路相机后的成功率"></div>
       <div class="figure-tools"><a data-figure="single_camera" href="../media/zh/single_camera.svg" target="_blank" rel="noopener">查看原图 SVG</a><a href="../results/single_camera_summary.csv">结果 CSV</a><a href="../results/single_camera.csv">逐回合数据</a></div>
       <p class="note">每个条件 500 回合（10 个任务 × 50 个初始状态，各条件初始状态相同；π0.5 腕部涂黑一项是同一组 100 个初始状态跑 5 次）。“屏蔽”指在模型内部把这一路相机的槽位换成空相机占位、掩码置 0；“冻结”指整个回合只给第一帧的真实画面。π0 与双相机按初始状态配对，各条件差值的 95% 区间都在预设的 ±8 个百分点以内。逐回合结果见仓库的 results/single_camera.csv。</p>
     </div>
 
     <div class="block" id="official">
       <h3><span class="n">1.5</span>官方 π0 对照</h3>
-      <p class="take">官方 π0 离开视觉就不能完成任务，只屏蔽腕部也是 0%；只屏蔽主视角还剩 77%。看不见也能成功的只有 LeRobot 这个权重。</p>
-      <div class="fig"><img loading="lazy" id="figOfficial" width="760" height="468" src="../media/zh/official_pi0.svg?v=layout-4" alt="官方 π0 与 LeRobot π0 去掉相机后的成功率"></div>
+      <p class="take">官方π0/OpenPI在所测全黑与腕部屏蔽条件下均为0/100，主视角屏蔽为77/100。LeRobot v044全黑仍有成功，但两边权重与管线不同。</p>
+      <div class="fig"><img loading="lazy" id="figOfficial" width="760" height="468" src="../media/zh/official_pi0.svg?v=claims-1" alt="官方 π0 与 LeRobot π0 去掉相机后的成功率"></div>
       <div class="figure-tools"><a data-figure="official_pi0" href="../media/zh/official_pi0.svg" target="_blank" rel="noopener">查看原图 SVG</a><a href="../results/official_pi0_summary.csv">结果 CSV</a></div>
-      <p class="note">官方 π0 为 Physical Intelligence 的 pi0_libero 检查点，在 OpenPI 原版管线下运行（渲染 256），正常 500 回合 96.4%，初始状态与 1.4 节逐回合相同；去视觉的各条件 100 回合。LeRobot π0 在 LeRobot 管线下运行（渲染 360）；官方 π0 改用 360 渲染复测，正常 99/100，去视觉仍为 0/100，分辨率不是原因。两边管线不同，差别不能单独归因到权重。LeRobot 转换版的官方权重在 LeRobot 管线下 0/50，没能跑通。设计与判读规则在运行前写好，见仓库 docs/NOTES_CN.md；汇总在 results/official_pi0_summary.csv。</p>
+      <p class="note">官方π0使用Physical Intelligence的pi0_libero检查点，在OpenPI管线下正常500回合为96.4%（256渲染），初始状态协议与1.4节匹配。各视觉干预100回合；360复测正常99/100，全黑和双槽屏蔽均为0/100。LeRobot侧为360渲染；官方权重转换路径冒烟0/50，未通过验收。此对照未隔离权重、转换与其他推理差异。设计记录见仓库docs/NOTES_CN.md，汇总见results/official_pi0_summary.csv。</p>
     </div>
 
     <div class="block" id="open-loop">
       <h3><span class="n">1.6</span>开环回放：固定动作能完成多少任务</h3>
       <p class="note">此图保留早期选择集上的交叉回放；已完成的选择外回放和状态更新检查见下方完整实验入口。</p>
       <p class="take" id="replayFinding"></p>
-      <div class="fig"><img id="figReplay" width="760" height="511" src="../media/zh/open_loop_replay.svg?v=layout-4" alt="固定动作交叉回放、事后挑选与选择偏差的比较" loading="lazy"></div>
-      <p class="note">动作来自官方 π0 正常运行。每任务事后挑出的最好一套为 77.8%，存在选择偏差，不能当作无偏基线。回放不说明 LeRobot π0 看不见时实际在做什么。</p>
+      <div class="fig"><img id="figReplay" width="760" height="511" src="../media/zh/open_loop_replay.svg?v=claims-1" alt="固定动作交叉回放、事后挑选与选择偏差的比较" loading="lazy"></div>
+      <p class="note">动作来自官方π0正常运行。每任务事后挑出的最好一套为77.8%，存在选择偏差，不能当作无偏基线。固定的是高层动作，底层控制器仍有反馈；回放不识别LeRobot π0全黑成功的内部机制。</p>
       <div class="figure-tools"><a data-figure="open_loop_replay" href="../media/zh/open_loop_replay.svg" target="_blank" rel="noopener">查看原图 SVG</a><a href="../results/open_loop_replay.csv">结果 CSV</a></div>
     </div>
 
@@ -123,7 +123,7 @@
 
   <section id="repro">
     <h2>复现结果</h2>
-    <p class="intro">每个模型评测 500 回合，与原作者公布的基准对比。两个 95% 置信区间有重叠即算复现。</p>
+    <p class="intro">每个模型评测500回合。本项目将本仓库95%区间与参考范围（报告的±值、按回合数估计的区间，或单点）比较，重叠记为达到复现判据；这不是性能等效检验。</p>
 
     <div class="block">
       <div class="panel">
@@ -140,7 +140,7 @@
         <div class="model-detail" id="modelDetail" aria-live="polite" aria-atomic="true"></div>
       </div>
       <div class="figure-tools"><a href="../results/reproduction.csv">结果 CSV</a></div>
-      <p class="note">SmolVLA 用的是只在 LIBERO-Spatial 上训练的公开权重，评测时 n_action_steps=10。点击模型行可以核对基准出处与原始评测。</p>
+      <p class="note">SmolVLA使用仅在LIBERO-Spatial训练的公开权重，n_action_steps=10，与论文四套件训练配置不同。点击模型行可核对参考出处与原始评测。</p>
     </div>
 
     <details class="evidence block"><summary>查看 LIBERO-Spatial 各任务成功率</summary>
@@ -175,11 +175,11 @@
     </div>
   </section>
 
-  <footer><span>复现图使用正态近似区间；官方 π0 对照使用 Wilson 区间。重复运行与配对比较的限制见实验记录。</span> <a href="https://github.com/chaoshengsc/libero-camera-ablation">chaoshengsc/libero-camera-ablation</a></footer>
+  <footer><span>公开权重对照中的本仓库区间使用正态近似；官方π0对照使用Wilson区间。参考范围定义、配对与重复限制见实验说明。</span> <a href="https://github.com/chaoshengsc/libero-camera-ablation">chaoshengsc/libero-camera-ablation</a></footer>
 </main>
 </div>
 <script src="results.js?v=replay-1"></script>
-<script src="app.js?v=layout-4"></script>
+<script src="app.js?v=claims-1"></script>
 <noscript><p class="no-script">交互图表需要 JavaScript。<a href="https://github.com/chaoshengsc/libero-camera-ablation">Read the results on GitHub</a>.</p></noscript>
 </body>
 </html>

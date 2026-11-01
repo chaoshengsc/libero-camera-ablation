@@ -5,7 +5,7 @@
 <line x1="93" y1="46" x2="111" y2="46" stroke="#7c3aed" stroke-width="2.5"/><text x="116" y="50" fill="#6b7280">正常（重跑）</text>
 <line x1="212" y1="46" x2="230" y2="46" stroke="#ea580c" stroke-width="2.5"/><text x="235" y="50" fill="#6b7280">相机全涂黑</text>
 <text x="318" y="50" fill="#6b7280">圆点 = 抓取点</text>
-<text x="26" y="76" font-weight="600">正常 vs 正常重跑（噪声底线）</text>
+<text x="26" y="76" font-weight="600">正常 vs 正常重跑</text>
 <text x="394" y="76" font-weight="600">正常 vs 相机全涂黑</text>
 <text x="26" y="96.0" font-size="12" fill="#6b7280">任务 4：碗在木柜上层抽屉里。全涂黑时 10 回合成功 9 次。</text>
 <rect x="26" y="104.0" width="340" height="328.9" rx="6" fill="#f9fafb" stroke="#e5e7eb"/>

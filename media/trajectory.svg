@@ -5,7 +5,7 @@
 <line x1="111" y1="46" x2="129" y2="46" stroke="#7c3aed" stroke-width="2.5"/><text x="134" y="50" fill="#6b7280">normal, re-run</text>
 <line x1="254" y1="46" x2="272" y2="46" stroke="#ea580c" stroke-width="2.5"/><text x="277" y="50" fill="#6b7280">all cameras black</text>
 <text x="418" y="50" fill="#6b7280">dots = grasp points</text>
-<text x="26" y="76" font-weight="600">Normal vs. normal re-run (noise floor)</text>
+<text x="26" y="76" font-weight="600">Normal vs. normal re-run</text>
 <text x="394" y="76" font-weight="600">Normal vs. all cameras black</text>
 <text x="26" y="96.0" font-size="12" fill="#6b7280">Task 4: bowl in the top drawer of the cabinet. Blind π0 succeeds in 9 of 10 episodes.</text>
 <rect x="26" y="104.0" width="340" height="328.9" rx="6" fill="#f9fafb" stroke="#e5e7eb"/>

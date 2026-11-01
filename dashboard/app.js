@@ -15,8 +15,8 @@ const DICT = [
   ["同一任务：π0.5 正常成功、涂黑失败，LeRobot π0 涂黑仍成功", "Same task: π0.5 succeeds with vision and fails with black input; LeRobot π0 still succeeds with black input"],
   ["同一任务、同一初始状态。右侧两次运行中，策略收到的是黑图。", "Same task and initial state. In the two right-hand runs, the policy receives black images."],
   ["开环回放：固定动作能完成多少任务", "Open-loop replay: how far fixed actions go"],
-  ["动作来自官方 π0 正常运行。每任务事后挑出的最好一套为 77.8%，存在选择偏差，不能当作无偏基线。回放不说明 LeRobot π0 看不见时实际在做什么。", "Actions come from official π0 with normal vision. The post-hoc best sequence per task scores 77.8%, but selection makes it an optimistic estimate, not an unbiased baseline. Replay does not identify what blind LeRobot π0 actually does."],
-  ["复现图使用正态近似区间；官方 π0 对照使用 Wilson 区间。重复运行与配对比较的限制见实验记录。", "Reproduction uses normal-approximation intervals; the official π0 control uses Wilson intervals. See the notes for repeat and paired-comparison limitations."],
+  ["动作来自官方π0正常运行。每任务事后挑出的最好一套为77.8%，存在选择偏差，不能当作无偏基线。固定的是高层动作，底层控制器仍有反馈；回放不识别LeRobot π0全黑成功的内部机制。", "Actions come from official π0 with normal vision. The post-hoc best sequence per task scores 77.8%, with selection bias rather than an unbiased baseline. High-level actions are fixed; the low-level controller retains feedback. Replay does not identify the mechanism of LeRobot π0 all-black success."],
+  ["公开权重对照中的本仓库区间使用正态近似；官方π0对照使用Wilson区间。参考范围定义、配对与重复限制见实验说明。", "This repo's public-checkpoint intervals use the normal approximation; the official π0 control uses Wilson intervals. See the experiment report for reference ranges, pairing and repeat limitations."],
   ["查看两次运行的轨迹明细", "Inspect both trajectory runs"],
   ["选择模型查看评测与基准来源", "Select a model to inspect evaluation and reference sources"],
   ["点击模型行查看来源；键盘可用上下方向键切换。", "Select a model row for sources. Use the up and down arrow keys to move between models."],
@@ -43,25 +43,25 @@ const DICT = [
   ["本地录像", "Local recordings"], ["结果表", "Result tables"], ["概览", "Overview"],
   ["切换为深色", "Switch to dark theme"], ["切换为浅色", "Switch to light theme"],
   ["深色", "Dark"], ["浅色", "Light"],
-  ["四个策略里有三个离开实时相机画面就无法完成任务；一个公开的 π0 权重在所有相机涂黑后仍有 53–56% 的成功率。做消融之前，先复现了五个公开权重。", "Three of the four policies fail without a live camera image. One public π0 checkpoint still succeeds 53–56% of the time with every camera blacked out. Five public checkpoints were reproduced first."],
-  ["每个模型评测 500 回合，与原作者公布的基准对比。两个 95% 置信区间有重叠即算复现。", "Each model is evaluated for 500 episodes and compared with the reference published by its authors. A result counts as reproduced when the two 95% confidence intervals overlap."],
-  ["SmolVLA 用的是只在 LIBERO-Spatial 上训练的公开权重，评测时 n_action_steps=10。点击模型行可以核对基准出处与原始评测。", "SmolVLA uses a public checkpoint trained on LIBERO-Spatial only, evaluated with n_action_steps=10. Select a model row to inspect reference sources and raw evaluations."],
-  ["本节的 π0 是 LeRobot 的公开权重，500 回合的正常成功率是 73%。官方 π0 在 OpenPI 原版管线下去掉视觉后是 0%（1.5 节），所以下面的现象只说明这个权重（连同它的推理管线），不代表所有 π0。", "π0 in this section is LeRobot's public checkpoint, which scores 73% over 500 normal episodes. Official π0 in OpenPI's own pipeline scores 0% without vision (section 1.5), so the behaviour below describes this checkpoint (together with its inference pipeline), not π0 in general."],
+  ["在所测全黑回合中，三个检查点均未成功；LeRobot π0 v044及其管线五次成功率为53–56%。另对五个公开权重做了参考对照。", "In the tested all-black episodes, three checkpoints completed no tasks. LeRobot π0 v044 with its pipeline scored 53–56% across five runs. Five public checkpoints were also evaluated against references."],
+  ["每个模型评测500回合。本项目将本仓库95%区间与参考范围（报告的±值、按回合数估计的区间，或单点）比较，重叠记为达到复现判据；这不是性能等效检验。", "Each model is evaluated for 500 episodes. The repo criterion compares its 95% interval with a reference range: a reported ± value, an interval estimated from episode counts, or a single point. Overlap meets the criterion; this is not an equivalence test."],
+  ["SmolVLA使用仅在LIBERO-Spatial训练的公开权重，n_action_steps=10，与论文四套件训练配置不同。点击模型行可核对参考出处与原始评测。", "SmolVLA uses a public checkpoint trained on LIBERO-Spatial only, with n_action_steps=10. Its training configuration differs from the paper's four-suite setup. Select a model row for reference sources and raw evaluations."],
+  ["早期π0相机实验使用LeRobot v044，一组500回合正常评测为73%。官方π0/OpenPI的全黑对照为0/100（1.5节）；结果限于各自所测检查点、管线和干预，不能推广到所有π0。", "Earlier π0 camera runs use LeRobot v044; one 500-episode normal evaluation scores 73%. Official π0/OpenPI scores 0/100 in the all-black control (section 1.5). Results concern each tested checkpoint, pipeline and intervention, not π0 in general."],
   ["每格是该任务 50 回合的成功率（%）。列标题是“拿起黑碗并放到盘子上”里碗的初始位置。", "Each cell is the success rate (%) over 50 episodes of that task. Column headers give where the bowl starts in \"pick up the black bowl and place it on the plate\"."],
   ["相机消融只改变画面输入；OpenVLA只接收主视角和指令，其余三个检查点还接收腕部画面与状态。", "Camera ablations alter image inputs. OpenVLA uses the agent view and instruction; the other three checkpoints also receive wrist images and state."],
   ["早期相机消融每次100回合，按相同初始状态比较。区间取决于配对与重复结构，不设统一的13点阈值；π0早期同条件重复最多相差18点。", "Earlier camera runs use 100 matched initial states. Uncertainty depends on pairing and repeats, not a universal 13-point threshold; earlier pi0 repeats differed by up to18 points."],
   ["三个检查点在所测全黑回合中均未成功完成任务；LeRobot π0 v044仍有一半以上成功。", "Three checkpoints completed no tested all-black episode; LeRobot pi0 v044 still succeeded in more than half."],
   ["π0 各任务的成功次数（每个任务 10 回合）：全涂黑后的失败集中在三个任务上。", "π0 successes per task (10 episodes each): the failures with black cameras are concentrated in three tasks."],
-  ["π0.5 和 SmolVLA 需要实时画面；对 π0，只有两路相机都涂黑才有稳定的影响。", "π0.5 and SmolVLA need a live image. For π0, only blacking out both cameras has a reliable effect."],
-  ["每格是 100 回合里的成功次数，每个条件跑了两次（同样的脚本、同一个种子）。噪声是标准差 0.1 的高斯噪声；冻结首帧持续使用真实旧图像，也改变图像—状态同步，不能称整体分布内干预。对 π0.5 和 SmolVLA，腕部相机比主视角更重要。π0 的单路相机、噪声、冻结条件两次相差 9 到 18，说明不了它依赖哪一路相机。只涂黑腕部相机又跑了三次，是 72、67 和 70。", "Each cell is successes out of 100 episodes; every condition was run twice with the same scripts and seed. Noise is Gaussian with standard deviation 0.1. Freezing repeats a real first-frame image but also changes image–state synchronization; it is not guaranteed to remain in-distribution. For π0.5 and SmolVLA the wrist camera matters more than the agent view. π0's single-camera, noise and frozen-image runs differ by 9 to 18 between the two runs, so they cannot show which camera it depends on. Three more runs with the wrist camera black gave 72, 67 and 70."],
-  ["在全涂黑仍能成功的任务上，它的路线和看得见时在噪声内无法区分；在从未成功的任务 7 上，它走到了别处。两次运行都是这样。", "On the tasks it still solves blind, its path cannot be told apart from the sighted path within noise. On task 7, where it never succeeds, it goes somewhere else. Both runs agree."],
+  ["所测π0.5和SmolVLA检查点对首帧冻结敏感；π0本组全黑运行的成功率低于正常运行。", "The tested π0.5 and SmolVLA checkpoints are sensitive to first-frame freezing. The π0 all-black runs in this group score below their normal runs."],
+  ["各干预条件每次100回合、重复两次（同脚本、同种子）；SmolVLA未单独重跑正常条件。噪声标准差为0.1。冻结真实首帧同时改变内容更新和图像—状态同步，不能视为整体分布内干预。所测π0.5和SmolVLA腕部涂黑降幅较大；这不构成普遍的相机重要性排序。π0的单路涂黑、噪声和冻结两次相差9到18点；腕部涂黑另三次为72、67、70，尚不能据此认定其他干预没有作用。", "Each intervention uses 100 episodes per run and two repeats with the same scripts and seed; SmolVLA has no separate normal rerun. Noise standard deviation is 0.1. First-frame freezing changes both content updates and image–state synchronization, so the joint input is not guaranteed to remain in-distribution. Wrist blackout causes larger decreases for the tested π0.5 and SmolVLA checkpoints; this is not a universal camera-importance ranking. π0 repeats differ by 9–18 points under single-camera blackout, noise and freezing; three further wrist-black runs score 72, 67 and 70. These observations do not establish that other interventions have no effect."],
+  ["按全黑成功率事后筛选的任务组中，正常与全黑的平均轨迹差与正常重跑参考接近；任务7的差异较大。这是描述性比较，未证明轨迹等效。", "In task groups selected post hoc by all-black success, mean normal-versus-black path differences are close to the normal-rerun reference. Task 7 has larger differences. This is descriptive, not evidence of trajectory equivalence."],
   ["各任务的末端路线差异（cm，动态时间规整后的平均点距）。整套比较跑了两次；标出的是全涂黑后成功不到一半的任务。", "End-effector path difference per task (cm, mean point distance after dynamic time warping). The whole comparison was run twice; tasks where blind π0 succeeds less than half the time are highlighted."],
-  ["两次正常运行几乎重合的任务（第 1 次的任务 0–3，第 2 次的任务 0）是同一个种子下还没有分叉，不能反映噪声；其余任务上的噪声底线平均是 3.4 和 3.3 cm。全涂黑仍能成功的任务上，路线相差 2.8 和 3.2 cm。任务 9 第 1 次相差 7.8 cm，第 2 次只有 4.9 cm，不如任务 7 清楚。这种比较分不出策略是跟着碗走，还是每个任务重复一套动作；后续已测量场景变化并做开环回放，见仓库 README 第 1.5 节。", "Tasks where the two sighted runs are almost identical (tasks 0–3 in run 1, task 0 in run 2) use the same seed and had not yet diverged, so they say nothing about noise; on the other tasks the noise floor averages 3.4 and 3.3 cm. On the tasks blind π0 still solves, the path differs by 2.8 and 3.2 cm. Task 9 differs by 7.8 cm in run 1 but only 4.9 cm in run 2, so it is less clear than task 7. This comparison cannot separate a policy that tracks the bowl from one that repeats one motion per task, the subsequent scene-variation measurement and open-loop replay are in repository README section 1.5."],
+  ["正常重跑参考剔除了近乎重合的任务（第1次0–3，第2次0），其余任务平均差为3.4和3.3 cm；全黑成功至少一半的事后任务组为2.8和3.2 cm。两组任务构成不同，未做轨迹等效检验。任务9两次差为7.8和4.9 cm，结果没有任务7清楚。这不能识别跟随物体或固定动作机制；固定动作回放见完整实验1.6节。", "The normal-rerun reference excludes nearly overlapping tasks (0–3 in run 1, task 0 in run 2), averaging 3.4 and 3.3 cm on the rest. Task groups selected post hoc for at least half of all-black episodes succeeding average 2.8 and 3.2 cm. The groups differ; no trajectory-equivalence test was performed. Task 9 differs by 7.8 and 4.9 cm and is less clear than task 7. This does not identify object tracking or fixed-action mechanisms; see experiment section 1.6 for replay."],
   ["每个任务一段成功、一段失败的录像。全涂黑的录像是环境的真实渲染，模型当时收到的是黑图。", "One successful and one failed episode per task. Recordings of the all-black runs show the simulator's real rendering; the model received black images."],
   ["回放视频体积大，没有随仓库发布。在本地把评测输出的 videos/ 放到 dashboard/data/<run>/ 下，就能在这里播放。", "Replay videos are too large to publish with the repository. Put each run's videos/ folder under dashboard/data/<run>/ locally to play them here."],
   ["置信区间为二项分布的正态近似。全部数据、脚本与说明见 GitHub 仓库。", "Confidence intervals use the normal approximation to the binomial. All data, scripts and notes are in the GitHub repository."],
-  ["公开权重复现到基准的误差范围内", "public checkpoints reproduced within sampling error"],
-  ["π0 在相机全涂黑后的成功率", "π0 success rate with every camera black"],
+  ["达到本项目参考对照判据的公开权重", "public checkpoints meeting the repo comparison criterion"],
+  ["LeRobot π0 v044 全黑成功率", "LeRobot π0 v044 success with all cameras black"],
   ["π0.5 画面冻结后的成功率", "π0.5 success rate with the image frozen"],
   ["整个回合只给第一帧画面（%），各 100 回合", "first frame only for the whole episode (%), 100 episodes each"],
   ["降到 0%：", "Drop to 0%: "],
@@ -70,10 +70,10 @@ const DICT = [
   ["openvla README（3 种子 × 500 回合，A100）", "openvla README (3 seeds × 500 episodes, A100)"],
   ["LeRobot 模型卡（500 回合；原版 DP 仓库同等模型 64.2%）", "LeRobot model card (500 episodes; the equivalent model in the original DP repo scores 64.2%)"],
   ["HF 仓库自带 eval_info.json（500 回合）", "eval_info.json shipped in the HF repo (500 episodes)"],
-  ["π0.5对腕部涂黑、屏蔽和冻结均高度敏感；LeRobot π0 v044的变化落在预设等效范围内。", "Pi0.5 is highly sensitive to wrist black/masked/frozen input; LeRobot pi0 v044 changes stay within the prespecified margin."],
+  ["π0.5对所测腕部干预高度敏感；LeRobot π0 v044配对差的95%区间落在事前±8点范围内。", "π0.5 is highly sensitive to the tested wrist interventions. LeRobot π0 v044 paired-difference 95% intervals fall inside the advance-recorded ±8-point margin."],
   ["每个条件 500 回合（10 个任务 × 50 个初始状态，各条件初始状态相同；π0.5 腕部涂黑一项是同一组 100 个初始状态跑 5 次）。“屏蔽”指在模型内部把这一路相机的槽位换成空相机占位、掩码置 0；“冻结”指整个回合只给第一帧的真实画面。π0 与双相机按初始状态配对，各条件差值的 95% 区间都在预设的 ±8 个百分点以内。逐回合结果见仓库的 results/single_camera.csv。", "500 episodes per condition (10 tasks × 50 initial states, the same initial states for every condition; π0.5 wrist black is the same 100 initial states run 5 times). \"Dropped\" fills the camera's slot inside the model with the empty-camera placeholder and sets its mask to 0; \"frozen\" gives the real first-frame image for the whole episode. Paired by initial state against both cameras, every π0 difference has a 95% interval inside the pre-set ±8-point margin. Per-episode results are in results/single_camera.csv in the repository."],
-  ["官方 π0 离开视觉就不能完成任务，只屏蔽腕部也是 0%；只屏蔽主视角还剩 77%。看不见也能成功的只有 LeRobot 这个权重。", "Official π0 cannot do the tasks without vision, and scores 0% with only the wrist camera masked; with only the main view masked it keeps 77%. Only LeRobot's checkpoint succeeds without vision."],
-  ["官方 π0 为 Physical Intelligence 的 pi0_libero 检查点，在 OpenPI 原版管线下运行（渲染 256），正常 500 回合 96.4%，初始状态与 1.4 节逐回合相同；去视觉的各条件 100 回合。LeRobot π0 在 LeRobot 管线下运行（渲染 360）；官方 π0 改用 360 渲染复测，正常 99/100，去视觉仍为 0/100，分辨率不是原因。两边管线不同，差别不能单独归因到权重。LeRobot 转换版的官方权重在 LeRobot 管线下 0/50，没能跑通。设计与判读规则在运行前写好，见仓库 docs/NOTES_CN.md；汇总在 results/official_pi0_summary.csv。", "Official π0 is Physical Intelligence's pi0_libero checkpoint, run in OpenPI's own pipeline (256 rendering): 96.4% over 500 normal episodes, with initial states identical episode by episode to section 1.4; 100 episodes per vision-removal condition. LeRobot π0 runs in the LeRobot pipeline (360 rendering); official π0 re-run at 360 scores 99/100 normally and still 0/100 without vision, so resolution is not the cause. The pipelines differ, so the difference cannot be attributed to the weights alone. The LeRobot conversion of the official checkpoint scored 0/50 in the LeRobot pipeline and did not run. The design and reading rule were written before running, see docs/NOTES.md in the repository; the summary is in results/official_pi0_summary.csv."],
+  ["官方π0/OpenPI在所测全黑与腕部屏蔽条件下均为0/100，主视角屏蔽为77/100。LeRobot v044全黑仍有成功，但两边权重与管线不同。", "Official π0/OpenPI scores 0/100 under the tested all-black and wrist-masked conditions, and 77/100 with the agent view masked. LeRobot v044 retains all-black successes, but weights and pipelines differ."],
+  ["官方π0使用Physical Intelligence的pi0_libero检查点，在OpenPI管线下正常500回合为96.4%（256渲染），初始状态协议与1.4节匹配。各视觉干预100回合；360复测正常99/100，全黑和双槽屏蔽均为0/100。LeRobot侧为360渲染；官方权重转换路径冒烟0/50，未通过验收。此对照未隔离权重、转换与其他推理差异。设计记录见仓库docs/NOTES_CN.md，汇总见results/official_pi0_summary.csv。", "Official π0 uses Physical Intelligence's pi0_libero checkpoint in OpenPI: 96.4% over 500 normal episodes at 256 rendering, with initial-state protocols matched to section 1.4. Visual interventions use 100 episodes each. At 360, normal scores 99/100; all black and both slots masked score 0/100. LeRobot uses 360 rendering; the official-weight conversion scores 0/50 in smoke testing and fails acceptance. Weights, conversion and other inference differences remain unseparated. See docs/NOTES.md for designs and results/official_pi0_summary.csv for the summary."],
   ["官方 π0 与 LeRobot π0 去掉相机后的成功率", "Official π0 vs. LeRobot π0 with cameras removed"],
   ["官方 π0 对照", "Official π0 control"],
   ["去掉腕部相机：每个条件 500 回合", "Wrist camera removed: 500 episodes per condition"],
@@ -83,7 +83,7 @@ const DICT = [
   ["正常与全涂黑成功率对比", "Normal vs. all-black success rate"], ["各模型成功率对比", "Success rate by model"],
   ["四个机器人策略在 LIBERO-Spatial 上的相机输入消融", "Camera-input ablations of four robot policies on LIBERO-Spatial"],
   ["LIBERO-Spatial 各任务成功率", "LIBERO-Spatial success rate per task"],
-  ["看不见的 π0 在成功的任务上走的是同一条路线", "Where blind π0 succeeds, it follows the sighted path"],
+  ["末端轨迹的描述性比较", "Descriptive end-effector trajectory comparison"],
   ["单路相机、噪声、冻结画面", "One camera, noise, frozen image"],
   ["所有相机涂黑", "All cameras black"],
   ["全涂黑时成功次数（/10）", "Blind π0 successes (of 10)"], ["正常 vs 正常重跑", "Normal vs. normal re-run"], ["全涂黑 vs 正常", "All black vs. normal"], ["π0.5 vs π0，都正常", "π0.5 vs. π0, both normal"],
@@ -112,9 +112,9 @@ $("langBtn").onclick = () => { location.search = "?lang=" + (LANG === "en" ? "zh
 // README 用的两张图：线上在仓库的 media/ 下；本地没有这些文件时整块隐藏
 for (const [id, name] of [["figInputs", "inputs"], ["figTraj", "trajectory"], ["figSingle", "single_camera"], ["figOfficial", "official_pi0"], ["figReplay", "open_loop_replay"]]) {
   $(id).onerror = () => $(id).closest(".fig").classList.add("hidden");
-  $(id).src = `../media/${LANG === "en" ? "" : "zh/"}${name}.svg?v=layout-4`;
+  $(id).src = `../media/${LANG === "en" ? "" : "zh/"}${name}.svg?v=claims-1`;
 }
-$("figInputsMobile").srcset = `../media/${LANG === "en" ? "" : "zh/"}inputs-mobile.svg?v=layout-4`;
+$("figInputsMobile").srcset = `../media/${LANG === "en" ? "" : "zh/"}inputs-mobile.svg?v=claims-1`;
 if (LANG === "en") {
   document.documentElement.lang = "en"; document.title = trStr(document.title);
   new MutationObserver(ms => ms.forEach(m => m.type === "characterData" ? trNode(m.target) : m.addedNodes.forEach(trNode)))
@@ -123,7 +123,7 @@ if (LANG === "en") {
 }
 
 const done = R.filter(r => r.status === "done");
-// 复现判定：本仓库 95% 区间与基准区间（± 或其 95% CI，没有则视为一个点）有重叠
+// 本项目参考对照判据：评测95%区间与来源±值、估计区间或单点重叠；非等效检验。
 const reproduced = (r) => { const b = r.baseline_pm ?? r.baseline_ci ?? 0; return Math.abs(r.pc - r.baseline_pc) <= r.ci + b; };
 const BO = window.BLACKOUT || { summary: [], runs: [] };
 const FU = window.FOLLOWUP || {};
@@ -134,9 +134,9 @@ const MNAME = { pi0: "π0", "pi0.5": "π0.5" };
   const ok = done.filter(reproduced), p0 = BO.summary.find(r => r.model === "pi0"), p5 = (FU.perturb || []).find(r => r.model === "pi0.5");
   const zero = BO.summary.filter(r => sum(r.black) === 0).map(r => MNAME[r.model] || r.model);
   $("keys").innerHTML = [
-    [`${Math.min(...FU.pi0_black_runs)}–${Math.max(...FU.pi0_black_runs)}%`, "π0 在相机全涂黑后的成功率", "降到 0%：" + zero.join(" · ")],
+    [`${Math.min(...FU.pi0_black_runs)}–${Math.max(...FU.pi0_black_runs)}%`, "LeRobot π0 v044 全黑成功率", "降到 0%：" + zero.join(" · ")],
     [`${p5.normal} → ${p5.freeze}`, "π0.5 画面冻结后的成功率", "整个回合只给第一帧画面（%），各 100 回合"],
-    [`${ok.length} / ${done.length}`, "公开权重复现到基准的误差范围内", done.map(r => r.model).join(" · ")],
+    [`${ok.length} / ${done.length}`, "达到本项目参考对照判据的公开权重", done.map(r => r.model).join(" · ")],
   ].map(([v, k, d], i) => `<a class="key" href="${["#blackout", "#perturbations", "#repro"][i]}"><span class="v">${v}</span><span class="key-copy"><span class="k">${k}</span><span class="d">${d}</span></span><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="m9 5 7 7-7 7"/></svg></a>`).join("");
 }
 

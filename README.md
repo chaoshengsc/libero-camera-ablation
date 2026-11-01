@@ -14,9 +14,9 @@ Camera ablations of four robot policies on LIBERO-Spatial
 
 </div>
 
-**Does completing a simulated task mean a robot uses its cameras?** We ablate camera inputs for public π0, π0.5, OpenVLA, and SmolVLA checkpoints, then use an official π0 control, fixed-action replay and state-input checks to bound the interpretation. Reproduction of five public checkpoints provides the engineering foundation.
+**Does completing a simulated task mean a robot uses its cameras?** We ablate camera inputs for public π0, π0.5, OpenVLA, and SmolVLA checkpoints, then use an official π0 control, fixed-action replay and state-input checks to bound the interpretation. Evaluation of five public checkpoints against published references provides the engineering foundation.
 
-**With every camera blacked out, three policies score 0%. LeRobot π0 v044 retains 53–56%; official π0 in OpenPI scores 0/100.**
+**In the tested all-black episodes, the π0.5, OpenVLA and SmolVLA checkpoints score 0%. LeRobot π0 v044 scores 53–56% across five runs; official π0 in OpenPI scores 0/100.**
 
 <p align="center">
   <img src="media/blackout_demo.gif" width="720" height="300" alt="Same LIBERO task: π0.5 succeeds with normal vision and fails with black input; LeRobot π0 still succeeds with black input">
@@ -54,13 +54,13 @@ These are representative 100-episode runs. Normal vision uses the first 10 episo
 
 With normal vision, official π0 in OpenPI scores **96.4%** and LeRobot π0 v044 in LeRobot scores **72.0%** (500 episodes each). With all cameras black, they score **0/100** and **53–56%** across five LeRobot runs, respectively.
 
-**Success without vision was observed only for the tested LeRobot π0 checkpoint together with its pipeline.**
+**In these all-black comparisons, LeRobot π0 v044 with its pipeline retains successful episodes; official π0/OpenPI has none.**
 
 Both the weights and the inference pipeline differ between the two sides; the difference cannot be attributed to the weights alone.
 
-A re-run at 360 rendering ruled out rendering resolution. Two further checks add context:
+A re-run of official π0 at 360 rendering still scores 0/100 with black input; this resolution change did not restore success. Further checks add context:
 
-- **Live images.** π0.5 and SmolVLA score 0% with frozen first frames in both runs. Removing the wrist camera brings π0.5 from 98.4% to 4.6% (500 episodes per condition).
+- **Image-freezing sensitivity.** The tested π0.5 and SmolVLA checkpoints score 0% with frozen first frames in both runs. Masking the wrist camera in its original slot brings π0.5 from 98.4% to 4.6% (500 episodes per condition). Freezing changes both visual updates and image–state synchronization; their effects remain unseparated.
 - **Fixed actions also succeed.** P2 replays one preselected official π0 sequence per task on states excluded from action selection: **262/400 = 65.5%**, with a **61.0–69.8%** stratified-bootstrap interval and **10/10** self-replay checks. This strengthens the baseline without identifying the LeRobot π0 mechanism. [Protocol, earlier replay and limits](docs/EXPERIMENTS.md#16-fixed-action-replay).
 - **State updates still matter.** In P1, LeRobot π0 v044 averages **73.3% / 55.3%** with normal/black images across three repeats; both score **0%** when the model receives its frozen first state. This measures update sensitivity, not a unique correction or phase mechanism. [Paired statistics](docs/EXPERIMENTS.md#17-state-input-update-sensitivity).
 
@@ -68,7 +68,7 @@ See the [full experiments](docs/EXPERIMENTS.md) for designs, repeated runs, per-
 
 ## 2. Reproduction of the public checkpoints
 
-| Model | Task | This repo (500 episodes) | Reference | Reproduced |
+| Model | Task | This repo (500 episodes) | Reference | Repo criterion |
 |---|---|---|---|---|
 | ACT | ALOHA Transfer Cube | **83.2%** | 83.0% (Hugging Face repo) | ✅ |
 | OpenVLA | LIBERO-Spatial | **86.2%** | 84.7 ± 0.9% (official README) | ✅ |
@@ -76,7 +76,7 @@ See the [full experiments](docs/EXPERIMENTS.md) for designs, repeated runs, per-
 | π0.5 | LIBERO-Spatial | **98.0%** | 98.8% (OpenPI), 97.0% (LeRobot) | ✅ |
 | Diffusion Policy | PushT (2-D, not MuJoCo) | **63.0%** | 65.4% (LeRobot model card) | ✅ |
 
-“Reproduced” means the two 95% confidence intervals overlap. Each evaluation has 500 episodes, giving an interval of about ±1–4 points.
+This repository compares its 95% confidence interval with a reference range: a reported ± value, an interval estimated from an available episode count, or a single point when no range is available. Overlap meets this repository's “reproduction” criterion. This is a reference-comparison convention, not a performance-equivalence test or a claim to reproduce identical training configurations. Each evaluation has 500 episodes, giving this repository's interval of about ±1–4 points.
 
 SmolVLA uses `lerobot/smolvla_libero` with `n_action_steps=10`, trained on LIBERO-Spatial only. The paper trains on four suites; its 100-episode reference has an interval of about ±6 points.
 
@@ -124,7 +124,7 @@ libero-camera-ablation/
 
 - Camera studies cover LIBERO-Spatial only. Earlier camera runs fix the environment seed; P1 adds three policy-noise repeats on the same 100 initial states, without new tasks or real robots.
 - [Experiments 1.1–1.3](docs/EXPERIMENTS.md#11-all-cameras-black) use 100 episodes per run; the [single-camera study](docs/EXPERIMENTS.md#14-wrist-camera-removed-500-episodes) uses 500. Repeating initial states does not add independent samples. Comparisons depend on pairing and repeat structure, not a universal 13-point threshold. Earlier π0 repeats of one condition differed by up to 18 points.
-- The π0 ablation results come from LeRobot's v044 checkpoint. Official π0 was tested only in OpenPI's own pipeline; the two sides differ in pipeline (rendering resolution was ruled out by a re-run at 360), so the difference cannot be attributed to the weights alone. Each official π0 ablation condition was run once, 100 episodes.
+- The π0 results concern the tested checkpoint/pipeline combinations. The official control uses the OpenPI path that passed the normal-evaluation gate; the LeRobot conversion scored 0/50 in smoke testing and failed acceptance. Official π0 scores 0/100 with black input at both 256 and 360 rendering; this check does not isolate weights, conversion or other inference differences. Each official π0 ablation condition was run once, 100 episodes.
 - [Replay](docs/EXPERIMENTS.md#16-fixed-action-replay) concerns the selected sequences and states. P2 targets were excluded from action selection but had appeared in earlier evaluations; they are not a hidden test set. P1/P2 use different checkpoint/state protocols and cannot be subtracted to assign mechanism contributions. P1 lacks stepwise terminal flags and full images; state freezing does not identify a unique mechanism. Full NPZ audit artifacts remain outside Git; published records reproduce rates and intervals.
 - Diffusion Policy was evaluated on PushT (2-D physics), not in MuJoCo.
 

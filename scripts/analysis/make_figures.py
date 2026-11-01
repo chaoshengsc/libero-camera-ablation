@@ -19,11 +19,11 @@ MODEL = {"pi0": "π0", "pi0.5": "π0.5"}
 TXT = {
     "en": {
         "rep_title": "Public checkpoints: success rate in this repo vs. reference",
-        "rep_ours": "This repo (500 episodes, 95% CI)", "rep_ref": "Reference", "rep_fail": "Not reproduced (intervals do not overlap)",
+        "rep_ours": "This repo (500 episodes, 95% CI)", "rep_ref": "Reference", "rep_fail": "Repo criterion not met",
         "pert_title": "Success rate under camera perturbations (bar = mean, dots = two runs of 100 episodes)",
         "conds": ["Normal", "Gaussian noise", "Frozen first frame", "Agent-view black", "Wrist black", "All black"],
         "traj_title": "π0 end-effector paths, top view: 10 episodes per task, identical initial states",
-        "traj_a": "Normal vs. normal re-run (noise floor)", "traj_b": "Normal vs. all cameras black",
+        "traj_a": "Normal vs. normal re-run", "traj_b": "Normal vs. all cameras black",
         "traj_row": "Task {i}: bowl {name}. Blind π0 succeeds in {k} of 10 episodes.",
         "traj_task": {4: "in the top drawer of the cabinet", 7: "on the stove"},
         "traj_normal": "normal", "traj_rerun": "normal, re-run", "traj_black": "all cameras black", "traj_grasp": "dots = grasp points",
@@ -40,7 +40,7 @@ TXT = {
         "op_models": {"official": "Official π0 (OpenPI pipeline)", "lerobot": "LeRobot π0 v044"},
         "op_conds": ["Both cameras", "All black", "Both slots masked", "Both frozen at frame 1", "Wrist masked", "Agent view masked"],
         "op_n": "{k}/{n}",
-        "rp_title": "Open-loop replay: one fixed action sequence per task, no model, no vision",
+        "rp_title": "Fixed-action replay: source-state selection and cross-replay",
         "rp_bars": ["Best fixed sequence (on the other 9 states)", "All cross-replays"],
         "rp_band": "LeRobot π0 all black, 53–56%",
         "rp_null": "Best of k if every sequence scored {p:.1f}%: {v:.1f}%",
@@ -49,12 +49,12 @@ TXT = {
         "rp_task": "Task {i}",
     },
     "zh": {
-        "rep_title": "公开权重复现：本机成功率 vs 基准",
-        "rep_ours": "本机（500 回合，95% 置信区间）", "rep_ref": "基准", "rep_fail": "未复现（区间不重叠）",
+        "rep_title": "公开权重对照：本机成功率 vs 参考值",
+        "rep_ours": "本机（500 回合，95% 置信区间）", "rep_ref": "参考值", "rep_fail": "未达本项目判据（范围不重叠）",
         "pert_title": "扰动相机输入后的成功率（柱 = 平均，圆点 = 两次运行，各 100 回合）",
         "conds": ["正常", "加高斯噪声", "冻结首帧", "只涂主视角", "只涂腕部", "全涂黑"],
         "traj_title": "π0 末端执行器路线（俯视）：每个任务 10 个回合，初始状态相同",
-        "traj_a": "正常 vs 正常重跑（噪声底线）", "traj_b": "正常 vs 相机全涂黑",
+        "traj_a": "正常 vs 正常重跑", "traj_b": "正常 vs 相机全涂黑",
         "traj_row": "任务 {i}：碗在{name}。全涂黑时 10 回合成功 {k} 次。",
         "traj_task": {4: "木柜上层抽屉里", 7: "灶台上"},
         "traj_normal": "正常", "traj_rerun": "正常（重跑）", "traj_black": "相机全涂黑", "traj_grasp": "圆点 = 抓取点",
@@ -71,7 +71,7 @@ TXT = {
         "op_models": {"official": "官方 π0（OpenPI 管线）", "lerobot": "LeRobot π0 v044"},
         "op_conds": ["两路都给", "全涂黑", "两路槽位都屏蔽", "两路冻结在第 1 帧", "只屏蔽腕部", "只屏蔽主视角"],
         "op_n": "{k}/{n}",
-        "rp_title": "开环回放：每个任务重复一套固定动作，不用模型、不看画面",
+        "rp_title": "固定动作回放：来源状态上的选择与交叉回放",
         "rp_bars": ["最好的一套固定动作（在另外 9 个状态上）", "全部交叉回放"],
         "rp_band": "LeRobot π0 全涂黑 53–56%",
         "rp_null": "若每套都只有 {p:.1f}%，挑最好一套的期望：{v:.1f}%",
@@ -92,7 +92,7 @@ SC_COL = ["#9ca3af", "#f59e0b", "#2563eb", "#14b8a6", "#7c3aed"]
 OP_RUNS = {"official": {"both": ["official_pi0/ojx_none"], "all_black": ["official_pi0/ojx_all"], "both_masked": ["official_pi0/ojx_drop_all"],
                         "both_frozen": ["official_pi0/ojx_freeze"], "wrist_masked": ["official_pi0/ojx_drop_wrist"],
                         "agent_masked": ["official_pi0/ojx_drop_agent"], "wrist_frozen": ["official_pi0/ojx_freeze_wrist"]},
-           # 同一官方 π0 改用 360 渲染（与 LeRobot 一侧相同），排除分辨率这一混杂；不进图
+           # 同一官方 π0 改用360渲染，核对本次分辨率变更下的结果；不进图
            "official_360": {"both": ["official_pi0/ojx360_none"], "all_black": ["official_pi0/ojx360_all"],
                             "both_masked": ["official_pi0/ojx360_drop_all"]},
            "lerobot": {"both": ["s500/pi0_none"],
@@ -338,7 +338,7 @@ def tw(s, size=13):
 
 
 def reproduced(r):
-    """本机区间与基准区间（没有则取基准点）是否重叠。"""
+    """本项目参考对照判据（非等效检验），缺少参考范围则用单点。"""
     b = r.get("baseline_pm") or r.get("baseline_ci") or 0
     return abs(r["pc"] - r["baseline_pc"]) <= r["ci"] + b
 
@@ -403,7 +403,7 @@ def fig_perturbations(rows, t):
 
 
 def fig_trajectory(trajs, t):
-    """每个任务一行、两幅俯视图：左 = 正常两次（噪声底线），右 = 正常 vs 全涂黑。坐标为机器人基座系 XY(cm)，各行同一比例尺。"""
+    """每个任务一行、两幅俯视图：左 = 正常重跑参考，右 = 正常 vs 全涂黑。坐标为机器人基座系 XY(cm)，各行同一比例尺。"""
     pw, pad, top = 340, 26, 104
     box = []
     for tr in trajs:
