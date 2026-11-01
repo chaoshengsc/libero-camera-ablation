@@ -534,3 +534,11 @@ After explicit approval, `Update documentation` was committed and pushed to `mai
 - Fix split Markdown tables in both result indexes and clarify that recorded actions are not additionally clipped; controller scaling/clipping retains the original protocol. Historical local checks stay as dated records; final publication state is given by the commit and its remote CI.
 
 - Additional review: generate new CSVs with explicit LF line endings, resolving staged whitespace errors without changing any cells. Validate the exact staged snapshot separately from the unpublished local UI.
+
+## Dashboard layout review and publication scope (2026-11-01)
+
+- User authorized review and publication of the existing layout changes. This follows result commit `d6d865e` and covers the dashboard, bilingual input diagrams/generator and this review record. Recovery experiments/P3 remain paused; the unrun proposal stays local. No new model, physics or GPU runs.
+- Desktop sidebar and mobile section navigation organize findings, figures and data sources. Styles/interactions move to `styles.css` and `app.js`. Preserve both languages/themes, keyboard model selection, table view and the missing-local-video explanation. Add portrait input diagrams for mobile, including the OpenVLA input exception.
+- Fix mobile metric wrapping, doubled anchor offsets, navigation hit areas and mobile header-link specificity. Restore the direct P1/P2 report link at the beginning of camera ablations and retain the resource index link. Version assets to avoid stale cached layouts.
+- Headless Chrome checks cover12 language/theme/viewport combinations (1440/390 in both languages/themes;320/768 in both languages/light), with no page overflow, missing images, broken fragment targets or JavaScript exceptions. All22 local asset/data links return200. Keyboard selection, table view, theme saving, language switching with a preserved fragment and synthesized horizontal touch scrolling pass. Screenshots were inspected; physical phones and all assistive technologies were not tested.
+- Recheck the existing50 tests, lint, script syntax and generated outputs against the final staged snapshot. Preserve Git identity/hooks without added signatures or history rewriting. The commit and remote CI/Pages determine publication status; the recovery candidate is excluded.

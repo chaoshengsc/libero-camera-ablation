@@ -451,25 +451,67 @@ def fig_trajectory(trajs, t):
     return svg(w, oy - 16, out)
 
 
-def fig_inputs(t):
-    w, h, bx, bw, bh = 760, 300, 30, 330, 46
-    rows = [("in_agent", None, "in_img_note", ORANGE), ("in_wrist", None, "in_img_note", ORANGE),
-            ("in_state", "in_sub_state", "in_state_note", MUTED), ("in_lang", "in_sub_lang", "in_lang_note", MUTED)]
-    px, py, pw, ph = 500, 106, 120, 110
-    out = [title(t["in_title"]),
-           '<defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">'
-           f'<path d="M0 0 L10 5 L0 10 z" fill="{MUTED}"/></marker></defs>']
-    for i, (k, sub, note, col) in enumerate(rows):
-        y = 50 + i * 60
-        label = t[k] + (f'<tspan font-weight="400" font-size="11" fill="{MUTED}">  {t[sub]}</tspan>' if sub else "")
-        out.append(f'<rect x="{bx}" y="{y}" width="{bw}" height="{bh}" rx="6" fill="#f9fafb" stroke="{GRID}" stroke-width="1.5"/>')
-        out.append(f'<text x="{bx + 14}" y="{y + 19}" font-weight="600">{label}</text>')
-        out.append(f'<text x="{bx + 14}" y="{y + 36}" font-size="12" fill="{col}" font-weight="600">{t[note]}</text>')
-        out.append(f'<path d="M{bx + bw} {y + bh / 2} L{px - 6} {py + 22 + i * 22}" fill="none" stroke="{MUTED}" stroke-width="1.3" marker-end="url(#a)"/>')
-    out.append(f'<rect x="{px}" y="{py}" width="{pw}" height="{ph}" rx="8" fill="{BLUE}"/>'
-               f'<text x="{px + pw / 2}" y="{py + ph / 2 + 5}" text-anchor="middle" fill="#ffffff" font-size="15" font-weight="600">{t["in_policy"]}</text>')
-    out.append(f'<path d="M{px + pw} {py + ph / 2} L{px + pw + 44} {py + ph / 2}" stroke="{MUTED}" stroke-width="1.3" marker-end="url(#a)"/>')
-    out.append(f'<text x="{px + pw + 52}" y="{py + ph / 2 + 5}" font-weight="600">{t["in_action"]}</text>')
+def fig_inputs(t, mobile=False):
+    """Camera interventions and held-fixed inputs, with a compact orthogonal flow."""
+    en = t["in_policy"] == "Policy"
+    w, h = (420, 500) if mobile else (880, 350)
+    width = 380 if mobile else 420
+    camera_y, fixed_y = 54, 206
+    blue, pale, edge, grey = "#285d8a", "#f1f6fa", "#cedde8", "#64717c"
+    words = {
+        "title": "Camera ablations: inputs and intervention" if en else "相机消融：输入与干预",
+        "camera": "Camera images" if en else "相机画面",
+        "changed": "Intervened" if en else "实验中改变",
+        "operations": "Black out · add noise · freeze · mask slot" if en else "涂黑 · 加噪声 · 冻结 · 槽位屏蔽",
+        "fixed": "Other inputs" if en else "其他输入",
+        "same": "Held fixed" if en else "保持不变",
+        "foot": "Two-camera policies shown. OpenVLA uses only the agent view and instruction."
+                if en else "图示双相机策略。OpenVLA 仅接收主视角画面与任务指令。",
+    }
+    out = [f'<title>{words["title"]}</title>',
+           '<defs><marker id="input-arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">'
+           f'<path d="M1 1 L7 4 L1 7" fill="none" stroke="{grey}" stroke-width="1.2"/></marker></defs>',
+           f'<text x="20" y="29" font-size="17" font-weight="600">{words["title"]}</text>',
+           f'<rect x="20" y="{camera_y}" width="{width}" height="128" rx="7" fill="{pale}" stroke="{edge}"/>',
+           f'<text x="36" y="80" font-size="14" font-weight="600" fill="{blue}">{words["camera"]}</text>',
+           f'<text x="{width + 4}" y="80" text-anchor="end" font-size="12" fill="{blue}">{words["changed"]}</text>']
+    for i, key in enumerate(("in_agent", "in_wrist")):
+        x = 36 + i * (174 if mobile else 196)
+        out.append(f'<g transform="translate({x} 101)" stroke="{blue}" stroke-width="1.4" fill="none">'
+                   '<rect x="0" y="3" width="25" height="17" rx="2"/><path d="M6 3 L9 0 H17 L20 3"/>'
+                   '<circle cx="12.5" cy="11.5" r="4.5"/></g>')
+        out.append(f'<text x="{x + 34}" y="116" font-size="{13 if en else 15}" font-weight="500">{t[key]}</text>')
+    out += [f'<line x1="36" y1="137" x2="{width + 4}" y2="137" stroke="{edge}"/>',
+            f'<text x="36" y="163" font-size="{12 if en else 13}" fill="{blue}">{words["operations"]}</text>',
+            f'<text x="36" y="{fixed_y + 3}" font-size="14" font-weight="600">{words["fixed"]}</text>',
+            f'<text x="{width + 4}" y="{fixed_y + 3}" text-anchor="end" font-size="12" fill="{grey}">{words["same"]}</text>',
+            f'<line x1="36" y1="{fixed_y + 14}" x2="{width + 4}" y2="{fixed_y + 14}" stroke="#dde2e6"/>']
+    for i, (key, sub) in enumerate((("in_state", "in_sub_state"), ("in_lang", "in_sub_lang"))):
+        y = fixed_y + 41 + i * (43 if mobile else 36)
+        if mobile:
+            out += [f'<text x="36" y="{y}" font-size="14" font-weight="500">{t[key]}</text>',
+                    f'<text x="36" y="{y + 19}" font-size="12" fill="{grey}">{t[sub]}</text>']
+        else:
+            out.append(f'<text x="36" y="{y}" font-size="14" font-weight="500">{t[key]}</text>')
+            out.append(f'<text x="{154 if en else 144}" y="{y}" font-size="12" fill="{grey}">{t[sub]}</text>')
+    if mobile:
+        path = 'M400 118 H410 V355 H194 V377'
+        out.append(f'<path d="{path}" fill="none" stroke="{grey}" stroke-width="1.2" marker-end="url(#input-arrow)"/>')
+        out.append(f'<path d="M400 264 H410" fill="none" stroke="{grey}" stroke-width="1.2"/>')
+        px, py = 130, 386
+    else:
+        out.append(f'<path d="M440 118 H476 V265 H440" fill="none" stroke="{grey}" stroke-width="1.2"/>')
+        out.append(f'<path d="M476 194 H526" fill="none" stroke="{grey}" stroke-width="1.2" marker-end="url(#input-arrow)"/>')
+        px, py = 538, 167
+    out += [f'<rect x="{px}" y="{py}" width="128" height="54" rx="5" fill="#fff" stroke="{blue}"/>',
+            f'<text x="{px + 64}" y="{py + 33}" text-anchor="middle" font-size="16" font-weight="600">{t["in_policy"]}</text>',
+            f'<path d="M{px + 128} {py + 27} H{px + 182}" fill="none" stroke="{grey}" stroke-width="1.2" marker-end="url(#input-arrow)"/>',
+            f'<text x="{px + 196}" y="{py + 32}" font-size="15" font-weight="500">{t["in_action"]}</text>']
+    if mobile and en:
+        out += [f'<text x="20" y="474" font-size="11" fill="{grey}">Two-camera policies shown. OpenVLA uses only</text>',
+                f'<text x="20" y="490" font-size="11" fill="{grey}">the agent view and instruction.</text>']
+    else:
+        out.append(f'<text x="20" y="{h - 12}" font-size="{10 if mobile else 12}" fill="{grey}">{words["foot"]}</text>')
     return svg(w, h, out)
 
 
@@ -517,7 +559,8 @@ if __name__ == "__main__":
         (out / "perturbations.svg").write_text(fig_perturbations(pert, t))
         (out / "trajectory.svg").write_text(fig_trajectory(traj, t))
         (out / "inputs.svg").write_text(fig_inputs(t))
+        (out / "inputs-mobile.svg").write_text(fig_inputs(t, mobile=True))
         (out / "single_camera.svg").write_text(fig_single_camera(sc_sum, t))
         (out / "official_pi0.svg").write_text(fig_official_pi0(op_sum, t))
         (out / "open_loop_replay.svg").write_text(fig_replay(rp_sum, t))
-    print(f"wrote {len(list(RES.glob('*.csv')))} csv -> results/, 7 svg -> media/ and media/zh/")
+    print(f"wrote {len(list(RES.glob('*.csv')))} csv -> results/, 8 svg -> media/ and media/zh/")

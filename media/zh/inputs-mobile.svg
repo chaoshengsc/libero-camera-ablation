@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 500" width="420" height="500" font-family="-apple-system,'Segoe UI','PingFang SC','Microsoft YaHei','Noto Sans CJK SC',sans-serif" font-size="13" fill="#1f2933">
+<rect width="420" height="500" rx="8" fill="#ffffff"/>
+<title>相机消融：输入与干预</title>
+<defs><marker id="input-arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto"><path d="M1 1 L7 4 L1 7" fill="none" stroke="#64717c" stroke-width="1.2"/></marker></defs>
+<text x="20" y="29" font-size="17" font-weight="600">相机消融：输入与干预</text>
+<rect x="20" y="54" width="380" height="128" rx="7" fill="#f1f6fa" stroke="#cedde8"/>
+<text x="36" y="80" font-size="14" font-weight="600" fill="#285d8a">相机画面</text>
+<text x="384" y="80" text-anchor="end" font-size="12" fill="#285d8a">实验中改变</text>
+<g transform="translate(36 101)" stroke="#285d8a" stroke-width="1.4" fill="none"><rect x="0" y="3" width="25" height="17" rx="2"/><path d="M6 3 L9 0 H17 L20 3"/><circle cx="12.5" cy="11.5" r="4.5"/></g>
+<text x="70" y="116" font-size="15" font-weight="500">主视角相机</text>
+<g transform="translate(210 101)" stroke="#285d8a" stroke-width="1.4" fill="none"><rect x="0" y="3" width="25" height="17" rx="2"/><path d="M6 3 L9 0 H17 L20 3"/><circle cx="12.5" cy="11.5" r="4.5"/></g>
+<text x="244" y="116" font-size="15" font-weight="500">腕部相机</text>
+<line x1="36" y1="137" x2="384" y2="137" stroke="#cedde8"/>
+<text x="36" y="163" font-size="13" fill="#285d8a">涂黑 · 加噪声 · 冻结 · 槽位屏蔽</text>
+<text x="36" y="209" font-size="14" font-weight="600">其他输入</text>
+<text x="384" y="209" text-anchor="end" font-size="12" fill="#64717c">保持不变</text>
+<line x1="36" y1="220" x2="384" y2="220" stroke="#dde2e6"/>
+<text x="36" y="247" font-size="14" font-weight="500">机械臂状态</text>
+<text x="36" y="266" font-size="12" fill="#64717c">末端位姿与夹爪开合</text>
+<text x="36" y="290" font-size="14" font-weight="500">任务指令</text>
+<text x="36" y="309" font-size="12" fill="#64717c">“把黑碗拿起来放到……”</text>
+<path d="M400 118 H410 V355 H194 V377" fill="none" stroke="#64717c" stroke-width="1.2" marker-end="url(#input-arrow)"/>
+<path d="M400 264 H410" fill="none" stroke="#64717c" stroke-width="1.2"/>
+<rect x="130" y="386" width="128" height="54" rx="5" fill="#fff" stroke="#285d8a"/>
+<text x="194" y="419" text-anchor="middle" font-size="16" font-weight="600">策略</text>
+<path d="M258 413 H312" fill="none" stroke="#64717c" stroke-width="1.2" marker-end="url(#input-arrow)"/>
+<text x="326" y="418" font-size="15" font-weight="500">动作</text>
+<text x="20" y="488" font-size="10" fill="#64717c">图示双相机策略。OpenVLA 仅接收主视角画面与任务指令。</text>
+</svg>
