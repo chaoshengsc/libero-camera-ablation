@@ -13,6 +13,6 @@
 | [constraints-ovla.txt](constraints-ovla.txt) | OpenVLA 的独立依赖约束 |
 | [lock/](lock/) | 2026-10-01 从三个实际环境导出的包清单及使用说明 |
 
-ACT / Diffusion Policy、OpenVLA、SmolVLA / π0 / π0.5 使用不同环境；官方 OpenPI π0 使用独立的 OpenPI 管线。不要把约束文件或旧导出清单当成当前机器的运行证明。
+ACT / Diffusion Policy、OpenVLA、SmolVLA / π0 / π0.5 使用不同环境；官方OpenPI π0另用独立JAX环境，[安装指南](../docs/OPENPI_CN.md)记录固定源码/锁文件指纹、Python/uv版本与已核对包元数据。上面三份历史环境导出不包含OpenPI，不将约束文件或旧清单当成当前机器的运行证明。
 
 装好后到[脚本索引](../scripts/README_CN.md)选择评测入口；遇到依赖、渲染或解码问题，查[排错文档](../docs/TROUBLESHOOTING_CN.md)。

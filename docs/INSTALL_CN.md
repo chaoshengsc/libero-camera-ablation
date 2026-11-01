@@ -5,6 +5,8 @@
 按当时在工作站上实际执行的步骤整理（Ubuntu 24.04，RTX A5000，驱动 570，无 sudo、不用 apt）。
 **没有在全新机器上从头重跑验证过**；版本号与 `constraints-*.txt` 一致。
 
+**OpenPI/JAX原版π0服务端 + LeRobot客户端**另见[官方OpenPI安装与复现](OPENPI_CN.md)，其中补充独立环境、固定上游锁文件、原生权重、分词器缓存与验收步骤；下面三个环境不包含该服务端。
+
 ## 0. 工作目录与 Miniforge
 
 ```bash
@@ -102,8 +104,9 @@ hf download lerobot/pi05_libero_finetuned_v044 --revision 8e174154 --local-dir $
   CK=$EMB_ROOT/ckpt/diffusion_pusht@84a7c231
   python $REPO/scripts/eval/migrate_tuplefix.py --pretrained-path $CK --output-dir ${CK}_migrated
   ```
-- **π0、π0.5** 的分词器来自受限仓库 `google/paligemma-3b-pt-224`：需自己在 Hugging Face 上申请授权后下载分词器文件，
+- **LeRobot π0、π0.5** 的分词器来自受限仓库 `google/paligemma-3b-pt-224`：需自己在 Hugging Face 上申请授权后下载分词器文件，
   再把权重目录里 `policy_preprocessor.json` 的 `tokenizer_name` 改成本地路径。本仓库不提供该分词器。
+- **OpenPI原版π0**使用原生Orbax检查点及独立GCS分词器缓存，按[OpenPI指南](OPENPI_CN.md#3-原生权重归一化与分词器)准备，不套用上面的LeRobot权重/分词器步骤。
 - **状态置零微调的训练数据**：`lerobot/libero` 数据集（约 1.9 GB），放在 `$EMB_ROOT/cache/lerobot/lerobot/libero@<commit>`。
 
 ## 5. 跑评测
@@ -117,3 +120,7 @@ python3 $REPO/scripts/analysis/summarize_eval.py pi05_spatial_500      # 成功�
 输出在 `$EMB_ROOT/logs/eval/<run_name>/`；`stdout.log` 最后一行 `exit=0` 表示正常结束。各实验的入口见 `scripts/README_CN.md`。
 
 要让新结果进入看板和图表：把 `eval_info.json` 复制到 `dashboard/data/<run_name>/`，再运行 `python3 dashboard/build.py && python3 scripts/analysis/make_figures.py`。
+
+## 6. 官方OpenPI π0
+
+接着阅读[独立指南](OPENPI_CN.md)：已有版本 → JAX独立环境 → 原生权重/缓存 → 纯配置客户端 → 本机服务端/客户端 → 分阶段验收。命令整理自历史管线与重建的安装步骤，本次文档更新未重新安装依赖或运行新实验；恢复实验和P3继续暂停。

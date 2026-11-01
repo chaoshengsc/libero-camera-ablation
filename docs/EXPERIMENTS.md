@@ -97,6 +97,8 @@ Per-episode results and first-frame hashes are in `results/single_camera.csv`; t
 
 ### 1.5 Official π0 control
 
+Installation, server/client commands and historical stage acceptance are in the [OpenPI reproduction guide](OPENPI.md).
+
 LeRobot's π0 still scores 53–56% with every camera black. Is that π0 in general or this checkpoint? This section repeats the vision removal with Physical Intelligence's own `pi0_libero` checkpoint, in the same environment and on the same initial states. The design, the gate (normal ≥ 92%) and the reading rule were written before the runs and pushed to the repository (commit `6c54c5d`); the single-camera and 360-rendering conditions added later were also written down before their runs, but only locally, without a public timestamp; they are advance records rather than pre-registrations, and their results are exploratory.
 
 - **The LeRobot conversion did not run.** `lerobot/pi0_libero_base` in the LeRobot v0.6.1 pipeline scored 0/50 in the smoke test and 0/20 in each of three diagnostics. A LeRobot maintainer has said that porting OpenPI's image processing and normalization into LeRobot is not straightforward ([lerobot#2533](https://github.com/huggingface/lerobot/issues/2533)). Following the fallback written in advance, OpenPI itself serves action chunks as a local server in its own environment, with LeRobot's LIBERO environment as the client (`scripts/openpi/`).

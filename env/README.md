@@ -13,6 +13,6 @@ Configuration examples, dependency constraints, and historical package inventori
 | [constraints-ovla.txt](constraints-ovla.txt) | Independent OpenVLA dependency constraints |
 | [lock/](lock/) | Package exports from three actual environments on 2026-10-01, with usage notes |
 
-ACT / Diffusion Policy, OpenVLA, and SmolVLA / π0 / π0.5 use separate environments. Official OpenPI π0 uses its own pipeline. Constraints and historical exports do not prove the current runtime state of a machine.
+ACT / Diffusion Policy, OpenVLA, and SmolVLA / π0 / π0.5 use separate environments. Official OpenPI π0 adds a separate JAX environment; its [setup guide](../docs/OPENPI.md) records the upstream revision/lock fingerprints, Python/uv versions and verified package metadata. The three historical exports above do not include OpenPI. Constraints and historical exports do not prove the current runtime state of a machine.
 
 After setup, choose an evaluation in the [script index](../scripts/README.md). For dependency, rendering, or decoding failures, consult [troubleshooting](../docs/TROUBLESHOOTING.md).

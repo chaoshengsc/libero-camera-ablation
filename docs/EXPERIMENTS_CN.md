@@ -97,6 +97,8 @@ OpenVLA 只接收主视角画面和指令；本项目对它只测试了“全涂
 
 ### 1.5 官方 π0 对照
 
+独立环境、服务端/客户端命令与历史阶段验收见[OpenPI复现指南](OPENPI_CN.md)。
+
 LeRobot π0 全涂黑仍有 53–56%，这是 π0 的共性，还是这个权重的特性？这一节换成 Physical Intelligence 官方的 `pi0_libero` 检查点，在同一环境、同一批初始状态上重复去掉视觉。设计、门槛（正常 ≥ 92%）和判读规则在运行前写好并推送到仓库（提交 `6c54c5d`）；后补的单路相机和 360 渲染条件也在运行前写下，但只在本地记录、没有公开时间戳，是事前记录而不是预注册，相应结论属探索性。
 
 - **先用 LeRobot 转换版，跑不出来。** `lerobot/pi0_libero_base` 在 LeRobot v0.6.1 管线下冒烟 0/50，三组对照各 0/20。LeRobot 维护者说过，把 OpenPI 的图像处理和归一化移植进 LeRobot 并不直接（[lerobot#2533](https://github.com/huggingface/lerobot/issues/2533)）。按预先写好的退路改用 OpenPI 原版：OpenPI 在独立环境里作为本机服务给出动作块，LeRobot 的 LIBERO 环境当客户端（`scripts/openpi/`）。

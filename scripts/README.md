@@ -44,9 +44,9 @@ The reproduction table uses `lerobot/smolvla_libero`. Its extra arguments are de
 | End-effector trajectories, one-camera blackout | [run_trajectory_and_single_camera.sh](eval/run_trajectory_and_single_camera.sh) | [Trajectory analysis](analysis/analyze_trajectories.py) · [Single-camera summary](analysis/summarize_single_camera.py) |
 | Official π0 control, single-camera masks, freeze, replay | [run_official_pi0.sh](eval/run_official_pi0.sh) | [Experiments 1.5–1.6](../docs/EXPERIMENTS.md#15-official-π0-control) |
 
-The official OpenPI π0 path needs a separate environment and an active local [serve_pi0_libero.py](openpi/serve_pi0_libero.py) server. [download_checkpoint.py](openpi/download_checkpoint.py) is the checkpoint download entry.
+Follow the [official OpenPI installation and reproduction guide](../docs/OPENPI.md) for the separate JAX environment, native checkpoint/tokenizer cache, configuration-only client and local [serve_pi0_libero.py](openpi/serve_pi0_libero.py) server. [download_checkpoint.py](openpi/download_checkpoint.py) downloads native assets.
 
-Read the staged runner and [notes](../docs/NOTES.md) for the protocol. This is a different inference pipeline from the LeRobot conversion.
+The guide maps every historical stage to run names, episode counts and rendering settings. The runner does not start the server or enforce the ≥92% success-rate gate; acceptance requires reviewing the actual records. This is a different inference pipeline from the failed LeRobot conversion; the [notes](../docs/NOTES.md) preserve the history.
 
 ## Minimal camera evaluation
 

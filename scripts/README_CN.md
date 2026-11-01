@@ -44,7 +44,9 @@ ACT的新输出统一为`logs/eval/act_cube_500/stdout.log`与`out/`；旧`logs/
 | 末端轨迹、单路相机涂黑 | [run_trajectory_and_single_camera.sh](eval/run_trajectory_and_single_camera.sh) | [轨迹分析](analysis/analyze_trajectories.py) · [单路汇总](analysis/summarize_single_camera.py) |
 | 官方 π0 对照、单路屏蔽、冻结与回放 | [run_official_pi0.sh](eval/run_official_pi0.sh) | [实验 1.5–1.6](../docs/EXPERIMENTS_CN.md#15-官方-π0-对照) |
 
-官方 π0 的 OpenPI 路径需要独立环境和已启动的本机 [serve_pi0_libero.py](openpi/serve_pi0_libero.py) 服务。权重下载入口为 [download_checkpoint.py](openpi/download_checkpoint.py)，分阶段运行约定见入口文件和[实验日志](../docs/NOTES_CN.md)。它与 LeRobot 转换版不是同一条推理管线。
+按[官方OpenPI安装与复现指南](../docs/OPENPI_CN.md)准备独立JAX环境、原生权重/分词器缓存、纯配置客户端及本机[serve_pi0_libero.py](openpi/serve_pi0_libero.py)服务；[download_checkpoint.py](openpi/download_checkpoint.py)负责原生资产下载。
+
+指南逐项对应历史阶段的运行名、回合数与渲染设置。入口不会启动服务，也不自动执行≥92%的成功率门槛，需核对实际工件后验收；它与失败的LeRobot转换路径不同，过程保留在[实验日志](../docs/NOTES_CN.md)。
 
 ## 最小相机评测
 

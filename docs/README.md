@@ -8,6 +8,7 @@ The README presents the key findings. This guide connects the full study, reprod
 |---|---|---|
 | Understand the study | [Experiments & results](EXPERIMENTS.md) | Interventions, full tables, repeated runs, and interpretation limits |
 | Set up | [Installation](INSTALL.md) | Environments, checkpoints, tokenizer, and a first evaluation |
+| Reproduce official π0 | [OpenPI setup & acceptance](OPENPI.md) | Pinned JAX environment, native assets, local server/client and historical protocol |
 | Choose an entry point | [Script index](../scripts/README.md) | Reproduction, camera ablations, official π0, and analysis |
 | Resolve a failure | [Troubleshooting](TROUBLESHOOTING.md) | Symptoms, causes, and fixes |
 | Verify a number | [Results directory](../results/README.md) | Table purposes, raw evidence, and generation commands |

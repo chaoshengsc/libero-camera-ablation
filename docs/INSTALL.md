@@ -5,6 +5,8 @@
 These are the steps that were actually run on the workstation (Ubuntu 24.04, RTX A5000, driver 570, no sudo, no apt).
 **They have not been re-run from scratch on a clean machine.** Version numbers match `constraints-*.txt`.
 
+For the native **OpenPI/JAX π0 server plus LeRobot client**, use the separate [OpenPI installation and reproduction guide](OPENPI.md). It records the additional environment, pinned upstream lock, native checkpoint, tokenizer cache and acceptance steps; the three environments below do not include that server.
+
 ## 0. Working directory and Miniforge
 
 ```bash
@@ -102,8 +104,9 @@ hf download lerobot/pi05_libero_finetuned_v044 --revision 8e174154 --local-dir $
   CK=$EMB_ROOT/ckpt/diffusion_pusht@84a7c231
   python $REPO/scripts/eval/migrate_tuplefix.py --pretrained-path $CK --output-dir ${CK}_migrated
   ```
-- **π0 and π0.5** use the tokenizer from the gated repository `google/paligemma-3b-pt-224`: request access on Hugging Face yourself, download the tokenizer files,
+- **LeRobot π0 and π0.5** use the tokenizer from the gated repository `google/paligemma-3b-pt-224`: request access on Hugging Face yourself, download the tokenizer files,
   then set `tokenizer_name` in the checkpoint's `policy_preprocessor.json` to the local path. This repo does not distribute the tokenizer.
+- **Native OpenPI π0** uses its original Orbax checkpoint and a separate GCS tokenizer cache; follow [the OpenPI guide](OPENPI.md#3-native-weights-normalization-and-tokenizer), not the LeRobot checkpoint/tokenizer procedure above.
 - **Training data for the state-zeroing fine-tune**: the `lerobot/libero` dataset (about 1.9 GB), placed at `$EMB_ROOT/cache/lerobot/lerobot/libero@<commit>`.
 
 ## 5. Running evaluations
@@ -117,3 +120,7 @@ python3 $REPO/scripts/analysis/summarize_eval.py pi05_spatial_500      # success
 Outputs go to `$EMB_ROOT/logs/eval/<run_name>/`; a last line of `exit=0` in `stdout.log` means the run finished normally. Entry points for each experiment are listed in `scripts/README.md`.
 
 To bring a new result into the dashboard and figures, copy its `eval_info.json` to `dashboard/data/<run_name>/`, then run `python3 dashboard/build.py && python3 scripts/analysis/make_figures.py`.
+
+## 6. Official OpenPI π0
+
+Continue with [the dedicated guide](OPENPI.md): recorded versions → separate JAX environment → native weights/cache → configuration-only client → local server/client → staged acceptance. Its commands document the historical pipeline and a reconstructed setup recipe; this documentation update did not reinstall dependencies or run new experiments. Recovery experiments and P3 remain paused.
