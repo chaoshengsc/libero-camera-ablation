@@ -66,6 +66,8 @@ A re-run of official π0 at 360 rendering still scores 0/100 with black input; t
 
 See the [full experiments](docs/EXPERIMENTS.md) for designs, repeated runs, per-task results, and statistical scope. The [notes](docs/NOTES.md) retain chronological records and corrections.
 
+Budgets differ by path: OpenVLA allows 220 control steps; the other LIBERO model clients allow 280, each with ten additional settling steps. These are not common-budget model rankings. Official π0 also uses this repository's client protocol; see [protocols and audit scope](docs/EXPERIMENTS.md#3-evaluation-protocols-and-audit-scope).
+
 ## 2. Reproduction of the public checkpoints
 
 | Model | Task | This repo (500 episodes) | Reference | Repo criterion |

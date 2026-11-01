@@ -65,6 +65,8 @@ const DICT = [
   ["每格是该任务 50 回合的成功率（%）。列标题是“拿起黑碗并放到盘子上”里碗的初始位置。", "Each cell is the success rate (%) over 50 episodes of that task. Column headers give where the bowl starts in \"pick up the black bowl and place it on the plate\"."],
   ["相机消融只改变画面输入；OpenVLA只接收主视角和指令，其余三个检查点还接收腕部画面与状态。", "Camera ablations alter image inputs. OpenVLA uses the agent view and instruction; the other three checkpoints also receive wrist images and state."],
   ["早期相机消融每次100回合，按相同初始状态比较。区间取决于配对与重复结构，不设统一的13点阈值；π0早期同条件重复最多相差18点。", "Earlier camera runs use 100 matched initial states. Uncertainty depends on pairing and repeats, not a universal 13-point threshold; earlier pi0 repeats differed by up to18 points."],
+  ["OpenVLA为220控制步，其他LIBERO模型客户端为280步，均另有10步等待；这些结果不构成统一预算的模型排名。", "OpenVLA allows 220 control steps; the other LIBERO model clients allow 280, each with ten additional settling steps. These are not common-budget model rankings."],
+  ["协议与验收范围", "Protocols & audit scope"],
   ["三个检查点在所测全黑回合中均未成功完成任务；LeRobot π0 v044仍有一半以上成功。", "Three checkpoints completed no tested all-black episode; LeRobot pi0 v044 still succeeded in more than half."],
   ["π0 各任务的成功次数（每个任务 10 回合）：全涂黑后的失败集中在三个任务上。", "π0 successes per task (10 episodes each): the failures with black cameras are concentrated in three tasks."],
   ["所测π0.5和SmolVLA检查点对首帧冻结敏感；π0本组全黑运行的成功率低于正常运行。", "The tested π0.5 and SmolVLA checkpoints are sensitive to first-frame freezing. The π0 all-black runs in this group score below their normal runs."],

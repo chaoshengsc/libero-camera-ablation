@@ -180,7 +180,7 @@ python3 "$REPO/scripts/analysis/summarize_eval.py" "$RUN"
 
 `CK`须指向已准备的权重，`RUN`须未被使用；该LIBERO命令每任务50回合、共500回合。只需十回合相机检查时，使用[最小示例](../scripts/README_CN.md#最小相机评测)。
 
-要让新结果进入看板和图表：把 `eval_info.json` 复制到 `dashboard/data/<run_name>/`，再运行 `python3 dashboard/build.py && python3 scripts/analysis/make_figures.py`。
+结果注册、专题所需配对/哈希记录及完整重建顺序统一见[脚本索引](../scripts/README_CN.md#已有数据的分析与出图)；只复制JSON不会自动把新运行注册到看板。
 
 ## 6. 官方OpenPI π0
 

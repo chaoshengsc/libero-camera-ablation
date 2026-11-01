@@ -183,6 +183,9 @@ python3 scripts/analysis/summarize_followup.py
 
 ## 自检、诊断与历史实验
 
+- **公开仓库检查：** [repository_check.py](checks/repository_check.py)离线检查Git跟踪的相对链接/锚点、JavaScript语法（需Node.js）和引用/项目版本；现有CI会执行，不导入模型或仿真。
+- **旧ACT演示导出：** [export_act.py](../viewer/export_act.py)使用已配置`lerobot`环境及未被使用的`--output`目录；顺序尝试seed1000–1009，取首个成功演示或最后一次失败，不属于评测结果。已有输出和失败工件均保留。另获准导出后，将`done.json`指向的`.mjb`及选中`.npz`一起复制到本地查看器；[replay.py](../viewer/replay.py)头部有macOS的`mjpython`命令。本轮维护未在GPU上运行该导出器。
+
 - **环境自检：** [torch_check.py](checks/torch_check.py)、[egl_smoke.py](checks/egl_smoke.py)、[codec_check.py](checks/codec_check.py)，分别检查 GPU/torch、EGL 与视频解码。
 - **π0 诊断：** [run_pi0_full.sh](eval/run_pi0_full.sh) 与 [run_pi0_action_steps.sh](eval/run_pi0_action_steps.sh)，对应历史冒烟、完整评测和动作块长度检查。
 - **历史微调：** [run_statedrop_pipeline.sh](train/run_statedrop_pipeline.sh) 调用 [run_train.sh](train/run_train.sh)，由 [summarize_statedrop.py](analysis/summarize_statedrop.py) 汇总。结果与后续更正保留在[实验日志](../docs/NOTES_CN.md)，不作为 README 的主要发现。

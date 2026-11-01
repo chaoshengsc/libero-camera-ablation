@@ -4,6 +4,8 @@
 
 This guide reconstructs the **native OpenPI/JAX server + LeRobot LIBERO client** used on 2026-10-28–29. It is the path that passed acceptance: smoke **50/50**, then normal **482/500 = 96.4%**. The LeRobot conversion scored **0/50** in its smoke test and is retained as a failed path, not an installation prerequisite.
 
+It reproduces this repository's historical client protocol: **280 control steps plus ten settling steps** for Spatial. The pinned [upstream OpenPI example](https://github.com/Physical-Intelligence/openpi/blob/215abfb217dbac7d5f1273282331b9b1866c0479/examples/libero/main.py) uses 220 plus ten. The 96.4% result evaluates official weights under our protocol, rather than reproducing the 96.8% reference under identical conditions; see [protocols and audit scope](EXPERIMENTS.md#3-evaluation-protocols-and-audit-scope).
+
 The commands below document setup and execution; they were **not executed again while writing this guide**. Read-only checks on 2026-11-01 verified installed package metadata, selected source fingerprints, the client configuration and historical logs. A clean-machine installation and a new model/simulation run remain unverified. Recovery experiments and P3 remain paused.
 
 ## 1. Recorded configuration
@@ -17,7 +19,7 @@ The commands below document setup and execution; they were **not executed again 
 | Other installed server packages | flax 0.10.2; orbax-checkpoint 0.11.13; NumPy 1.26.4; tensorstore 0.1.74; ml-dtypes 0.4.1 |
 | Client environment | `smolvla`: LeRobot v0.6.1 (`7e241bd6`), torch 2.11.0+cu128, MuJoCo 3.3.2, robosuite 1.4.0, hf-libero 0.1.4 |
 | Native checkpoint | `gs://openpi-assets/checkpoints/pi0_libero`; historical download: 19 files, 12,014,131,888 bytes |
-| Evaluation | LIBERO-Spatial, ten tasks, batch1, seed1000, five executed actions per query |
+| Evaluation | LIBERO-Spatial, ten tasks, batch1, seed1000, 280 control steps + ten settling steps, five executed actions per query |
 | Images | Historical main run: 256 rendering, then 224 model input; separate 360-rendering check |
 
 The server and client use **separate environments**. OpenPI's lock includes its own Git-pinned LeRobot dependency; it is not the v0.6.1 simulation client. The October 1 [environment exports](../env/lock/) do not include OpenPI.
@@ -188,7 +190,7 @@ WRAP=probe BLACKOUT=none POLICY_SERVER="$OPENPI_PORT" \
 
 The wrapper activates `smolvla`, requires cached assets (`HF_HUB_OFFLINE=1`), and runs **five episodes per task, 50 total**, with batch1 and seed1000. `POLICY_SERVER` selects native OpenPI inference; omitting it selects the failed conversion path for this configuration. Existing output directories/files/symlinks are rejected and failed outputs retained. Do not delete an old run to bypass protection.
 
-Within each task, the recorded protocol uses initial-state indices0–4 for smoke,0–49 for the gate and0–9 for 100-episode conditions. Keep the client's ten settling steps and task horizons unchanged. The evaluation seed does not fix the separate OpenPI server's random-number stream.
+Within each task, the recorded protocol uses initial-state indices0–4 for smoke,0–49 for the gate and0–9 for 100-episode conditions. The client allows 280 control steps plus ten separate settling steps, differing from the upstream example's 220 control steps. The evaluation seed does not fix the separate OpenPI server's random-number stream.
 
 The client rotates both views by 180°, sends raw eight-dimensional state and task text; the server resizes to 224, applies the original normalization and restores delta actions. It returns `(50,7)` action chunks; only the first five actions are executed before querying again. Do not apply LeRobot normalization or delta restoration a second time.
 

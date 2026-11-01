@@ -4,7 +4,7 @@
 
 Full results for camera ablations, the official π0 control, open-loop replay, and public-checkpoint reproduction. The [notes](NOTES.md) retain chronological designs and corrections; this report does not replace the raw records.
 
-[All black](#11-all-cameras-black) · [Noise & freeze](#12-one-camera-noise-frozen-image) · [Trajectories](#13-where-blind-π0-succeeds-it-follows-the-sighted-path) · [Single camera](#14-wrist-camera-removed-500-episodes) · [Official π0](#15-official-π0-control) · [Fixed-action replay](#16-fixed-action-replay) · [State updates](#17-state-input-update-sensitivity) · [Reproduction](#2-reproduction-of-the-public-checkpoints)
+[All black](#11-all-cameras-black) · [Noise & freeze](#12-one-camera-noise-frozen-image) · [Trajectories](#13-where-blind-π0-succeeds-it-follows-the-sighted-path) · [Single camera](#14-wrist-camera-removed-500-episodes) · [Official π0](#15-official-π0-control) · [Fixed-action replay](#16-fixed-action-replay) · [State updates](#17-state-input-update-sensitivity) · [Reproduction](#2-reproduction-of-the-public-checkpoints) · [Protocols & audit scope](#3-evaluation-protocols-and-audit-scope)
 
 ---
 
@@ -102,7 +102,7 @@ Installation, server/client commands and historical stage acceptance are in the 
 LeRobot's π0 still scores 53–56% with every camera black. Is that π0 in general or this checkpoint? This section repeats the vision removal with Physical Intelligence's own `pi0_libero` checkpoint, in the same environment and on the same initial states. The design, the gate (normal ≥ 92%) and the reading rule were written before the runs and pushed to the repository (commit `6c54c5d`); the single-camera and 360-rendering conditions added later were also written down before their runs, but only locally, without a public timestamp; they are advance records rather than pre-registrations, and their results are exploratory.
 
 - **The LeRobot conversion did not run.** `lerobot/pi0_libero_base` in the LeRobot v0.6.1 pipeline scored 0/50 in the smoke test and 0/20 in each of three diagnostics. A LeRobot maintainer has said that porting OpenPI's image processing and normalization into LeRobot is not straightforward ([lerobot#2533](https://github.com/huggingface/lerobot/issues/2533)). Following the fallback written in advance, OpenPI itself serves action chunks as a local server in its own environment, with LeRobot's LIBERO environment as the client (`scripts/openpi/`).
-- **Gate and initial states.** Normal, 500 episodes: 482/500 = 96.4%, close to the earlier OpenPI README's 96.8%. First-step end-effector positions match section 1.4's π0 normal run episode by episode (500/500). This is the recorded matching check, not a bitwise comparison of complete simulation states.
+- **Gate and initial states.** Normal, 500 episodes: 482/500 = 96.4%, passing this study's ≥92% gate. Our LeRobot client allows 280 control steps; the pinned upstream OpenPI example allows 220. The earlier README's 96.8% is therefore a reference, not an identical-protocol reproduction. First-step end-effector positions match section 1.4's π0 normal run episode by episode (500/500). This is the recorded matching check, not a bitwise comparison of complete simulation states.
 
 ![Official π0 vs. LeRobot π0 with cameras removed](../media/official_pi0.svg)
 
@@ -202,3 +202,51 @@ This repository's 500-episode 95% intervals are about ±1–4 points. They are c
 <p align="center"><img src="../media/act_transfer_cube_success.gif" width="320" alt="A successful ACT episode"><br><sub>ACT on ALOHA Transfer Cube: the right arm picks up the cube and hands it to the left arm.</sub></p>
 
 Per-task results are on the [dashboard](https://chaoshengsc.github.io/libero-camera-ablation/dashboard/). Replay videos are too large to publish; the dashboard plays them when the files are present locally. Sources of the reference numbers and the full experiment log are in [`docs/NOTES.md`](NOTES.md).
+
+## 3. Evaluation protocols and audit scope
+
+### 3.1 Steps and replanning
+
+**Control steps, predicted action horizons and internal model iterations are different quantities.** The episode limit bounds actions sent to the environment; `chunk_size`/horizon describes a prediction's length; `n_action_steps` or `replan_steps` determines how many are executed before querying again. For example, π0 predicts 50 steps but executes only five before replanning. Ten denoising iterations are not ten environment steps. A public checkpoint's training configuration or scheduler fields do not establish training steps performed by this repository.
+
+These are existing-run protocols checked against historical logs, retained artifacts and version-specific source. Current script defaults alone do not prove historical execution. LIBERO paths use 20 Hz and ten additional settling steps outside the control budget. ACT and PushT use different environments; their step counts are not directly comparable.
+
+| Path / checkpoint | Control budget / frequency | Prediction length / replan interval | Rendering | Seed |
+|---|---|---|---|---|
+| LeRobot π0 v044, camera runs | 280 / 20 Hz | 50 / 5 | 360 | 1000 |
+| LeRobot π0.5 v044 | 280 / 20 Hz | 50 / 10 | 360 | 1000 |
+| LeRobot SmolVLA `31d453f7` | 280 / 20 Hz | 50 / 10 | 360 | 1000 |
+| Official π0, OpenPI server + LeRobot client | 280 / 20 Hz | 50 / 5 | Main 256; check 360 | Client 1000; separate server RNG stream |
+| OpenVLA | 220 / 20 Hz | Single action / 1 | 256, center crop enabled | 7 |
+| P1: LeRobot π0 v044 | 280 / 20 Hz | 50 / 5 | 360 | Environment 1000; episode-noise formula in 1.7 |
+| P2: fixed source actions | Limit 280; source lengths 80–133 | No model call or sequence extension | 128 | 1000 + target initial-state ID |
+| ACT, ALOHA Transfer Cube | 400 / 50 Hz | 100 / 100 | Environment cameras | 1000 |
+| Diffusion Policy, PushT | 300 / 10 Hz | Horizon 16, two observation steps / execute 8 | Environment camera | 1000 |
+
+The seed column gives entry/base seeds, not an identical random-number state for every episode. P1 fixes episode-level policy noise separately; the client seed does not fix the native OpenPI server's RNG stream.
+
+Checkpoint sources/revisions are in the [reproduction RUNS](../dashboard/build.py) and sections 1.5/1.7. LeRobot uses [run_libero.sh](../scripts/eval/run_libero.sh); native inference uses the [local server bridge](../scripts/openpi/serve_pi0_libero.py), without loading the proxy configuration's PyTorch weights. The environment-source fingerprint matches the [P2 runtime record](../dashboard/data/replay_holdout/audit.json); checked logs report a 280-step budget. OpenVLA uses [run_ovla.sh](../scripts/eval/run_ovla.sh).
+
+**Within-protocol contrasts and cross-protocol comparisons are distinct.** Normal/intervention conditions use the same checkpoint and its own budget. Early normal columns take the first ten episodes per task; P1 runs its own paired normal conditions. The pinned [upstream OpenPI example](https://github.com/Physical-Intelligence/openpi/blob/215abfb217dbac7d5f1273282331b9b1866c0479/examples/libero/main.py) uses 220 control steps plus ten settling steps, versus 280 plus ten here. These results are not a common-budget model ranking; 96.4% is not an identical-protocol reproduction of the 96.8% reference. No new runs or truncation of old summaries were used to remove these differences.
+
+### 3.2 Execution, denominators and stopping
+
+LeRobot LIBERO evaluation ends on environment termination/truncation or success, or at the control limit; unsuccessful episodes remain in the denominator. P1 follows that loop but lacks saved stepwise terminal flags, so a unique stopping reason cannot be reconstructed for every episode. OpenVLA counts environment `done` as success and also stops on budget exhaustion or exceptions. Its checked 500 normal and two 100-episode all-black logs contain no caught exception and retain all episodes. The earlier out-of-memory startup is a separate logged engineering failure, not a formal episode.
+
+P2 stops on success, termination/truncation, 280 steps or source-sequence exhaustion; see its [replay loop](../scripts/analysis/replay_holdout.py). The ten sources are 80–133 steps long. Of 400 formal episodes, 262 succeed and 138 exhaust the source, with zero technical invalids. Those failures are not environment timeouts and did not execute 280 steps. Ten self-replays are excluded from the formal 400, as P1's 40 engineering checks are excluded from its 1200 formal executions.
+
+### 3.3 What the evidence supports
+
+The 2026-11-02 review distinguishes public-data consistency, historical execution logs and full-artifact acceptance. All 117 public `eval_info.json` records have consistent episode counts, success rates and task keys; that does not certify complete stepwise evidence for all 117 runs.
+
+| Existing result | Checked evidence | Supported scope and remaining limits |
+|---|---|---|
+| 1.1–1.2, blackout/perturbations/repeats | Per-task outcomes, generator mappings and core-condition historical logs | Retain protocol-specific sensitivity observations; some supplemental repeat logs are not independently associated, and identical all-zero outcomes cannot identify a repeat |
+| 1.3, trajectories | Two public DTW summaries against the CSV | Not every old trajectory NPZ was recomputed here; post-hoc task selection/reference exclusions remain, without trajectory equivalence or a fixed-action mechanism claim |
+| 1.4, 500-episode single-camera runs | Eleven new-run outcomes/logs, episode first-frame hashes and paired statistics | Each new run covers 500 task/state pairs; π0.5 wrist blackout instead repeats 100 states five times, not 500 independent states |
+| 1.5, official π0 | Normal gate, ablation/rendering logs and first-position or first-frame matching | Observations apply to each checkpoint/pipeline; 280-step client, unseparated weights/pipelines, not a complete copy of the upstream 220-step protocol |
+| 1.6, earlier replay / P2 | Historical replay JSON; all 410 local P2 NPZs, action prefixes, stop flags and public outcomes | P2 evaluates 400 selection-external states after fixing actions; no hidden/new-task test or quantification of LeRobot π0's mechanism |
+| 1.7, P1 | All 1240 local episodes; 277644 actions, 55689 inference blocks and paired records | Formal C/D each record 280 steps in all 300 episodes, with no evidence of shortened execution; full images/stepwise terminal flags are absent, supporting update sensitivity only |
+| Section 2, five public checkpoints | 500 episodes each, historical run records and reference sources | Meets this repo's reference-overlap convention; environments/budgets/training differ, without common-budget ranking or identical-training reproduction |
+
+Original stdout and complete NPZs remain outside Git. The [P1 audit](../dashboard/data/state_feedback/audit.json) and [P2 audit](../dashboard/data/replay_holdout/audit.json) record local checks and their boundaries; public JSON does not replace complete artifacts. The old official-normal NPZ has no action arrays, so end-effector records alone do not supply a 220-step success rate. No execution error requiring a core rerun was found in the checked evidence; this does not certify complete historical records or remove nondeterminism, input mismatch and unresolved mechanisms described above.

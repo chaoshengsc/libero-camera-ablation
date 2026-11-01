@@ -180,7 +180,7 @@ Outputs go to `$EMB_ROOT/logs/eval/<run_name>/`; a last line of `exit=0` in `std
 
 `CK` must be the prepared checkpoint; choose an unused `RUN`. The LIBERO command runs 50 episodes per task, 500 total. For the bounded ten-episode camera check, use [the minimal example](../scripts/README.md#minimal-camera-evaluation) instead.
 
-To bring a new result into the dashboard and figures, copy its `eval_info.json` to `dashboard/data/<run_name>/`, then run `python3 dashboard/build.py && python3 scripts/analysis/make_figures.py`.
+For result registration, required pairing/hash records and the complete regeneration sequence, follow [the script guide](../scripts/README.md#existing-data-analysis-and-figures). Copying a JSON file alone does not register a run in the dashboard.
 
 ## 6. Official OpenPI π0
 

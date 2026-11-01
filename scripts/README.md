@@ -180,6 +180,9 @@ Run all three from the repository root for dashboard data, earlier figures, then
 
 ## Checks, diagnostics, and historical experiments
 
+- **Public repository checks:** [repository_check.py](checks/repository_check.py) checks Git-tracked relative links/fragments, JavaScript syntax (Node.js) and citation/project versions offline; the existing CI runs it. It imports no model or simulator.
+- **Legacy ACT demonstration export:** [export_act.py](../viewer/export_act.py) uses the configured `lerobot` environment and an unused `--output` directory. It tries seeds1000–1009 until the first success, retaining that demonstration or the last failure; it is not an evaluation result. Existing outputs and failed artifacts are kept. After an independently authorized export, copy the `.mjb` and selected `.npz` from `done.json` together to the local viewer; [replay.py](../viewer/replay.py) documents the macOS `mjpython` command. This maintenance update did not run the exporter on a GPU.
+
 - **Environment checks:** [torch_check.py](checks/torch_check.py), [egl_smoke.py](checks/egl_smoke.py), and [codec_check.py](checks/codec_check.py) check GPU/torch, EGL, and video decoding.
 - **π0 diagnostics:** [run_pi0_full.sh](eval/run_pi0_full.sh) and [run_pi0_action_steps.sh](eval/run_pi0_action_steps.sh) cover historical smoke/full evaluations and action-chunk checks.
 - **Historical fine-tuning:** [run_statedrop_pipeline.sh](train/run_statedrop_pipeline.sh) calls [run_train.sh](train/run_train.sh); [summarize_statedrop.py](analysis/summarize_statedrop.py) summarizes the results. Outcomes and corrections remain in the [notes](../docs/NOTES.md), outside the README's main findings.

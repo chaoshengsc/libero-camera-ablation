@@ -62,6 +62,8 @@ Camera ablations of four robot policies on LIBERO-Spatial
 
 完整设计、重复运行、逐任务结果与统计口径见[实验说明](docs/EXPERIMENTS_CN.md)；原始记录与更正见[实验日志](docs/NOTES_CN.md)。
 
+评测预算因路径而异：OpenVLA为220控制步，其他LIBERO模型客户端为280步，均另有10步稳定等待。这些结果不构成统一预算的模型排名；官方π0也采用本仓库客户端协议，详见[协议与验收范围](docs/EXPERIMENTS_CN.md#3-评测协议与验收范围)。
+
 ## 2. 公开权重的复现
 
 | 模型 | 任务 | 本仓库（500 回合） | 基准 | 本项目判据 |

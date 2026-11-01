@@ -20,6 +20,8 @@ jobs:
         run: for f in scripts/*.sh scripts/*/*.sh; do bash -n "$f"; done
       - name: Tests
         run: pytest -q
+      - name: Documentation, JavaScript and citation consistency
+        run: python scripts/checks/repository_check.py
       - name: Dashboard data and figures are up to date
         run: |
           python dashboard/build.py
