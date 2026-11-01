@@ -22,6 +22,7 @@
 | [state_feedback_comparisons.csv](state_feedback_comparisons.csv) | P1预定主比较、次比较与探索性交互 |
 | [replay_holdout_episodes.csv](replay_holdout_episodes.csv) | P2全部410个自回放/正式结果，含结束原因 |
 | [replay_holdout_summary.csv](replay_holdout_summary.csv) | P2逐任务Wilson与总体分层bootstrap区间 |
+| [budget_sensitivity.csv](budget_sensitivity.csv) | 既有LIBERO回合的220步截止计分，保留原分母和matched100范围，不覆盖原结果 |
 
 ## 数字怎样追溯
 
@@ -44,3 +45,5 @@ python3 scripts/analysis/summarize_followup.py
 `trajectories_task4.json` 与 `trajectories_task7.json` 是轨迹图使用的精简 XY 数据（cm）。它们由 [export_trajectories.py](../scripts/analysis/export_trajectories.py) 从原始 NPZ 单独导出，需要 NumPy 与原始轨迹，不由上述三条命令重新生成。
 
 P1/P2公开来源分别为[state_feedback](../dashboard/data/state_feedback/)和[replay_holdout](../dashboard/data/replay_holdout/)，哈希绑定逐运行/逐回合记录；原始完整NPZ不入Git，张量审计范围与记录缺口见各目录README。
+
+协议补证见[95组来源与长度记录](../dashboard/data/protocol_audit/)。`budget_sensitivity.csv`的`source_episodes`是原运行回合数，`episodes`是有证据可重计的范围；`original_successes`仅对应这个范围，不能误作全运行结果。`successes_by_220`是已记录回合在220步内成功数；不重新推理或补跑。用`python scripts/analysis/summarize_protocol_audit.py`只读核查，`--write`经来源审查后重建此补充表。

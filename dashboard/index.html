@@ -55,7 +55,7 @@
     <p class="intro"><a href="#state-feedback">状态输入更新（P1）</a> · <a href="#open-loop">选择外固定动作回放（P2）</a></p>
     <p class="intro">相机消融只改变画面输入；OpenVLA只接收主视角和指令，其余三个检查点还接收腕部画面与状态。</p>
     <p class="intro">早期相机消融每次100回合，按相同初始状态比较。区间取决于配对与重复结构，不设统一的13点阈值；π0早期同条件重复最多相差18点。</p>
-    <p class="intro"><span>OpenVLA为220控制步，其他LIBERO模型客户端为280步，均另有10步等待；这些结果不构成统一预算的模型排名。</span> <a data-doc="docs/EXPERIMENTS" data-anchor-zh="3-评测协议与验收范围" data-anchor-en="3-evaluation-protocols-and-audit-scope" href="https://github.com/chaoshengsc/libero-camera-ablation/blob/main/docs/EXPERIMENTS_CN.md#3-评测协议与验收范围">协议与验收范围</a></p>
+    <p class="intro"><span>OpenVLA为220控制步，其他LIBERO模型客户端为280步，均另有10步等待。对已有回合统一220步截止计分后，首页全黑对照数字不变；这仍不是完整同协议排名。</span> <a data-doc="docs/EXPERIMENTS" data-anchor-zh="3-评测协议与验收范围" data-anchor-en="3-evaluation-protocols-and-audit-scope" href="https://github.com/chaoshengsc/libero-camera-ablation/blob/main/docs/EXPERIMENTS_CN.md#3-评测协议与验收范围">协议与验收范围</a></p>
     <p class="intro">早期π0相机实验使用LeRobot v044，一组500回合正常评测为73%。官方π0/OpenPI的全黑对照为0/100（1.5节）；结果限于各自所测检查点、管线和干预，不能推广到所有π0。</p>
     <div class="block"><div class="fig"><picture><source id="figInputsMobile" width="420" height="500" srcset="../media/zh/inputs-mobile.svg?v=claims-1" media="(max-width: 600px)"><img id="figInputs" width="880" height="350" src="../media/zh/inputs.svg?v=claims-1" alt="策略的输入，以及各实验改了哪一项"></picture></div></div>
 
@@ -109,7 +109,7 @@
       <p class="take">官方π0/OpenPI在所测全黑与腕部屏蔽条件下均为0/100，主视角屏蔽为77/100。LeRobot v044全黑仍有成功，但两边权重与管线不同。</p>
       <div class="fig"><img loading="lazy" id="figOfficial" width="760" height="468" src="../media/zh/official_pi0.svg?v=claims-1" alt="官方 π0 与 LeRobot π0 去掉相机后的成功率"></div>
       <div class="figure-tools"><a data-figure="official_pi0" href="../media/zh/official_pi0.svg" target="_blank" rel="noopener">查看原图 SVG</a><a href="../results/official_pi0_summary.csv">结果 CSV</a></div>
-      <p class="note">官方π0使用Physical Intelligence的pi0_libero检查点，在OpenPI管线下正常500回合为96.4%（256渲染），初始状态协议与1.4节匹配。各视觉干预100回合；360复测正常99/100，全黑和双槽屏蔽均为0/100。LeRobot侧为360渲染；官方权重转换路径冒烟0/50，未通过验收。此对照未隔离权重、转换与其他推理差异。设计记录见仓库docs/NOTES_CN.md，汇总见results/official_pi0_summary.csv。</p>
+      <p class="note">官方π0使用Physical Intelligence的pi0_libero检查点，在OpenPI管线下正常500回合为96.4%（256渲染），初始状态协议与1.4节匹配。各视觉干预100回合；360复测正常99/100，全黑和双槽屏蔽均为0/100。LeRobot侧为360渲染；另行试用的HF检查点冒烟0/50，且未通过同源性核验，不是同权重的管线对照。此对照未隔离权重、转换与其他推理差异。设计记录见仓库docs/NOTES_CN.md，汇总见results/official_pi0_summary.csv。</p>
     </div>
 
     <div class="block" id="open-loop">

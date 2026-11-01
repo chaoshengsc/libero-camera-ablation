@@ -66,7 +66,7 @@ A re-run of official π0 at 360 rendering still scores 0/100 with black input; t
 
 See the [full experiments](docs/EXPERIMENTS.md) for designs, repeated runs, per-task results, and statistical scope. The [notes](docs/NOTES.md) retain chronological records and corrections.
 
-Budgets differ by path: OpenVLA allows 220 control steps; the other LIBERO model clients allow 280, each with ten additional settling steps. These are not common-budget model rankings. Official π0 also uses this repository's client protocol; see [protocols and audit scope](docs/EXPERIMENTS.md#3-evaluation-protocols-and-audit-scope).
+Budgets differ by path: OpenVLA allows 220 control steps; the other LIBERO model clients allow 280, each with ten additional settling steps. Recounting retained artifacts at 220 steps preserves the headline blackout table; official π0's 500 normal episodes give 481/500. This is not a complete common-protocol reproduction or model ranking; see [the deadline check](docs/EXPERIMENTS.md#34-existing-episodes-at-the-same-220-step-deadline).
 
 ## 2. Reproduction of the public checkpoints
 
@@ -126,7 +126,7 @@ libero-camera-ablation/
 
 - Camera studies cover LIBERO-Spatial only. Earlier camera runs fix the environment seed; P1 adds three policy-noise repeats on the same 100 initial states, without new tasks or real robots.
 - [Experiments 1.1–1.3](docs/EXPERIMENTS.md#11-all-cameras-black) use 100 episodes per run; the [single-camera study](docs/EXPERIMENTS.md#14-wrist-camera-removed-500-episodes) uses 500. Repeating initial states does not add independent samples. Comparisons depend on pairing and repeat structure, not a universal 13-point threshold. Earlier π0 repeats of one condition differed by up to 18 points.
-- The π0 results concern the tested checkpoint/pipeline combinations. The official control uses the OpenPI path that passed the normal-evaluation gate; the LeRobot conversion scored 0/50 in smoke testing and failed acceptance. Official π0 scores 0/100 with black input at both 256 and 360 rendering; this check does not isolate weights, conversion or other inference differences. Each official π0 ablation condition was run once, 100 episodes.
+- The π0 results concern the tested checkpoint/pipeline combinations. The official control uses native GCS assets and the accepted OpenPI path. A separate HF candidate scores 0/50 and fails checkpoint-identity verification, so it is not a same-weight pipeline control. Official π0 scores 0/100 with black input at 256 and 360 rendering; weights and other inference differences remain unseparated. Each ablation condition was run once, 100 episodes.
 - [Replay](docs/EXPERIMENTS.md#16-fixed-action-replay) concerns the selected sequences and states. P2 targets were excluded from action selection but had appeared in earlier evaluations; they are not a hidden test set. P1/P2 use different checkpoint/state protocols and cannot be subtracted to assign mechanism contributions. P1 lacks stepwise terminal flags and full images; state freezing does not identify a unique mechanism. Full NPZ audit artifacts remain outside Git; published records reproduce rates and intervals.
 - Diffusion Policy was evaluated on PushT (2-D physics), not in MuJoCo.
 

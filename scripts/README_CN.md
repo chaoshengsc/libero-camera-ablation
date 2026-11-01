@@ -65,7 +65,7 @@ python scripts/analysis/summarize_eval.py --file \
 
 按[官方OpenPI安装与复现指南](../docs/OPENPI_CN.md)准备独立JAX环境、原生权重/分词器缓存、纯配置客户端及本机[serve_pi0_libero.py](openpi/serve_pi0_libero.py)服务；[download_checkpoint.py](openpi/download_checkpoint.py)负责原生资产下载。
 
-指南逐项对应历史阶段的运行名、回合数与渲染设置。入口不会启动服务，也不自动执行≥92%的成功率门槛，需核对实际工件后验收；它与失败的LeRobot转换路径不同，过程保留在[实验日志](../docs/NOTES_CN.md)。
+指南逐项对应历史阶段的运行名、回合数与渲染设置。入口不会启动服务，也不自动执行≥92%的成功率门槛，需核对工件后验收。早期HF试用检查点失败且未验证与原生权重同源，不能把它作为同权重的管线对照，见[证据核验](../dashboard/data/protocol_audit/)。
 
 ## 最小相机评测
 
@@ -183,6 +183,7 @@ python3 scripts/analysis/summarize_followup.py
 
 ## 自检、诊断与历史实验
 
+- **既有协议补证：** [summarize_protocol_audit.py](analysis/summarize_protocol_audit.py)只读核查95条来源关联元数据、公开结果/长度文件哈希与220步截止计分，CI不重新读取Git外原始工件；`--write`仅重建补充CSV。[check_checkpoint_identity.py](analysis/check_checkpoint_identity.py)在已有OpenPI环境中用CPU核对原生/HF参数，不导入模型、不写权重；返回1表示已确认参数不同，返回2表示不完整或输入错误。输入、内存保护和命令见[证据说明](../dashboard/data/protocol_audit/)。
 - **公开仓库检查：** [repository_check.py](checks/repository_check.py)离线检查Git跟踪的相对链接/锚点、JavaScript语法（需Node.js）和引用/项目版本；现有CI会执行，不导入模型或仿真。
 - **旧ACT演示导出：** [export_act.py](../viewer/export_act.py)使用已配置`lerobot`环境及未被使用的`--output`目录；顺序尝试seed1000–1009，取首个成功演示或最后一次失败，不属于评测结果。已有输出和失败工件均保留。另获准导出后，将`done.json`指向的`.mjb`及选中`.npz`一起复制到本地查看器；[replay.py](../viewer/replay.py)头部有macOS的`mjpython`命令。本轮维护未在GPU上运行该导出器。
 

@@ -65,7 +65,7 @@ Exit codes: **0** means all selected inputs were processed; **1** means missing,
 
 Follow the [official OpenPI installation and reproduction guide](../docs/OPENPI.md) for the separate JAX environment, native checkpoint/tokenizer cache, configuration-only client and local [serve_pi0_libero.py](openpi/serve_pi0_libero.py) server. [download_checkpoint.py](openpi/download_checkpoint.py) downloads native assets.
 
-The guide maps every historical stage to run names, episode counts and rendering settings. The runner does not start the server or enforce the ≥92% success-rate gate; acceptance requires reviewing the actual records. This is a different inference pipeline from the failed LeRobot conversion; the [notes](../docs/NOTES.md) preserve the history.
+The guide maps every historical stage to run names, episode counts and rendering settings. The runner does not start the server or enforce the ≥92% success-rate gate; acceptance requires reviewing the actual records. The failed early HF candidate is not verified as the same native weights and cannot serve as a pipeline-only control; see [the evidence audit](../dashboard/data/protocol_audit/).
 
 ## Minimal camera evaluation
 
@@ -180,6 +180,7 @@ Run all three from the repository root for dashboard data, earlier figures, then
 
 ## Checks, diagnostics, and historical experiments
 
+- **Existing-protocol evidence:** [summarize_protocol_audit.py](analysis/summarize_protocol_audit.py) validates 95 recorded source-association entries, public-result/duration hashes and 220-step deadline counts read-only; raw external artifacts are not rehashed by CI. `--write` regenerates only the supplemental CSV. [check_checkpoint_identity.py](analysis/check_checkpoint_identity.py) uses the existing OpenPI environment for CPU parameter comparison, without importing models or writing weights. Exit 1 means a confirmed parameter difference; exit 2 means incomplete evidence/invalid input. Inputs, RAM guards and commands are in the [evidence guide](../dashboard/data/protocol_audit/).
 - **Public repository checks:** [repository_check.py](checks/repository_check.py) checks Git-tracked relative links/fragments, JavaScript syntax (Node.js) and citation/project versions offline; the existing CI runs it. It imports no model or simulator.
 - **Legacy ACT demonstration export:** [export_act.py](../viewer/export_act.py) uses the configured `lerobot` environment and an unused `--output` directory. It tries seeds1000–1009 until the first success, retaining that demonstration or the last failure; it is not an evaluation result. Existing outputs and failed artifacts are kept. After an independently authorized export, copy the `.mjb` and selected `.npz` from `done.json` together to the local viewer; [replay.py](../viewer/replay.py) documents the macOS `mjpython` command. This maintenance update did not run the exporter on a GPU.
 

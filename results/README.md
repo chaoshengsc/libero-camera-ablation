@@ -22,6 +22,7 @@ Recomputable tables live here. Read the [experiments](../docs/EXPERIMENTS.md) fo
 | [state_feedback_comparisons.csv](state_feedback_comparisons.csv) | P1 primary/secondary contrasts and exploratory interaction |
 | [replay_holdout_episodes.csv](replay_holdout_episodes.csv) | All 410 P2 self/formal outcomes and stopping reasons |
 | [replay_holdout_summary.csv](replay_holdout_summary.csv) | P2 per-task Wilson and overall stratified-bootstrap intervals |
+| [budget_sensitivity.csv](budget_sensitivity.csv) | Existing LIBERO episodes recounted at 220 steps, retaining original denominators and matched100 scope |
 
 ## Trace a number
 
@@ -44,3 +45,5 @@ These build dashboard data, earlier CSVs/figures, then P1/P2 CSVs/figures and [d
 `trajectories_task4.json` and `trajectories_task7.json` contain compact XY trajectories (cm) for the trajectory figure. [export_trajectories.py](../scripts/analysis/export_trajectories.py) exports them separately from raw NPZ files; it needs NumPy and the raw trajectories. The commands above do not regenerate them.
 
 P1/P2 sources are [state_feedback](../dashboard/data/state_feedback/) and [replay_holdout](../dashboard/data/replay_holdout/), with hash-bound run/episode records. Full NPZ files stay outside Git; each directory explains audit scope and missing records.
+
+The [95-run provenance and length export](../dashboard/data/protocol_audit/) supports the supplemental deadline check. In `budget_sensitivity.csv`, `source_episodes` is the original run size; `episodes` is the evidenced scope being recounted. `original_successes` concerns only that scope, not necessarily the full run. `successes_by_220` counts successes by 220 steps on recorded trajectories without new inference. `python scripts/analysis/summarize_protocol_audit.py` checks it read-only; `--write` regenerates this managed CSV after source review.

@@ -1,0 +1,4029 @@
+{
+  "schema": 1,
+  "audit_date": "2026-11-02",
+  "scope": "79 existing core records plus16 P1 runs; no new policy/simulator execution",
+  "evaluator_source_sha256": "fddec10c709401dd863814091d525fcd54d41cc6ccf51f7ef8300459cf69b873",
+  "step_mapping": {
+    "method": "LIBERO batch1 preprocessing/action loop and video slicing; successful episodes stop at first task success; video frame count equals control steps, not steps+1",
+    "old_trace_video_pairs": 6110,
+    "old_action_video_pairs": 100,
+    "P1_action_video_pairs": 1240,
+    "length_mismatches": 0,
+    "limitations": "Video/EEF lengths are source-validated control-step records, not full model-input tensors or saved terminal flags. Some500-episode baselines retain only the first10 videos per task. Recounting these observed trajectories is not a fresh220-step evaluation."
+  },
+  "runs": [
+    {
+      "id": "act_cube_500",
+      "public_eval_sha256": "196b1a93d49232e645994d5e94871927e70f554d478dd83bc87713c01e80392f",
+      "source_eval_sha256": "3c4d7c243aad4f250f9ab054b9571f8954593f4cc1a6cf1d28af96910fd7639e",
+      "log_sha256": "70c845392db78331fddf744997e59df98ccd670c244d9c62a7735f29466e649a",
+      "canonical_matches": [
+        "logs/eval/act_cube_500"
+      ],
+      "association": "canonical_json_after_EMB_ROOT_replacement",
+      "budget": [
+        400
+      ]
+    },
+    {
+      "id": "dp_pusht_500",
+      "public_eval_sha256": "90fc688d83a7b73be1fbb064ef63381136ecc53fe6a8b8872362c66bea329bf5",
+      "canonical_matches": [
+        "logs/eval/dp_pusht_500"
+      ],
+      "source_eval_sha256": "6cc31866620a2ea44589f600f7f6cd4673e282b3014cce3bd2afadb6c17cd212",
+      "log_sha256": "8cb60a736a9ca41659637065f954268a9110ee85456e3273a571656221940e2c",
+      "exit_codes": [
+        0
+      ],
+      "tracebacks": 0,
+      "settings": {
+        "n_action_steps": [
+          "8"
+        ],
+        "chunk_size": [],
+        "num_inference_steps": [
+          "None"
+        ],
+        "num_steps": [],
+        "seed": [
+          "1000"
+        ],
+        "observation_height": [
+          "384"
+        ],
+        "batch_size": [
+          "50"
+        ],
+        "n_episodes": [
+          "500"
+        ],
+        "episode_length": [
+          "300"
+        ],
+        "fps": [
+          "10"
+        ]
+      },
+      "budget": [
+        300
+      ],
+      "total_episodes": 500,
+      "association": "canonical_json_after_EMB_ROOT_replacement"
+    },
+    {
+      "id": "official_pi0/ojx360_all",
+      "public_eval_sha256": "005b8440b313f51c68ccd93f18822332f581ffb736bd403662f4e4b78c93956a",
+      "canonical_matches": [
+        "logs/eval/ojx360_all"
+      ],
+      "source_eval_sha256": "7f8e59165ed536e33f987eda31b0b921546e3a9657618cf2b74cedeeee2d4b68",
+      "log_sha256": "01bcebbc5cb53342cc2f333fdcfc7058a3535db1c837eb0104e13bdf8d239920",
+      "exit_codes": [
+        0
+      ],
+      "tracebacks": 0,
+      "settings": {
+        "n_action_steps": [
+          "5"
+        ],
+        "chunk_size": [
+          "50"
+        ],
+        "num_inference_steps": [
+          "10"
+        ],
+        "num_steps": [],
+        "seed": [
+          "1000"
+        ],
+        "observation_height": [
+          "360"
+        ],
+        "batch_size": [
+          "1"
+        ],
+        "n_episodes": [
+          "10",
+          "100"
+        ],
+        "episode_length": [
+          "None"
+        ],
+        "fps": [
+          "20"
+        ]
+      },
+      "budget": [
+        280
+      ],
+      "traj_sha256": "9f78a72f6ac64bdcb9d9c780259aebf9087bd944968b9c96385ba10aaa9320cc",
+      "total_episodes": 100,
+      "association": "canonical_json_after_EMB_ROOT_replacement"
+    },
+    {
+      "id": "official_pi0/ojx360_drop_all",
+      "public_eval_sha256": "4f1ad62ac1094061c788e0da3ddec5c5fc675b857719bc4e5ea378042890c9b6",
+      "canonical_matches": [
+        "logs/eval/ojx360_drop_all"
+      ],
+      "source_eval_sha256": "219ffa8c155cdd740f19751a0ee935f5fe434575a97d9a123b141dcc34171ec8",
+      "log_sha256": "8af5e0be6d110740181137c769ee8710b0a88124ea79fd029938c217d78fbf6f",
+      "exit_codes": [
+        0
+      ],
+      "tracebacks": 0,
+      "settings": {
+        "n_action_steps": [
+          "5"
+        ],
+        "chunk_size": [
+          "50"
+        ],
+        "num_inference_steps": [
+          "10"
+        ],
+        "num_steps": [],
+        "seed": [
+          "1000"
+        ],
+        "observation_height": [
+          "360"
+        ],
+        "batch_size": [
+          "1"
+        ],
+        "n_episodes": [
+          "10",
+          "100"
+        ],
+        "episode_length": [
+          "None"
+        ],
+        "fps": [
+          "20"
+        ]
+      },
+      "budget": [
+        280
+      ],
+      "traj_sha256": "0128a098862538029cae26b6654d35de7d34481b3decc4f186829d5b2ded136b",
+      "total_episodes": 100,
+      "association": "canonical_json_after_EMB_ROOT_replacement"
+    },
+    {
+      "id": "official_pi0/ojx360_none",
+      "public_eval_sha256": "deb02b099ee938e91bd010c9cf18cb6d47cc5714790b4d821ebbdd6f6980694e",
+      "canonical_matches": [
+        "logs/eval/ojx360_none"
+      ],
+      "source_eval_sha256": "b91372edc8de618d3a27cdffdbccb483ec943443a88b426d3bba7fc9252ace90",
+      "log_sha256": "f84af04e9384a15370ce459ab7467ad1ae1879092174bbb1309bccfb4115f5f0",
+      "exit_codes": [
+        0
+      ],
+      "tracebacks": 0,
+      "settings": {
+        "n_action_steps": [
+          "5"
+        ],
+        "chunk_size": [
+          "50"
+        ],
+        "num_inference_steps": [
+          "10"
+        ],
+        "num_steps": [],
+        "seed": [
+          "1000"
+        ],
+        "observation_height": [
+          "360"
+        ],
+        "batch_size": [
+          "1"
+        ],
+        "n_episodes": [
+          "10",
+          "100"
+        ],
+        "episode_length": [
+          "None"
+        ],
+        "fps": [
+          "20"
+        ]
+      },
+      "budget": [
+        280
+      ],
+      "traj_sha256": "574ba42d1c22019fa6f50c3f04595682ec1fd4fd09a43d053effac8d6ea307f5",
+      "total_episodes": 100,
+      "association": "canonical_json_after_EMB_ROOT_replacement"
+    },
+    {
+      "id": "official_pi0/ojx_all",
+      "public_eval_sha256": "82368048ba407b410fe833575f7e6ceb76533d3e841f85fd865ad74fc1aae80b",
+      "canonical_matches": [
+        "logs/eval/ojx_all"
+      ],
+      "source_eval_sha256": "aef5dc6a74bd706a1db6dfd5b3e3be340e977e4e70392f7f91eadf685b57b9c3",
+      "log_sha256": "87ef5fef9a9092bec301f702bcfe03a6c3342e0912403fc99481f446ef973a66",
+      "exit_codes": [
+        0
+      ],
+      "tracebacks": 0,
+      "settings": {
+        "n_action_steps": [
+          "5"
+        ],
+        "chunk_size": [
+          "50"
+        ],
+        "num_inference_steps": [
+          "10"
+        ],
+        "num_steps": [],
+        "seed": [
+          "1000"
+        ],
+        "observation_height": [
+          "256"
+        ],
+        "batch_size": [
+          "1"
+        ],
+        "n_episodes": [
+          "10",
+          "100"
+        ],
+        "episode_length": [
+          "None"
+        ],
+        "fps": [
+          "20"
+        ]
+      },
+      "budget": [
+        280
+      ],
+      "traj_sha256": "2d1e65e2b1c2b67a7393402b91271382b693c61ed9e6f564b27ebaafb5e443ad",
+      "total_episodes": 100,
+      "association": "canonical_json_after_EMB_ROOT_replacement"
+    },
+    {
+      "id": "official_pi0/ojx_drop_agent",
+      "public_eval_sha256": "0c054a721cba96c0b8e0a5953f22643175c22be2574e5b50148e80570ddb1689",
+      "canonical_matches": [
+        "logs/eval/ojx_drop_agent"
+      ],
+      "source_eval_sha256": "0f85cd89e761688f01ca076bc5729c073264e447887c451adbe597bbf15d6b7d",
+      "log_sha256": "c66b5d344c235bd05f2e6709b0bf43541637b4925da3cdfaf50b5a194f3800ff",
+      "exit_codes": [
+        0
+      ],
+      "tracebacks": 0,
+      "settings": {
+        "n_action_steps": [
+          "5"
+        ],
+        "chunk_size": [
+          "50"
+        ],
+        "num_inference_steps": [
+          "10"
+        ],
+        "num_steps": [],
+        "seed": [
+          "1000"
+        ],
+        "observation_height": [
+          "256"
+        ],
+        "batch_size": [
+          "1"
+        ],
+        "n_episodes": [
+          "10",
+          "100"
+        ],
+        "episode_length": [
+          "None"
+        ],
+        "fps": [
+          "20"
+        ]
+      },
+      "budget": [
+        280
+      ],
+      "traj_sha256": "d30b05bf9f2eed46dba5f22a0fc70f28dd4ee246a95b8fd0e48342242ef99cfe",
+      "total_episodes": 100,
+      "association": "canonical_json_after_EMB_ROOT_replacement"
+    },
+    {
+      "id": "official_pi0/ojx_drop_all",
+      "public_eval_sha256": "b50738581864647fecb1489db4dd94e4e9c43f3b7fc1c1c511c1ba05ab71185b",
+      "canonical_matches": [
+        "logs/eval/ojx_drop_all"
+      ],
+      "source_eval_sha256": "4d9ff74c4b24ee66149186ef57c8612efb4465b14f8945049e7ca35396e61565",
+      "log_sha256": "0d84f9e89670e24a4f3867de19a825f0d63bcf61029bf184010674821e311011",
+      "exit_codes": [
+        0
+      ],
+      "tracebacks": 0,
+      "settings": {
+        "n_action_steps": [
+          "5"
+        ],
+        "chunk_size": [
+          "50"
+        ],
+        "num_inference_steps": [
+          "10"
+        ],
+        "num_steps": [],
+        "seed": [
+          "1000"
+        ],
+        "observation_height": [
+          "256"
+        ],
+        "batch_size": [
+          "1"
+        ],
+        "n_episodes": [
+          "10",
+          "100"
+        ],
+        "episode_length": [
+          "None"
+        ],
+        "fps": [
+          "20"
+        ]
+      },
+      "budget": [
+        280
+      ],
+      "traj_sha256": "277a917473ef725caa9072e255119f8192c1404b11b6a0867ea8d51af6044a9d",
+      "total_episodes": 100,
+      "association": "canonical_json_after_EMB_ROOT_replacement"
+    },
+    {
+      "id": "official_pi0/ojx_drop_wrist",
+      "public_eval_sha256": "678b37343a8ed3d8d2d1aa0b721a0078b5bc41a7d5468d1bed73edc51fc222bd",
+      "canonical_matches": [
+        "logs/eval/ojx_drop_wrist"
+      ],
+      "source_eval_sha256": "61e0d3e801da2fbabe6d46c1ddee72fece8d580d152af612e7d66daae0855ebb",
+      "log_sha256": "602edb29cff8589171f38460eeb522fc01755107beb5ed27d74a845501247ab4",
+      "exit_codes": [
+        0
+      ],
+      "tracebacks": 0,
+      "settings": {
+        "n_action_steps": [
+          "5"
+        ],
+        "chunk_size": [
+          "50"
+        ],
+        "num_inference_steps": [
+          "10"
+        ],
+        "num_steps": [],
+        "seed": [
+          "1000"
+        ],
+        "observation_height": [
+          "256"
+        ],
+        "batch_size": [
+          "1"
+        ],
+        "n_episodes": [
+          "10",
+          "100"
+        ],
+        "episode_length": [
+          "None"
+        ],
+        "fps": [
+          "20"
+        ]
+      },
+      "budget": [
+        280
+      ],
+      "traj_sha256": "ae3742934e9f8012d5eea42a4a033051e5d925887bcb064386719ec459c82af5",
+      "total_episodes": 100,
+      "association": "canonical_json_after_EMB_ROOT_replacement"
+    },
+    {
+      "id": "official_pi0/ojx_freeze",
+      "public_eval_sha256": "9ffb20a1d2e81ef7b98d753848be38f656456eb33d61c3958a9be57f7619e640",
+      "canonical_matches": [
+        "logs/eval/ojx_freeze"
+      ],
+      "source_eval_sha256": "d4778008c3a41bec10436feee5c7e21453450a41e7441d769d2eadf19be94094",
+      "log_sha256": "a89129fbd5d91da224f44760af621a066e0b8b463ff4fdd386f03f5336c1175e",
+      "exit_codes": [
+        0
+      ],
+      "tracebacks": 0,
+      "settings": {
+        "n_action_steps": [
+          "5"
+        ],
+        "chunk_size": [
+          "50"
+        ],
+        "num_inference_steps": [
+          "10"
+        ],
+        "num_steps": [],
+        "seed": [
+          "1000"
+        ],
+        "observation_height": [
+          "256"
+        ],
+        "batch_size": [
+          "1"
+        ],
+        "n_episodes": [
+          "10",
+          "100"
+        ],
+        "episode_length": [
+          "None"
+        ],
+        "fps": [
+          "20"
+        ]
+      },
+      "budget": [
+        280
+      ],
+      "traj_sha256": "c36ee333eb92393eba10d49b9a8738af20d06b5d659263e7f11deea5ed735a05",
+      "total_episodes": 100,
+      "association": "canonical_json_after_EMB_ROOT_replacement"
+    },
+    {
+      "id": "official_pi0/ojx_freeze_wrist",
+      "public_eval_sha256": "fd6b2fbfd0fd3ad348822870c905b3db21c8abb759e695511a4f52f60a48310e",
+      "canonical_matches": [
+        "logs/eval/ojx_freeze_wrist"
+      ],
+      "source_eval_sha256": "f404e765c3ed7c03d962237c87cd11c556173e6a1e5a6c79d687562e1895bcb8",
+      "log_sha256": "c0f8fccb682e407e96d04bb285a5818095f02cbf75226f8089e4adb051e7c777",
+      "exit_codes": [
+        0
+      ],
+      "tracebacks": 0,
+      "settings": {
+        "n_action_steps": [
+          "5"
+        ],
+        "chunk_size": [
+          "50"
+        ],
+        "num_inference_steps": [
+          "10"
+        ],
+        "num_steps": [],
+        "seed": [
+          "1000"
+        ],
+        "observation_height": [
+          "256"
+        ],
+        "batch_size": [
+          "1"
+        ],
+        "n_episodes": [
+          "10",
+          "100"
+        ],
+        "episode_length": [
+          "None"
+        ],
+        "fps": [
+          "20"
+        ]
+      },
+      "budget": [
+        280
+      ],
+      "traj_sha256": "bccd236109a9b92d2f6a9036653f48310f0d757266ef62087be64b398cfd583a",
+      "total_episodes": 100,
+      "association": "canonical_json_after_EMB_ROOT_replacement"
+    },
+    {
+      "id": "official_pi0/ojx_none",
+      "public_eval_sha256": "dabdc3cc98cffa4c76a856eebfbeec9737b0a62a11f3e8333c2c65a857565c4d",
+      "canonical_matches": [
+        "logs/eval/ojx_none"
+      ],
+      "source_eval_sha256": "92a9092879dc8780f62a15fac1fc232069d0ea6e16e9b366298b71f408f55d10",
+      "log_sha256": "f2038f87dc32d586efb3e158129c5fc48264b075216f74924a02f31decda6cbf",
+      "exit_codes": [
+        0
+      ],
+      "tracebacks": 0,
+      "settings": {
+        "n_action_steps": [
+          "5"
+        ],
+        "chunk_size": [
+          "50"
+        ],
+        "num_inference_steps": [
+          "10"
+        ],
+        "num_steps": [],
+        "seed": [
+          "1000"
+        ],
+        "observation_height": [
+          "256"
+        ],
+        "batch_size": [
+          "1"
+        ],
+        "n_episodes": [
+          "50",
+          "500"
+        ],
+        "episode_length": [
+          "None"
+        ],
+        "fps": [
+          "20"
+        ]
+      },
+      "budget": [
+        280
+      ],
+      "traj_sha256": "ff08cac02a0677de773286fddb747b9e48a81d2426bba129d615b8a42b1e488a",
+      "total_episodes": 500,
+      "association": "canonical_json_after_EMB_ROOT_replacement"
+    },
+    {
+      "id": "official_pi0/opi0_diag_a",
+      "public_eval_sha256": "d35e90e3f26c75666d554189a527942de115b7fc985ebd3656b2879224a768aa",
+      "canonical_matches": [
+        "logs/eval/opi0_diag_a"
+      ],
+      "source_eval_sha256": "4b72422dc9a7b68af5cb22d09f61631888bb35315f245905fe55736e55fa5fe6",
+      "log_sha256": "c27f6833fa5a5537d6a6cbd8b8f863a506e995c251a4b14be66b873ea88730e9",
+      "exit_codes": [
+        0
+      ],
+      "tracebacks": 0,
+      "settings": {
+        "n_action_steps": [
+          "5"
+        ],
+        "chunk_size": [
+          "50"
+        ],
+        "num_inference_steps": [
+          "10"
+        ],
+        "num_steps": [],
+        "seed": [
+          "1000"
+        ],
+        "observation_height": [
+          "360"
+        ],
+        "batch_size": [
+          "1"
+        ],
+        "n_episodes": [
+          "2",
+          "20"
+        ],
+        "episode_length": [
+          "None"
+        ],
+        "fps": [
+          "20"
+        ]
+      },
+      "budget": [
+        280
+      ],
+      "traj_sha256": "52cd5bbc324146112adfef09c2bc7f8fd3b44293d390427b6184a036d7fdccba",
+      "total_episodes": 20,
+      "association": "canonical_json_after_EMB_ROOT_replacement"
+    },
+    {
+      "id": "official_pi0/opi0_diag_b",
+      "public_eval_sha256": "1e79685b6813bfea610e5a90917f92f10b44546318c8f524e85d4a316ae57a6b",
+      "canonical_matches": [
+        "logs/eval/opi0_diag_b"
+      ],
+      "source_eval_sha256": "77255f23c169654f05798dfba51e95e312aa5ef91ec1bc56377bddb74ac0e65b",
+      "log_sha256": "0e9cda42993d7db525145415da771d4e710360004a98e345d7f352da10c40d64",
+      "exit_codes": [
+        0
+      ],
+      "tracebacks": 0,
+      "settings": {
+        "n_action_steps": [
+          "5"
+        ],
+        "chunk_size": [
+          "50"
+        ],
+        "num_inference_steps": [
+          "10"
+        ],
+        "num_steps": [],
+        "seed": [
+          "1000"
+        ],
+        "observation_height": [
+          "360"
+        ],
+        "batch_size": [
+          "1"
+        ],
+        "n_episodes": [
+          "2",
+          "20"
+        ],
+        "episode_length": [
+          "None"
+        ],
+        "fps": [
+          "20"
+        ]
+      },
+      "budget": [
+        280
+      ],
+      "traj_sha256": "5efed765ba89cd1493a7017d7503e279aa51d53ea63585bd0c52fe293ee544c3",
+      "total_episodes": 20,
+      "association": "canonical_json_after_EMB_ROOT_replacement"
+    },
+    {
+      "id": "official_pi0/opi0_diag_c",
+      "public_eval_sha256": "8d036845286dd475d51931fa2106f74fe2d557ada1a3dd6e3b601b482a129ba9",
+      "canonical_matches": [
+        "logs/eval/opi0_diag_c"
+      ],
+      "source_eval_sha256": "ab62757052f51f2be4308a9bddfb3cf5d79108a623a0cfea73ba9b6a559aacfd",
+      "log_sha256": "2d75d0100648c66262c764778ee85d10e1dbb8f9c0ec423923d5ace29f4c2537",
+      "exit_codes": [
+        0
+      ],
+      "tracebacks": 0,
+      "settings": {
+        "n_action_steps": [
+          "5"
+        ],
+        "chunk_size": [
+          "50"
+        ],
+        "num_inference_steps": [
+          "10"
+        ],
+        "num_steps": [],
+        "seed": [
+          "1000"
+        ],
+        "observation_height": [
+          "256"
+        ],
+        "batch_size": [
+          "1"
+        ],
+        "n_episodes": [
+          "2",
+          "20"
+        ],
+        "episode_length": [
+          "None"
+        ],
+        "fps": [
+          "20"
+        ]
+      },
+      "budget": [
+        280
+      ],
+      "traj_sha256": "06e4b4396d1979a3bac71a0af6971fa84d8a1b7d1d87e6e074c7a97df7372e25",
+      "total_episodes": 20,
+      "association": "canonical_json_after_EMB_ROOT_replacement"
+    },
+    {
+      "id": "official_pi0/opi0_smoke",
+      "public_eval_sha256": "2299117d5584d8a9df9ee244cfa94ed6a7f2ca7597a6196b3dfd3f93382696b6",
+      "canonical_matches": [
+        "logs/eval/opi0_smoke"
+      ],
+      "source_eval_sha256": "8ab4811f2a9de95ac6acc3f901d772e6d24b462d33912badaf8990995be2b5b2",
+      "log_sha256": "4d309167140600f0546a80d585551f28f1ae39d1218db8831facd41ca3b35b2c",
+      "exit_codes": [
+        0
+      ],
+      "tracebacks": 0,
+      "settings": {
+        "n_action_steps": [
+          "5"
+        ],
+        "chunk_size": [
+          "50"
+        ],
+        "num_inference_steps": [
+          "10"
+        ],
+        "num_steps": [],
+        "seed": [
+          "1000"
+        ],
+        "observation_height": [
+          "360"
+        ],
+        "batch_size": [
+          "1"
+        ],
+        "n_episodes": [
+          "5",
+          "50"
+        ],
+        "episode_length": [
+          "None"
+        ],
+        "fps": [
+          "20"
+        ]
+      },
+      "budget": [
+        280
+      ],
+      "traj_sha256": "59b8099c0eb29467bd69f888f10362ce499e1eeec31dfe8504e0e42fa0037928",
+      "total_episodes": 50,
+      "association": "canonical_json_after_EMB_ROOT_replacement"
+    },
+    {
+      "id": "official_pi0/pi0_drop_all",
+      "public_eval_sha256": "d3beb5ba8d3c4f8a091f45b11a1f37ee36bd8956308fb68e9016caa104958670",
+      "canonical_matches": [
+        "logs/eval/pi0_drop_all"
+      ],
+      "source_eval_sha256": "3935651977cdc8c57f7e2640c9b45186f3bcefab8fb1e24d01770cae456e9fea",
+      "log_sha256": "d22b0c09914445b6d3a673f84514c22e02fc4adc8dd39f2fe3c2d46e328986ff",
+      "exit_codes": [
+        0
+      ],
+      "tracebacks": 0,
+      "settings": {
+        "n_action_steps": [
+          "5"
+        ],
+        "chunk_size": [
+          "50"
+        ],
+        "num_inference_steps": [
+          "10"
+        ],
+        "num_steps": [],
+        "seed": [
+          "1000"
+        ],
+        "observation_height": [
+          "360"
+        ],
+        "batch_size": [
+          "1"
+        ],
+        "n_episodes": [
+          "10",
+          "100"
+        ],
+        "episode_length": [
+          "None"
+        ],
+        "fps": [
+          "20"
+        ]
+      },
+      "budget": [
+        280
+      ],
+      "traj_sha256": "bbfad7770ae5c42964366ffc66b7fb288d330911c5ef3225f92c1d134c919f09",
+      "total_episodes": 100,
+      "association": "canonical_json_after_EMB_ROOT_replacement"
+    },
+    {
+      "id": "openvla_black_all",
+      "public_eval_sha256": "bce0a01c17f2dcd3f19444827e8d49f8b497d68b9cb2dcacb3de24f547eba6c7",
+      "association": "ordered_original_task_video_success_blocks",
+      "source_log_path": "logs/eval/openvla_black_all/logs/EVAL-libero_spatial-openvla-2026_09_30-19_27_58.txt",
+      "source_log_sha256": "169e7062a97c16e9853e50290e51c049ca4760c3fb0d14ecb7688321dadc077f",
+      "parser_sha256": "7a7820662fb1b810af06038d49d3380227080db64126596b624eab325eb76987",
+      "caught_exceptions": 0,
+      "total_episodes": 100,
+      "budget": [
+        220
+      ]
+    },
+    {
+      "id": "openvla_spatial_500",
+      "public_eval_sha256": "f846fbf2862c5b04048c53fbd6550520605810feaa4e9a0af76214509842bef8",
+      "association": "ordered_original_task_video_success_blocks",
+      "source_log_path": "logs/eval/openvla_spatial_500/logs/EVAL-libero_spatial-openvla-2026_09_29-19_42_35.txt",
+      "source_log_sha256": "926776b2adf8e9121488338b615a7908e974b1e3595dccc3d6a57f335468200e",
+      "parser_sha256": "7a7820662fb1b810af06038d49d3380227080db64126596b624eab325eb76987",
+      "caught_exceptions": 0,
+      "total_episodes": 500,
+      "budget": [
+        220
+      ]
+    },
+    {
+      "id": "pert_pi05_freeze",
+      "public_eval_sha256": "16db56549b28c357f662bfad4af704fdd6ba73bb8ed94f8848c1067ac671b5df",
+      "canonical_matches": [
+        "logs/eval/pert_pi05_freeze"
+      ],
+      "source_eval_sha256": "eb30708383ee2e073523f323228823b7781fbf4596a8f14933763a9310ad2eee",
+      "log_sha256": "c8b41722f882530810f132a4b7f3d8d83622b8af7d4b10b15a286530a36875cb",
+      "exit_codes": [
+        0
+      ],
+      "tracebacks": 0,
+      "settings": {
+        "n_action_steps": [
+          "10"
+        ],
+        "chunk_size": [
+          "50"
+        ],
+        "num_inference_steps": [
+          "10"
+        ],
+        "num_steps": [],
+        "seed": [
+          "1000"
+        ],
+        "observation_height": [
+          "360"
+        ],
+        "batch_size": [
+          "1"
+        ],
+        "n_episodes": [
+          "10",
+          "100"
+        ],
+        "episode_length": [
+          "None"
+        ],
+        "fps": [
+          "20"
+        ]
+      },
+      "budget": [
+        280
+      ],
+      "traj_sha256": "40a9a098ac9229e02c8e05846ced87272d62e8b12d16e4906181f2eed897486d",
+      "total_episodes": 100,
+      "association": "canonical_json_after_EMB_ROOT_replacement"
+    },
+    {
+      "id": "pert_pi05_noise",
+      "public_eval_sha256": "60401804ca87935192a699a47a28aa9a4c01ee365ee36c9cd2291c50af7409a3",
+      "canonical_matches": [
+        "logs/eval/pert_pi05_noise"
+      ],
+      "source_eval_sha256": "0ba458396dfa9a0bc309c1567ae8204eb2bcdb63b56cfa3ddc9a529b6597c1c0",
+      "log_sha256": "93d27b4570eed3e6a6b98f18c9d72e370da6667e708b5d9aafe6db3c6220a183",
+      "exit_codes": [
+        0
+      ],
+      "tracebacks": 0,
+      "settings": {
+        "n_action_steps": [
+          "10"
+        ],
+        "chunk_size": [
+          "50"
+        ],
+        "num_inference_steps": [
+          "10"
+        ],
+        "num_steps": [],
+        "seed": [
+          "1000"
+        ],
+        "observation_height": [
+          "360"
+        ],
+        "batch_size": [
+          "1"
+        ],
+        "n_episodes": [
+          "10",
+          "100"
+        ],
+        "episode_length": [
+          "None"
+        ],
+        "fps": [
+          "20"
+        ]
+      },
+      "budget": [
+        280
+      ],
+      "traj_sha256": "72f6369203394efc1d0d055b86eb0e87f3082e518d8423c5814cdf7993f477fe",
+      "total_episodes": 100,
+      "association": "canonical_json_after_EMB_ROOT_replacement"
+    },
+    {
+      "id": "pert_pi0_freeze",
+      "public_eval_sha256": "db42c2602c5223af54e1e7e9e2ac142db4a9bfcd271cedcee37cee050c37aad5",
+      "canonical_matches": [
+        "logs/eval/pert_pi0_freeze"
+      ],
+      "source_eval_sha256": "c75c01d7d7609c64df135a9f2620c17d1dccb2ad6e5360b6bce779a99d66c0b0",
+      "log_sha256": "71b6db83da3556af6b654be3f0740e81669948cbcddd45f62278d002b72a050d",
+      "exit_codes": [
+        0
+      ],
+      "tracebacks": 0,
+      "settings": {
+        "n_action_steps": [
+          "5"
+        ],
+        "chunk_size": [
+          "50"
+        ],
+        "num_inference_steps": [
+          "10"
+        ],
+        "num_steps": [],
+        "seed": [
+          "1000"
+        ],
+        "observation_height": [
+          "360"
+        ],
+        "batch_size": [
+          "1"
+        ],
+        "n_episodes": [
+          "10",
+          "100"
+        ],
+        "episode_length": [
+          "None"
+        ],
+        "fps": [
+          "20"
+        ]
+      },
+      "budget": [
+        280
+      ],
+      "traj_sha256": "cd02d0f6a8997f20cf1eea6e69d9f2c3bf0cda5b4a7ecceb9c5426378f51edfe",
+      "total_episodes": 100,
+      "association": "canonical_json_after_EMB_ROOT_replacement"
+    },
+    {
+      "id": "pert_pi0_noise",
+      "public_eval_sha256": "a172280a0f020c0c9938ea7b949f68e04a55471a1887fcc9aa54a92edb4b714b",
+      "canonical_matches": [
+        "logs/eval/pert_pi0_noise"
+      ],
+      "source_eval_sha256": "465f44c80b865945d595667445dc4486b4507ac2ef0c79e64fa8709472d6f8c3",
+      "log_sha256": "452fc4e8bb987d761cec2b9439b63b29f2445bded350c5a16fe66b50ca843628",
+      "exit_codes": [
+        0
+      ],
+      "tracebacks": 0,
+      "settings": {
+        "n_action_steps": [
+          "5"
+        ],
+        "chunk_size": [
+          "50"
+        ],
+        "num_inference_steps": [
+          "10"
+        ],
+        "num_steps": [],
+        "seed": [
+          "1000"
+        ],
+        "observation_height": [
+          "360"
+        ],
+        "batch_size": [
+          "1"
+        ],
+        "n_episodes": [
+          "10",
+          "100"
+        ],
+        "episode_length": [
+          "None"
+        ],
+        "fps": [
+          "20"
+        ]
+      },
+      "budget": [
+        280
+      ],
+      "traj_sha256": "c8296d4c636f1cc6c7450b6ad157584a4b9f28bb3ee975722c1ccb390da610f7",
+      "total_episodes": 100,
+      "association": "canonical_json_after_EMB_ROOT_replacement"
+    },
+    {
+      "id": "pert_smol2_freeze",
+      "public_eval_sha256": "e6923bfadbd146180dc1ed195e8bded9eb9fd488ce0a022daeb7e4100dad8318",
+      "canonical_matches": [
+        "logs/eval/pert_smol2_freeze"
+      ],
+      "source_eval_sha256": "03caa6791a94367c992a55bf9ae1f52a997ba1e45ad7e34d21e47bc2849dbccb",
+      "log_sha256": "9d6f17dc00168ad4fdfb14ef87881688d29cf1d48e0a7ddf3c4ce1f0061fd439",
+      "exit_codes": [
+        0
+      ],
+      "tracebacks": 0,
+      "settings": {
+        "n_action_steps": [
+          "10"
+        ],
+        "chunk_size": [
+          "50"
+        ],
+        "num_inference_steps": [],
+        "num_steps": [
+          "10"
+        ],
+        "seed": [
+          "1000"
+        ],
+        "observation_height": [
+          "360"
+        ],
+        "batch_size": [
+          "1"
+        ],
+        "n_episodes": [
+          "10",
+          "100"
+        ],
+        "episode_length": [
+          "None"
+        ],
+        "fps": [
+          "20"
+        ]
+      },
+      "budget": [
+        280
+      ],
+      "traj_sha256": "46a198488610f9b469a78fff6e793b22b302125e2dce4f20a2695e4069dc5489",
+      "total_episodes": 100,
+      "association": "canonical_json_after_EMB_ROOT_replacement"
+    },
+    {
+      "id": "pert_smol2_noise",
+      "public_eval_sha256": "becf3743d20229d72791d4ce25977ca71872e8c62e3d3b98538ed94acf70328a",
+      "canonical_matches": [
+        "logs/eval/pert_smol2_noise"
+      ],
+      "source_eval_sha256": "72aeda141fb8e9f0ede668a569bcd050755c622040ad681fc972d632cd0dcddb",
+      "log_sha256": "c3c260e012b45207fee7366adf248ce7822158589ef19543737362139a97f2e0",
+      "exit_codes": [
+        0
+      ],
+      "tracebacks": 0,
+      "settings": {
+        "n_action_steps": [
+          "10"
+        ],
+        "chunk_size": [
+          "50"
+        ],
+        "num_inference_steps": [],
+        "num_steps": [
+          "10"
+        ],
+        "seed": [
+          "1000"
+        ],
+        "observation_height": [
+          "360"
+        ],
+        "batch_size": [
+          "1"
+        ],
+        "n_episodes": [
+          "10",
+          "100"
+        ],
+        "episode_length": [
+          "None"
+        ],
+        "fps": [
+          "20"
+        ]
+      },
+      "budget": [
+        280
+      ],
+      "traj_sha256": "29f52ba5cd8eaad302a303275e0e000a7b142fea7dfe6c1c7bc5d8da5298e6d1",
+      "total_episodes": 100,
+      "association": "canonical_json_after_EMB_ROOT_replacement"
+    },
+    {
+      "id": "pi05_black_all",
+      "public_eval_sha256": "d57626c1651f967f62d9210c433866832b0bcfc66bb84204f3d6b0b5ac2c27ff",
+      "canonical_matches": [
+        "logs/eval/pi05_black_all"
+      ],
+      "source_eval_sha256": "66b101d696c5a547eca5ac678fa5548dcb00fb489f4fcad39ff071fffc56dc19",
+      "log_sha256": "ce1db3e8fefd211a2162eb2aaabfed84d193bb33347879f3914c16705a71c4fc",
+      "exit_codes": [
+        0
+      ],
+      "tracebacks": 0,
+      "settings": {
+        "n_action_steps": [
+          "10"
+        ],
+        "chunk_size": [
+          "50"
+        ],
+        "num_inference_steps": [
+          "10"
+        ],
+        "num_steps": [],
+        "seed": [
+          "1000"
+        ],
+        "observation_height": [
+          "360"
+        ],
+        "batch_size": [
+          "1"
+        ],
+        "n_episodes": [
+          "10",
+          "100"
+        ],
+        "episode_length": [
+          "None"
+        ],
+        "fps": [
+          "20"
+        ]
+      },
+      "budget": [
+        280
+      ],
+      "total_episodes": 100,
+      "association": "canonical_json_after_EMB_ROOT_replacement"
+    },
+    {
+      "id": "pi05_spatial_500",
+      "public_eval_sha256": "4748af800aa59a101870d8e5a4e49fd40c776fb1dd3151117b4e8fd56288825d",
+      "canonical_matches": [
+        "logs/eval/pi05_spatial_500"
+      ],
+      "source_eval_sha256": "72dd4b1d117bf475e6a4d3d4bcc90d96bb3a1b61bde4ceab47a70ebabc95dfd4",
+      "log_sha256": "eed86db4afc37d35376b9061401d6733d340156a47af495e266f2acc0f831b81",
+      "exit_codes": [
+        0
+      ],
+      "tracebacks": 0,
+      "settings": {
+        "n_action_steps": [
+          "10"
+        ],
+        "chunk_size": [
+          "50"
+        ],
+        "num_inference_steps": [
+          "10"
+        ],
+        "num_steps": [],
+        "seed": [
+          "1000"
+        ],
+        "observation_height": [
+          "360"
+        ],
+        "batch_size": [
+          "1"
+        ],
+        "n_episodes": [
+          "50",
+          "500"
+        ],
+        "episode_length": [
+          "None"
+        ],
+        "fps": [
+          "20"
+        ]
+      },
+      "budget": [
+        280
+      ],
+      "total_episodes": 500,
+      "association": "canonical_json_after_EMB_ROOT_replacement"
+    },
+    {
+      "id": "pi0_black_all",
+      "public_eval_sha256": "d2fccec0baf850e54904034763fb73056d683c8cda72eaa9568f77fac6272fb7",
+      "canonical_matches": [
+        "logs/eval/pi0_black_all"
+      ],
+      "source_eval_sha256": "f3e50a378a060c53c4c4a50dd42aecdd498b4ca9ed053f051cefb173ed0692f2",
+      "log_sha256": "a9273507153189fbd276d439758f6a04b17e2c6185ff5c8879140efc5eaca42d",
+      "exit_codes": [
+        0
+      ],
+      "tracebacks": 0,
+      "settings": {
+        "n_action_steps": [
+          "5"
+        ],
+        "chunk_size": [
+          "50"
+        ],
+        "num_inference_steps": [
+          "10"
+        ],
+        "num_steps": [],
+        "seed": [
+          "1000"
+        ],
+        "observation_height": [
+          "360"
+        ],
+        "batch_size": [
+          "1"
+        ],
+        "n_episodes": [
+          "10",
+          "100"
+        ],
+        "episode_length": [
+          "None"
+        ],
+        "fps": [
+          "20"
+        ]
+      },
+      "budget": [
+        280
+      ],
+      "total_episodes": 100,
+      "association": "canonical_json_after_EMB_ROOT_replacement"
+    },
+    {
+      "id": "pi0_spatial_500",
+      "public_eval_sha256": "1ff67f5eba45ce79eade82a5cea9623b2e1d7defe9cfc19f04bb0f1ca0de9a7a",
+      "canonical_matches": [
+        "logs/eval/pi0_spatial_500"
+      ],
+      "source_eval_sha256": "8d77c88c4ed786fb82129710ba089e2f173778883f9747cbdbbf8ba94a71761d",
+      "log_sha256": "876569305ebfc4d07fff231ef0eb7f71ccf5575bfaa0b7e7271a2cda077292e6",
+      "exit_codes": [
+        0
+      ],
+      "tracebacks": 0,
+      "settings": {
+        "n_action_steps": [
+          "5"
+        ],
+        "chunk_size": [
+          "50"
+        ],
+        "num_inference_steps": [
+          "10"
+        ],
+        "num_steps": [],
+        "seed": [
+          "1000"
+        ],
+        "observation_height": [
+          "360"
+        ],
+        "batch_size": [
+          "1"
+        ],
+        "n_episodes": [
+          "50",
+          "500"
+        ],
+        "episode_length": [
+          "None"
+        ],
+        "fps": [
+          "20"
+        ]
+      },
+      "budget": [
+        280
+      ],
+      "total_episodes": 500,
+      "association": "canonical_json_after_EMB_ROOT_replacement"
+    },
+    {
+      "id": "run2/openvla_black_all",
+      "public_eval_sha256": "bce0a01c17f2dcd3f19444827e8d49f8b497d68b9cb2dcacb3de24f547eba6c7",
+      "association": "ordered_original_task_video_success_blocks",
+      "source_log_path": "logs/eval_rerun_20261007/openvla_black_all_run2/logs/EVAL-libero_spatial-openvla-2026_10_07-19_45_28.txt",
+      "source_log_sha256": "4d7e3dd8b7c2eefddea3ceb71b5edf50c113643d8ab68da75a585043c67310cc",
+      "parser_sha256": "7a7820662fb1b810af06038d49d3380227080db64126596b624eab325eb76987",
+      "caught_exceptions": 0,
+      "total_episodes": 100,
+      "budget": [
+        220
+      ]
+    },
+    {
+      "id": "run2/pert_pi05_freeze",
+      "public_eval_sha256": "b846239a951ba90bf9277529e6a0c7e1c86b3c8af4b8536bfd4b51ce3bca9a1f",
+      "canonical_matches": [
+        "logs/eval_rerun_20261007/pert_pi05_freeze"
+      ],
+      "source_eval_sha256": "3f3de9293c11592054ffc5d7fa91e8805983b50e2603b9946c4056004468064a",
+      "log_sha256": "892a67e107ce7af06fb49d671c6cc8aeb416298c107c5f34505e98de9ae4948f",
+      "exit_codes": [
+        0
+      ],
+      "tracebacks": 0,
+      "settings": {
+        "n_action_steps": [
+          "10"
+        ],
+        "chunk_size": [
+          "50"
+        ],
+        "num_inference_steps": [
+          "10"
+        ],
+        "num_steps": [],
+        "seed": [
+          "1000"
+        ],
+        "observation_height": [
+          "360"
+        ],
+        "batch_size": [
+          "1"
+        ],
+        "n_episodes": [
+          "10",
+          "100"
+        ],
+        "episode_length": [
+          "None"
+        ],
+        "fps": [
+          "20"
+        ]
+      },
+      "budget": [
+        280
+      ],
+      "traj_sha256": "0b7d4705bc9b4090e31707158c3b49f53eae6eba3e49a89384c469417378860d",
+      "total_episodes": 100,
+      "association": "canonical_json_after_EMB_ROOT_replacement"
+    },
+    {
+      "id": "run2/pert_pi05_noise",
+      "public_eval_sha256": "1a2a7e39d85bfc46c8cd0263dc3a853696a6d74f17bf07c7b47971198b0b2f02",
+      "canonical_matches": [
+        "logs/eval_rerun_20261007/pert_pi05_noise"
+      ],
+      "source_eval_sha256": "8c7998e93f55c2a6a99b6de14aad36642ece981f662704c43e6130f25b1e6166",
+      "log_sha256": "9b8f5f17bac718a83a78e54e5bfd3697856468d737c1e152fc36f58645c04bc3",
+      "exit_codes": [
+        0
+      ],
+      "tracebacks": 0,
+      "settings": {
+        "n_action_steps": [
+          "10"
+        ],
+        "chunk_size": [
+          "50"
+        ],
+        "num_inference_steps": [
+          "10"
+        ],
+        "num_steps": [],
+        "seed": [
+          "1000"
+        ],
+        "observation_height": [
+          "360"
+        ],
+        "batch_size": [
+          "1"
+        ],
+        "n_episodes": [
+          "10",
+          "100"
+        ],
+        "episode_length": [
+          "None"
+        ],
+        "fps": [
+          "20"
+        ]
+      },
+      "budget": [
+        280
+      ],
+      "traj_sha256": "b67160eb60b1f44be7dbeb8efa6266f6853f91b21d0595c8f47db022e705ef3d",
+      "total_episodes": 100,
+      "association": "canonical_json_after_EMB_ROOT_replacement"
+    },
+    {
+      "id": "run2/pert_pi0_freeze",
+      "public_eval_sha256": "d57f659eec521ec6d43754de35bc8258b428f98969146755d5ebd71d4395ec5b",
+      "canonical_matches": [
+        "logs/eval_rerun_20261007/pert_pi0_freeze"
+      ],
+      "source_eval_sha256": "4cccd5482f75863bdcda80422a6776f67193a8d71020fbc2e8c1ed0a111d0d88",
+      "log_sha256": "f1674b6cd25c773093e456d9e565d298822ee83271e7fd568255259778663d9b",
+      "exit_codes": [
+        0
+      ],
+      "tracebacks": 0,
+      "settings": {
+        "n_action_steps": [
+          "5"
+        ],
+        "chunk_size": [
+          "50"
+        ],
+        "num_inference_steps": [
+          "10"
+        ],
+        "num_steps": [],
+        "seed": [
+          "1000"
+        ],
+        "observation_height": [
+          "360"
+        ],
+        "batch_size": [
+          "1"
+        ],
+        "n_episodes": [
+          "10",
+          "100"
+        ],
+        "episode_length": [
+          "None"
+        ],
+        "fps": [
+          "20"
+        ]
+      },
+      "budget": [
+        280
+      ],
+      "traj_sha256": "30977042557a27d46b678cde033a0ca9b59eb9bbdf0a77a7fbc201b7dcb65f68",
+      "total_episodes": 100,
+      "association": "canonical_json_after_EMB_ROOT_replacement"
+    },
+    {
+      "id": "run2/pert_pi0_noise",
+      "public_eval_sha256": "70d22d2be28db61d65441ce45f9065def7c10b452b2bd03340e1dfc279c3df93",
+      "canonical_matches": [
+        "logs/eval_rerun_20261007/pert_pi0_noise"
+      ],
+      "source_eval_sha256": "eaf8cdfcc751983b08b174928b8ef917a934923a1ecfa7cce5f9aa0393a19513",
+      "log_sha256": "f08d10c61fb9d0d5469cf5b87c5bdd4a244298a8996e19323af24791157ee3eb",
+      "exit_codes": [
+        0
+      ],
+      "tracebacks": 0,
+      "settings": {
+        "n_action_steps": [
+          "5"
+        ],
+        "chunk_size": [
+          "50"
+        ],
+        "num_inference_steps": [
+          "10"
+        ],
+        "num_steps": [],
+        "seed": [
+          "1000"
+        ],
+        "observation_height": [
+          "360"
+        ],
+        "batch_size": [
+          "1"
+        ],
+        "n_episodes": [
+          "10",
+          "100"
+        ],
+        "episode_length": [
+          "None"
+        ],
+        "fps": [
+          "20"
+        ]
+      },
+      "budget": [
+        280
+      ],
+      "traj_sha256": "e04eafb0415ae494ae55ce5e98ac93073c06e6497cdd151fc5bb1702a8e2fe6f",
+      "total_episodes": 100,
+      "association": "canonical_json_after_EMB_ROOT_replacement"
+    },
+    {
+      "id": "run2/pert_smol2_freeze",
+      "public_eval_sha256": "e72b9e1ace2bbb4b948a832f82ff4138fc8f53a219455496f566063207483ad4",
+      "canonical_matches": [
+        "logs/eval_rerun_20261007/pert_smol2_freeze"
+      ],
+      "source_eval_sha256": "fa6d6f412ecbc324cbe4966c0febe9b8974c2e8764b7cea7c64313fab2024eed",
+      "log_sha256": "3f1225e5118266c609dc4c1b140a77222983f1316a54e4e9a6521aedbe3df86d",
+      "exit_codes": [
+        0
+      ],
+      "tracebacks": 0,
+      "settings": {
+        "n_action_steps": [
+          "10"
+        ],
+        "chunk_size": [
+          "50"
+        ],
+        "num_inference_steps": [],
+        "num_steps": [
+          "10"
+        ],
+        "seed": [
+          "1000"
+        ],
+        "observation_height": [
+          "360"
+        ],
+        "batch_size": [
+          "1"
+        ],
+        "n_episodes": [
+          "10",
+          "100"
+        ],
+        "episode_length": [
+          "None"
+        ],
+        "fps": [
+          "20"
+        ]
+      },
+      "budget": [
+        280
+      ],
+      "traj_sha256": "46a198488610f9b469a78fff6e793b22b302125e2dce4f20a2695e4069dc5489",
+      "total_episodes": 100,
+      "association": "canonical_json_after_EMB_ROOT_replacement"
+    },
+    {
+      "id": "run2/pert_smol2_noise",
+      "public_eval_sha256": "3b82ea37122b8ba5a1f2face92f1b3b53e62266375a64425118315c83f1b9bab",
+      "canonical_matches": [
+        "logs/eval_rerun_20261007/pert_smol2_noise"
+      ],
+      "source_eval_sha256": "363797fd0e93a40ed43c9435933b69c73908d501f106a9a46f9bca07ce2bdd17",
+      "log_sha256": "7e9977bf5fa1512ae735b60f4788d8cce82fcca503d2c90fb89c57847269b60b",
+      "exit_codes": [
+        0
+      ],
+      "tracebacks": 0,
+      "settings": {
+        "n_action_steps": [
+          "10"
+        ],
+        "chunk_size": [
+          "50"
+        ],
+        "num_inference_steps": [],
+        "num_steps": [
+          "10"
+        ],
+        "seed": [
+          "1000"
+        ],
+        "observation_height": [
+          "360"
+        ],
+        "batch_size": [
+          "1"
+        ],
+        "n_episodes": [
+          "10",
+          "100"
+        ],
+        "episode_length": [
+          "None"
+        ],
+        "fps": [
+          "20"
+        ]
+      },
+      "budget": [
+        280
+      ],
+      "traj_sha256": "e1fa70a2d1b1b91d4f33399e8b3dddad8c435227be4a1929dfe1d1125c7244e0",
+      "total_episodes": 100,
+      "association": "canonical_json_after_EMB_ROOT_replacement"
+    },
+    {
+      "id": "run2/pi05_black_all",
+      "public_eval_sha256": "987ebe311ab6c791b897592ba28108ab533b439fc46866c84193678828322f16",
+      "canonical_matches": [
+        "logs/eval_rerun_20261007/pi05_black_all"
+      ],
+      "source_eval_sha256": "551e83fc8c381cc89096e5ecfa5c86663d330877c65edabd1322bf58ab5ec2aa",
+      "log_sha256": "c2494703a09d51eda461805f7eb7b8b63af0c42186b1f2dcb33f68a5f3ca07f1",
+      "exit_codes": [
+        0
+      ],
+      "tracebacks": 0,
+      "settings": {
+        "n_action_steps": [
+          "10"
+        ],
+        "chunk_size": [
+          "50"
+        ],
+        "num_inference_steps": [
+          "10"
+        ],
+        "num_steps": [],
+        "seed": [
+          "1000"
+        ],
+        "observation_height": [
+          "360"
+        ],
+        "batch_size": [
+          "1"
+        ],
+        "n_episodes": [
+          "10",
+          "100"
+        ],
+        "episode_length": [
+          "None"
+        ],
+        "fps": [
+          "20"
+        ]
+      },
+      "budget": [
+        280
+      ],
+      "total_episodes": 100,
+      "association": "canonical_json_after_EMB_ROOT_replacement"
+    },
+    {
+      "id": "run2/pi0_black_all",
+      "public_eval_sha256": "a4b13827b128790032ed0815255f88a2d407ed64361efa0b1196ec0147f226ce",
+      "canonical_matches": [
+        "logs/eval_rerun_20261007/pi0_black_all"
+      ],
+      "source_eval_sha256": "8dbe975f8e7dc09ffa38b00e432279606f58b1065c00c1b8e0a88951f6330138",
+      "log_sha256": "993ecf7770af7737c7db8f5cce03c370cda77c12204c20197f1ccc3bbd0a6cd6",
+      "exit_codes": [
+        0
+      ],
+      "tracebacks": 0,
+      "settings": {
+        "n_action_steps": [
+          "5"
+        ],
+        "chunk_size": [
+          "50"
+        ],
+        "num_inference_steps": [
+          "10"
+        ],
+        "num_steps": [],
+        "seed": [
+          "1000"
+        ],
+        "observation_height": [
+          "360"
+        ],
+        "batch_size": [
+          "1"
+        ],
+        "n_episodes": [
+          "10",
+          "100"
+        ],
+        "episode_length": [
+          "None"
+        ],
+        "fps": [
+          "20"
+        ]
+      },
+      "budget": [
+        280
+      ],
+      "total_episodes": 100,
+      "association": "canonical_json_after_EMB_ROOT_replacement"
+    },
+    {
+      "id": "run2/smol2_black_all",
+      "public_eval_sha256": "bbd50ab0bddf83f258490a78ea2c4fb1f3ff8e8f8922420ab8e9153a9222557f",
+      "canonical_matches": [
+        "logs/eval_rerun_20261007/smol2_black_all"
+      ],
+      "source_eval_sha256": "e474b007905a16d6edd7505d6bd93b0513b81e319b8ea50ae46336d871df9652",
+      "log_sha256": "a2073b191d47561d4dc90684f0784befdaa0429a90b287c4dc431b1945202ef1",
+      "exit_codes": [
+        0
+      ],
+      "tracebacks": 0,
+      "settings": {
+        "n_action_steps": [
+          "10"
+        ],
+        "chunk_size": [
+          "50"
+        ],
+        "num_inference_steps": [],
+        "num_steps": [
+          "10"
+        ],
+        "seed": [
+          "1000"
+        ],
+        "observation_height": [
+          "360"
+        ],
+        "batch_size": [
+          "1"
+        ],
+        "n_episodes": [
+          "10",
+          "100"
+        ],
+        "episode_length": [
+          "None"
+        ],
+        "fps": [
+          "20"
+        ]
+      },
+      "budget": [
+        280
+      ],
+      "total_episodes": 100,
+      "association": "canonical_json_after_EMB_ROOT_replacement"
+    },
+    {
+      "id": "run2/traj_pi05_agent",
+      "public_eval_sha256": "949656edbc3527e2fed683aa8757caf360623f4b0029520ce5d28cdddb8120c6",
+      "canonical_matches": [
+        "logs/eval_rerun_20261007/traj_pi05_agent"
+      ],
+      "source_eval_sha256": "d7ad0f5ea44a4a205f48676ef94bfd846f39c5cca7d075d4d8bdb774ed45f086",
+      "log_sha256": "df68e8e53ed05a2995287b53f7e35f62bc40cb35d8bd00b123449f19f6035454",
+      "exit_codes": [
+        0
+      ],
+      "tracebacks": 0,
+      "settings": {
+        "n_action_steps": [
+          "10"
+        ],
+        "chunk_size": [
+          "50"
+        ],
+        "num_inference_steps": [
+          "10"
+        ],
+        "num_steps": [],
+        "seed": [
+          "1000"
+        ],
+        "observation_height": [
+          "360"
+        ],
+        "batch_size": [
+          "1"
+        ],
+        "n_episodes": [
+          "10",
+          "100"
+        ],
+        "episode_length": [
+          "None"
+        ],
+        "fps": [
+          "20"
+        ]
+      },
+      "budget": [
+        280
+      ],
+      "traj_sha256": "8a328659f556d79fea4428b36e809102ddddb429f12ec12bd5d63f9c3d1d6361",
+      "total_episodes": 100,
+      "association": "canonical_json_after_EMB_ROOT_replacement"
+    },
+    {
+      "id": "run2/traj_pi05_normal",
+      "public_eval_sha256": "5ff2bb7b9e8071d702f73d6633e7106e1d80cc99d00cbb210f5768106e30521e",
+      "canonical_matches": [
+        "logs/eval_rerun_20261007/traj_pi05_normal"
+      ],
+      "source_eval_sha256": "978b4224696f30815579e247a7de422f976bfff82fcb4b9ae4909f90be9214f5",
+      "log_sha256": "fdfb29356dc9ccd03ab30af1e43ac97f6404fb7890b53cb3693a45044acb1bbc",
+      "exit_codes": [
+        0
+      ],
+      "tracebacks": 0,
+      "settings": {
+        "n_action_steps": [
+          "10"
+        ],
+        "chunk_size": [
+          "50"
+        ],
+        "num_inference_steps": [
+          "10"
+        ],
+        "num_steps": [],
+        "seed": [
+          "1000"
+        ],
+        "observation_height": [
+          "360"
+        ],
+        "batch_size": [
+          "1"
+        ],
+        "n_episodes": [
+          "10",
+          "100"
+        ],
+        "episode_length": [
+          "None"
+        ],
+        "fps": [
+          "20"
+        ]
+      },
+      "budget": [
+        280
+      ],
+      "traj_sha256": "5d3aa902fe4ee1585dac52813fee8e7860cc422dd7f999181022a6727e897465",
+      "total_episodes": 100,
+      "association": "canonical_json_after_EMB_ROOT_replacement"
+    },
+    {
+      "id": "run2/traj_pi05_wrist",
+      "public_eval_sha256": "12406223bcb77a8f2e31bd4d2f2b2aabec5148c89f21c5307f564910f571cd03",
+      "canonical_matches": [
+        "logs/eval_rerun_20261007/traj_pi05_wrist"
+      ],
+      "source_eval_sha256": "f97642be2dc3543afe451c19423decb7968114294ca72386f3bf4983a50da5cc",
+      "log_sha256": "7abbe43309209045f15adedc7517eabb884f15b0b733515f2b5afdfd1052fc21",
+      "exit_codes": [
+        0
+      ],
+      "tracebacks": 0,
+      "settings": {
+        "n_action_steps": [
+          "10"
+        ],
+        "chunk_size": [
+          "50"
+        ],
+        "num_inference_steps": [
+          "10"
+        ],
+        "num_steps": [],
+        "seed": [
+          "1000"
+        ],
+        "observation_height": [
+          "360"
+        ],
+        "batch_size": [
+          "1"
+        ],
+        "n_episodes": [
+          "10",
+          "100"
+        ],
+        "episode_length": [
+          "None"
+        ],
+        "fps": [
+          "20"
+        ]
+      },
+      "budget": [
+        280
+      ],
+      "traj_sha256": "3f62cba7051ed7516a325e2bd12c514525dcc62548988ad99aaa1bf16623bdb3",
+      "total_episodes": 100,
+      "association": "canonical_json_after_EMB_ROOT_replacement"
+    },
+    {
+      "id": "run2/traj_pi0_agent",
+      "public_eval_sha256": "204d24cfdda3c0d302c88a2de516ff74243038d19f8bb3aa4659d424dda51759",
+      "canonical_matches": [
+        "logs/eval_rerun_20261007/traj_pi0_agent"
+      ],
+      "source_eval_sha256": "3b0ed921c9fbb7bb7529b909fa3e92d0242fe3effded5e3154a6cc121c029c49",
+      "log_sha256": "562d18610f5f87b74c0d4c9ef321220aaf8aa6eade341cc1d548fbd655f08e5e",
+      "exit_codes": [
+        0
+      ],
+      "tracebacks": 0,
+      "settings": {
+        "n_action_steps": [
+          "5"
+        ],
+        "chunk_size": [
+          "50"
+        ],
+        "num_inference_steps": [
+          "10"
+        ],
+        "num_steps": [],
+        "seed": [
+          "1000"
+        ],
+        "observation_height": [
+          "360"
+        ],
+        "batch_size": [
+          "1"
+        ],
+        "n_episodes": [
+          "10",
+          "100"
+        ],
+        "episode_length": [
+          "None"
+        ],
+        "fps": [
+          "20"
+        ]
+      },
+      "budget": [
+        280
+      ],
+      "traj_sha256": "6626849a98dcd5229ef49fb36dca802b76bcaad92e3a57ee2912389e865b5479",
+      "total_episodes": 100,
+      "association": "canonical_json_after_EMB_ROOT_replacement"
+    },
+    {
+      "id": "run2/traj_pi0_black",
+      "public_eval_sha256": "daf28b6876dd8e09dedfb17c13a38508aa8cdae8f223937f918a3bfbb0f3c838",
+      "canonical_matches": [
+        "logs/eval_rerun_20261007/traj_pi0_black"
+      ],
+      "source_eval_sha256": "ca58b75fa6a9eb54efd5831e2b7b89fdd6c5eec0f6cd1494cc1308716508086e",
+      "log_sha256": "4954249d70eb87e89f68338cc14f62e2f24d6d0370a44a8733fd05e56e93eceb",
+      "exit_codes": [
+        0
+      ],
+      "tracebacks": 0,
+      "settings": {
+        "n_action_steps": [
+          "5"
+        ],
+        "chunk_size": [
+          "50"
+        ],
+        "num_inference_steps": [
+          "10"
+        ],
+        "num_steps": [],
+        "seed": [
+          "1000"
+        ],
+        "observation_height": [
+          "360"
+        ],
+        "batch_size": [
+          "1"
+        ],
+        "n_episodes": [
+          "10",
+          "100"
+        ],
+        "episode_length": [
+          "None"
+        ],
+        "fps": [
+          "20"
+        ]
+      },
+      "budget": [
+        280
+      ],
+      "traj_sha256": "63bdbff310db3b8d5b17ae2c81aeb54b7a147a359fb647a6c493f50750594cb7",
+      "total_episodes": 100,
+      "association": "canonical_json_after_EMB_ROOT_replacement"
+    },
+    {
+      "id": "run2/traj_pi0_normal",
+      "public_eval_sha256": "8c486154578dcd5243b0d804c726c72f7379f8aa80f9722c3abbc9a711c3d8f8",
+      "canonical_matches": [
+        "logs/eval_rerun_20261007/traj_pi0_normal"
+      ],
+      "source_eval_sha256": "d48dbca31d09c549bf83c13f3cd7b0fa2e9c94b10f12e3c826f4025cc8e44b78",
+      "log_sha256": "68123c5a3df32e5880e91418bcb9417ad91c7bc350db3b2fdd1d1c3bc9f491d9",
+      "exit_codes": [
+        0
+      ],
+      "tracebacks": 0,
+      "settings": {
+        "n_action_steps": [
+          "5"
+        ],
+        "chunk_size": [
+          "50"
+        ],
+        "num_inference_steps": [
+          "10"
+        ],
+        "num_steps": [],
+        "seed": [
+          "1000"
+        ],
+        "observation_height": [
+          "360"
+        ],
+        "batch_size": [
+          "1"
+        ],
+        "n_episodes": [
+          "10",
+          "100"
+        ],
+        "episode_length": [
+          "None"
+        ],
+        "fps": [
+          "20"
+        ]
+      },
+      "budget": [
+        280
+      ],
+      "traj_sha256": "a910841c15db79aa3bfaff1ab025c012b9bf033e6c1531fa461bb653822760f6",
+      "total_episodes": 100,
+      "association": "canonical_json_after_EMB_ROOT_replacement"
+    },
+    {
+      "id": "run2/traj_pi0_normal2",
+      "public_eval_sha256": "1733f1ef9aadcef5011d450290e91cd51a9ec76f65bfeb14924a54ed30fc62b5",
+      "canonical_matches": [
+        "logs/eval_rerun_20261007/traj_pi0_normal2"
+      ],
+      "source_eval_sha256": "055bc08729f59a960c0310fc99cda3933af1cf279797baa411ee44a88ca002e0",
+      "log_sha256": "e7f711172ff90a05c141c827eea47b70557954915dd54b89e21099004b2540e0",
+      "exit_codes": [
+        0
+      ],
+      "tracebacks": 0,
+      "settings": {
+        "n_action_steps": [
+          "5"
+        ],
+        "chunk_size": [
+          "50"
+        ],
+        "num_inference_steps": [
+          "10"
+        ],
+        "num_steps": [],
+        "seed": [
+          "1000"
+        ],
+        "observation_height": [
+          "360"
+        ],
+        "batch_size": [
+          "1"
+        ],
+        "n_episodes": [
+          "10",
+          "100"
+        ],
+        "episode_length": [
+          "None"
+        ],
+        "fps": [
+          "20"
+        ]
+      },
+      "budget": [
+        280
+      ],
+      "traj_sha256": "18521d5289219f1b2439149fcf109d4586c87776c532dc95fe127d0f41c47e66",
+      "total_episodes": 100,
+      "association": "canonical_json_after_EMB_ROOT_replacement"
+    },
+    {
+      "id": "run2/traj_pi0_wrist",
+      "public_eval_sha256": "f10ecf7408c3f8675fccce30b73ce56c34300c7ff2c6f825a32abe398e01091f",
+      "canonical_matches": [
+        "logs/eval_rerun_20261007/traj_pi0_wrist"
+      ],
+      "source_eval_sha256": "6918f981a84392cc801bcb7f19081a4ad63b77990ebb2e914d8f4c6c2993d9eb",
+      "log_sha256": "c9a61775a5bb4ae699a34a9999df90ba84ca9b728e1e79c0d705d5bd79413232",
+      "exit_codes": [
+        0
+      ],
+      "tracebacks": 0,
+      "settings": {
+        "n_action_steps": [
+          "5"
+        ],
+        "chunk_size": [
+          "50"
+        ],
+        "num_inference_steps": [
+          "10"
+        ],
+        "num_steps": [],
+        "seed": [
+          "1000"
+        ],
+        "observation_height": [
+          "360"
+        ],
+        "batch_size": [
+          "1"
+        ],
+        "n_episodes": [
+          "10",
+          "100"
+        ],
+        "episode_length": [
+          "None"
+        ],
+        "fps": [
+          "20"
+        ]
+      },
+      "budget": [
+        280
+      ],
+      "traj_sha256": "987aec85f1580c66b0bb0853210c69f9cee4ce0acb33a141dfa78e47c97c1b45",
+      "total_episodes": 100,
+      "association": "canonical_json_after_EMB_ROOT_replacement"
+    },
+    {
+      "id": "run2/traj_smol2_agent",
+      "public_eval_sha256": "0e72682df3de904fd0490ae71c21e5c5332328e5df369225a0d69712c08cc633",
+      "canonical_matches": [
+        "logs/eval_rerun_20261007/traj_smol2_agent"
+      ],
+      "source_eval_sha256": "506be34f29ab346b4cdcbb211eb830a6b59e2401a3306d33e74fa6eb14b23b24",
+      "log_sha256": "ea22477d60385bbbac8feefd75a74761c47437fce6f12e172910ee77b627c3da",
+      "exit_codes": [
+        0
+      ],
+      "tracebacks": 0,
+      "settings": {
+        "n_action_steps": [
+          "10"
+        ],
+        "chunk_size": [
+          "50"
+        ],
+        "num_inference_steps": [],
+        "num_steps": [
+          "10"
+        ],
+        "seed": [
+          "1000"
+        ],
+        "observation_height": [
+          "360"
+        ],
+        "batch_size": [
+          "1"
+        ],
+        "n_episodes": [
+          "10",
+          "100"
+        ],
+        "episode_length": [
+          "None"
+        ],
+        "fps": [
+          "20"
+        ]
+      },
+      "budget": [
+        280
+      ],
+      "traj_sha256": "2b2d901ca3bc59fda9b2bca764f9431166e894e3e539cbe1f191ba1ceb090469",
+      "total_episodes": 100,
+      "association": "canonical_json_after_EMB_ROOT_replacement"
+    },
+    {
+      "id": "run2/traj_smol2_wrist",
+      "public_eval_sha256": "3e83004741e04174be274a562ff646d5fb50e96bef0f5099245794e46a3a3da1",
+      "canonical_matches": [
+        "logs/eval_rerun_20261007/traj_smol2_wrist"
+      ],
+      "source_eval_sha256": "bdf06b42eedef8f8c3e5ef35eac77ed1cb02c90554d32311c3d4c4f65341deab",
+      "log_sha256": "467a4459d71073485a449bdd1313a92af6181c1180959dd6013a0d9fc6ea39d3",
+      "exit_codes": [
+        0
+      ],
+      "tracebacks": 0,
+      "settings": {
+        "n_action_steps": [
+          "10"
+        ],
+        "chunk_size": [
+          "50"
+        ],
+        "num_inference_steps": [],
+        "num_steps": [
+          "10"
+        ],
+        "seed": [
+          "1000"
+        ],
+        "observation_height": [
+          "360"
+        ],
+        "batch_size": [
+          "1"
+        ],
+        "n_episodes": [
+          "10",
+          "100"
+        ],
+        "episode_length": [
+          "None"
+        ],
+        "fps": [
+          "20"
+        ]
+      },
+      "budget": [
+        280
+      ],
+      "traj_sha256": "d6f639a910240c0683f2366fc8ddeb3b00b4909218277290c074172d495583f8",
+      "total_episodes": 100,
+      "association": "canonical_json_after_EMB_ROOT_replacement"
+    },
+    {
+      "id": "run3/pi0_black_all",
+      "public_eval_sha256": "3b699a03c3cdb0a95f6b1f2b58da21ebd4036ac78081c16dacb8916e10a4972a",
+      "canonical_matches": [
+        "logs/eval_rerun_20261007/pi0_black_all_run2"
+      ],
+      "source_eval_sha256": "a499d88a9047a72868eed12b532b5703f5a379d2e7d54b0d3258ec45806523ea",
+      "log_sha256": "a6417623ed2572b4e0f51ec4ad71f6690282677ae4e880e09921a20ddf46d502",
+      "exit_codes": [
+        0
+      ],
+      "tracebacks": 0,
+      "settings": {
+        "n_action_steps": [
+          "5"
+        ],
+        "chunk_size": [
+          "50"
+        ],
+        "num_inference_steps": [
+          "10"
+        ],
+        "num_steps": [],
+        "seed": [
+          "1000"
+        ],
+        "observation_height": [
+          "360"
+        ],
+        "batch_size": [
+          "1"
+        ],
+        "n_episodes": [
+          "10",
+          "100"
+        ],
+        "episode_length": [
+          "None"
+        ],
+        "fps": [
+          "20"
+        ]
+      },
+      "budget": [
+        280
+      ],
+      "total_episodes": 100,
+      "association": "canonical_json_after_EMB_ROOT_replacement"
+    },
+    {
+      "id": "run3/traj_pi05_wrist",
+      "public_eval_sha256": "5b5f5518f6c79a9352e569a5ab0bc10dfb4fc18e7e21733bf1ac52857186a0ea",
+      "canonical_matches": [
+        "logs/eval/traj_pi05_wrist_r3"
+      ],
+      "source_eval_sha256": "591bca9faa0b5a3aa251fdf88e76d3a586be1112521747091f16836e8a357986",
+      "log_sha256": "265b0482315dec281b23daa9297431773f15969243cdcbb6091374e4674ab351",
+      "exit_codes": [
+        0
+      ],
+      "tracebacks": 0,
+      "settings": {
+        "n_action_steps": [
+          "10"
+        ],
+        "chunk_size": [
+          "50"
+        ],
+        "num_inference_steps": [
+          "10"
+        ],
+        "num_steps": [],
+        "seed": [
+          "1000"
+        ],
+        "observation_height": [
+          "360"
+        ],
+        "batch_size": [
+          "1"
+        ],
+        "n_episodes": [
+          "10",
+          "100"
+        ],
+        "episode_length": [
+          "None"
+        ],
+        "fps": [
+          "20"
+        ]
+      },
+      "budget": [
+        280
+      ],
+      "traj_sha256": "a6e6f9344a36a63135bbad8bc58109bcac0e20589ae666ca320a211f81602696",
+      "total_episodes": 100,
+      "association": "canonical_json_after_EMB_ROOT_replacement"
+    },
+    {
+      "id": "run3/traj_pi0_wrist",
+      "public_eval_sha256": "c202c1dda296a7a8bf6c64445b41e488277491b80cf0b528454295ab4c86c927",
+      "canonical_matches": [
+        "logs/eval/traj_pi0_wrist_r3"
+      ],
+      "source_eval_sha256": "a522fc2ee7e66960565dcace4a2ba045ca1fa0852fda9c36093942fe8c8a2ca5",
+      "log_sha256": "9a518d56a514dc0f431128c18ee56baa0331e8b224d151de7a6371de1becb44b",
+      "exit_codes": [
+        0
+      ],
+      "tracebacks": 0,
+      "settings": {
+        "n_action_steps": [
+          "5"
+        ],
+        "chunk_size": [
+          "50"
+        ],
+        "num_inference_steps": [
+          "10"
+        ],
+        "num_steps": [],
+        "seed": [
+          "1000"
+        ],
+        "observation_height": [
+          "360"
+        ],
+        "batch_size": [
+          "1"
+        ],
+        "n_episodes": [
+          "10",
+          "100"
+        ],
+        "episode_length": [
+          "None"
+        ],
+        "fps": [
+          "20"
+        ]
+      },
+      "budget": [
+        280
+      ],
+      "traj_sha256": "8b1905cf9f4fb40ce530260aaf031bc5bf916a8738a9a7ea8be60bc1897317c2",
+      "total_episodes": 100,
+      "association": "canonical_json_after_EMB_ROOT_replacement"
+    },
+    {
+      "id": "run4/traj_pi05_wrist",
+      "public_eval_sha256": "4e98d45c29ba43e969ff60fb68e5883dccfd6f51ca8651a0333326aec69ae9e8",
+      "canonical_matches": [
+        "logs/eval/traj_pi05_wrist_r4"
+      ],
+      "source_eval_sha256": "81ee0ed59470fe5688bbb5559ae13049536be1b7aeecef0a101c6dfd8d349d5e",
+      "log_sha256": "b5e1723dcaebb6dc938e842e9d2fad77ed8ae37dab7589731a8bd314d96eafe5",
+      "exit_codes": [
+        0
+      ],
+      "tracebacks": 0,
+      "settings": {
+        "n_action_steps": [
+          "10"
+        ],
+        "chunk_size": [
+          "50"
+        ],
+        "num_inference_steps": [
+          "10"
+        ],
+        "num_steps": [],
+        "seed": [
+          "1000"
+        ],
+        "observation_height": [
+          "360"
+        ],
+        "batch_size": [
+          "1"
+        ],
+        "n_episodes": [
+          "10",
+          "100"
+        ],
+        "episode_length": [
+          "None"
+        ],
+        "fps": [
+          "20"
+        ]
+      },
+      "budget": [
+        280
+      ],
+      "traj_sha256": "9892de3bf02a3fc5a05b84e6585f8036e37082709e5d5858f8a9628fac572adc",
+      "total_episodes": 100,
+      "association": "canonical_json_after_EMB_ROOT_replacement"
+    },
+    {
+      "id": "run4/traj_pi0_wrist",
+      "public_eval_sha256": "7e403e4fb4d1beb5a2b07354e7f9682754082f782fa6216d6ba8976d9475e861",
+      "canonical_matches": [
+        "logs/eval/traj_pi0_wrist_r4"
+      ],
+      "source_eval_sha256": "b1a1fc3752240143135968fe057fc39334218a0b4026b8aa700d6b57174eaf00",
+      "log_sha256": "b277658a8feb23e5de7e225dbc7e170f4a5571db19a76b6f3ecb1a060db175ed",
+      "exit_codes": [
+        0
+      ],
+      "tracebacks": 0,
+      "settings": {
+        "n_action_steps": [
+          "5"
+        ],
+        "chunk_size": [
+          "50"
+        ],
+        "num_inference_steps": [
+          "10"
+        ],
+        "num_steps": [],
+        "seed": [
+          "1000"
+        ],
+        "observation_height": [
+          "360"
+        ],
+        "batch_size": [
+          "1"
+        ],
+        "n_episodes": [
+          "10",
+          "100"
+        ],
+        "episode_length": [
+          "None"
+        ],
+        "fps": [
+          "20"
+        ]
+      },
+      "budget": [
+        280
+      ],
+      "traj_sha256": "deab56cb5a3eb89ba8479b7ce7b0242495f7546a883b64f5f8e117b4252cdafd",
+      "total_episodes": 100,
+      "association": "canonical_json_after_EMB_ROOT_replacement"
+    },
+    {
+      "id": "run5/traj_pi05_wrist",
+      "public_eval_sha256": "44dcdd951f01701d514edaf1930f2b0627f3cdfbcc9b830c69b84acc08e55b84",
+      "canonical_matches": [
+        "logs/eval/traj_pi05_wrist_r5"
+      ],
+      "source_eval_sha256": "4ad13bc73837cbd99ef711ad4b7cf0d93c92ca2ecdfd46f9378432ab7302591d",
+      "log_sha256": "8c7c876445ebae529126da074be36f5a6ffff5ffa3e99c3fc2082cd43267ae57",
+      "exit_codes": [
+        0
+      ],
+      "tracebacks": 0,
+      "settings": {
+        "n_action_steps": [
+          "10"
+        ],
+        "chunk_size": [
+          "50"
+        ],
+        "num_inference_steps": [
+          "10"
+        ],
+        "num_steps": [],
+        "seed": [
+          "1000"
+        ],
+        "observation_height": [
+          "360"
+        ],
+        "batch_size": [
+          "1"
+        ],
+        "n_episodes": [
+          "10",
+          "100"
+        ],
+        "episode_length": [
+          "None"
+        ],
+        "fps": [
+          "20"
+        ]
+      },
+      "budget": [
+        280
+      ],
+      "traj_sha256": "991588d970a226940a00a04bc63cc38e34ea233170a5ec6eba28736ae5214437",
+      "total_episodes": 100,
+      "association": "canonical_json_after_EMB_ROOT_replacement"
+    },
+    {
+      "id": "run5/traj_pi0_wrist",
+      "public_eval_sha256": "f696659909522221ae34015e262f4c0e944e6eef7cc8365a98e8a0d7205e21f9",
+      "canonical_matches": [
+        "logs/eval/traj_pi0_wrist_r5"
+      ],
+      "source_eval_sha256": "026753eae74f0e4c431ef41c075a13a9bc0857feee77a1c203a49cc1787e2a11",
+      "log_sha256": "291f27a6340c8e893cf9b93455cd964e488b8b656a59d7cee6f625245ca1e9f0",
+      "exit_codes": [
+        0
+      ],
+      "tracebacks": 0,
+      "settings": {
+        "n_action_steps": [
+          "5"
+        ],
+        "chunk_size": [
+          "50"
+        ],
+        "num_inference_steps": [
+          "10"
+        ],
+        "num_steps": [],
+        "seed": [
+          "1000"
+        ],
+        "observation_height": [
+          "360"
+        ],
+        "batch_size": [
+          "1"
+        ],
+        "n_episodes": [
+          "10",
+          "100"
+        ],
+        "episode_length": [
+          "None"
+        ],
+        "fps": [
+          "20"
+        ]
+      },
+      "budget": [
+        280
+      ],
+      "traj_sha256": "27d1413d5e3d48d2f3b2073e1edafc1d45a1160eabde7b41f2ac356d279655f9",
+      "total_episodes": 100,
+      "association": "canonical_json_after_EMB_ROOT_replacement"
+    },
+    {
+      "id": "s500/pi05_drop_agent",
+      "public_eval_sha256": "1d114ac5afbf359918009a296c7cfe3df5eef25f2266d3d0edc45cd44b845447",
+      "canonical_matches": [
+        "logs/eval/s500_pi05_drop_agent"
+      ],
+      "source_eval_sha256": "b37779b9e1f5b9755d6df05058063cb39e80080874ced7240199169d9402e7ba",
+      "log_sha256": "1170d9868b0ff6f72208bfcd781dfe20d13e407293b2a9f7c442f92466b74fef",
+      "exit_codes": [
+        0
+      ],
+      "tracebacks": 0,
+      "settings": {
+        "n_action_steps": [
+          "10"
+        ],
+        "chunk_size": [
+          "50"
+        ],
+        "num_inference_steps": [
+          "10"
+        ],
+        "num_steps": [],
+        "seed": [
+          "1000"
+        ],
+        "observation_height": [
+          "360"
+        ],
+        "batch_size": [
+          "1"
+        ],
+        "n_episodes": [
+          "50",
+          "500"
+        ],
+        "episode_length": [
+          "None"
+        ],
+        "fps": [
+          "20"
+        ]
+      },
+      "budget": [
+        280
+      ],
+      "traj_sha256": "b34d75cdd2bb269f4fffb50d6ed94c422948dd2149a611e8a33f38ccccf2d341",
+      "total_episodes": 500,
+      "association": "canonical_json_after_EMB_ROOT_replacement"
+    },
+    {
+      "id": "s500/pi05_drop_wrist",
+      "public_eval_sha256": "a2c27a6f396502ba03488113bf19c8aa75500989b1bb19b53bdc4847559d2d10",
+      "canonical_matches": [
+        "logs/eval/s500_pi05_drop_wrist"
+      ],
+      "source_eval_sha256": "00e0ebf45da3f018d12a6fe3ae7613cfd92bc88f206ad9e62037df491a1c30be",
+      "log_sha256": "f9b53f99d8c9ab0227cc06d4dd80471b7a5e5c51e7a8c726bdc960a2e54e65d0",
+      "exit_codes": [
+        0
+      ],
+      "tracebacks": 0,
+      "settings": {
+        "n_action_steps": [
+          "10"
+        ],
+        "chunk_size": [
+          "50"
+        ],
+        "num_inference_steps": [
+          "10"
+        ],
+        "num_steps": [],
+        "seed": [
+          "1000"
+        ],
+        "observation_height": [
+          "360"
+        ],
+        "batch_size": [
+          "1"
+        ],
+        "n_episodes": [
+          "50",
+          "500"
+        ],
+        "episode_length": [
+          "None"
+        ],
+        "fps": [
+          "20"
+        ]
+      },
+      "budget": [
+        280
+      ],
+      "traj_sha256": "c9baaad8f11e3143b9f6638416d2a47ba0f478d82082572b3ac07f35a6812c87",
+      "total_episodes": 500,
+      "association": "canonical_json_after_EMB_ROOT_replacement"
+    },
+    {
+      "id": "s500/pi05_freeze_wrist",
+      "public_eval_sha256": "1c0af3ee30862a97b7cf467c1137ba90ab85d3b4912ca28c4805bdc239a12ee7",
+      "canonical_matches": [
+        "logs/eval/s500_pi05_freeze_wrist"
+      ],
+      "source_eval_sha256": "766a1ff2e6bc9fd519305da3dda31c7987d693cbbc3630c5b6048616bbad8287",
+      "log_sha256": "bbe8829436c198424c615dc097e3cf4a5013fcb17797ada8502f09173702963e",
+      "exit_codes": [
+        0
+      ],
+      "tracebacks": 0,
+      "settings": {
+        "n_action_steps": [
+          "10"
+        ],
+        "chunk_size": [
+          "50"
+        ],
+        "num_inference_steps": [
+          "10"
+        ],
+        "num_steps": [],
+        "seed": [
+          "1000"
+        ],
+        "observation_height": [
+          "360"
+        ],
+        "batch_size": [
+          "1"
+        ],
+        "n_episodes": [
+          "50",
+          "500"
+        ],
+        "episode_length": [
+          "None"
+        ],
+        "fps": [
+          "20"
+        ]
+      },
+      "budget": [
+        280
+      ],
+      "traj_sha256": "dcb4e0a645ce402b8ef41ae9b529ed06cf21bffdc308d89bade913929d48c346",
+      "total_episodes": 500,
+      "association": "canonical_json_after_EMB_ROOT_replacement"
+    },
+    {
+      "id": "s500/pi05_none",
+      "public_eval_sha256": "63082e9d88d591baff7e07bcb354804864cb74673953f0a1ee954dde922c1f97",
+      "canonical_matches": [
+        "logs/eval/s500_pi05_none"
+      ],
+      "source_eval_sha256": "229434d64efdeb9f4edb02f00d50f22d810d9facea992e5cdc2b60729fe971d9",
+      "log_sha256": "d55606ee376b5e7b0cb6ceda851b177dafecd3be3bc7d1094e008734583b7e89",
+      "exit_codes": [
+        0
+      ],
+      "tracebacks": 0,
+      "settings": {
+        "n_action_steps": [
+          "10"
+        ],
+        "chunk_size": [
+          "50"
+        ],
+        "num_inference_steps": [
+          "10"
+        ],
+        "num_steps": [],
+        "seed": [
+          "1000"
+        ],
+        "observation_height": [
+          "360"
+        ],
+        "batch_size": [
+          "1"
+        ],
+        "n_episodes": [
+          "50",
+          "500"
+        ],
+        "episode_length": [
+          "None"
+        ],
+        "fps": [
+          "20"
+        ]
+      },
+      "budget": [
+        280
+      ],
+      "traj_sha256": "15cd770a0d41216879641c5ba62d0ec31ff3b11f616a4e6f778f1cb59a00b858",
+      "total_episodes": 500,
+      "association": "canonical_json_after_EMB_ROOT_replacement"
+    },
+    {
+      "id": "s500/pi0_drop_agent",
+      "public_eval_sha256": "b841fbc4b83b5feb3f09109c1b062341c0565a617f2da95d4f6119eb1141ae28",
+      "canonical_matches": [
+        "logs/eval/s500_pi0_drop_agent"
+      ],
+      "source_eval_sha256": "b200ab746a763d1834d17d48497cfdb3a39ef9616d012dfec9d9143686410994",
+      "log_sha256": "b038ec78059d3956c935741b6b60cdd2cdd03f049289db6a371f3a2aa62faeb6",
+      "exit_codes": [
+        0
+      ],
+      "tracebacks": 0,
+      "settings": {
+        "n_action_steps": [
+          "5"
+        ],
+        "chunk_size": [
+          "50"
+        ],
+        "num_inference_steps": [
+          "10"
+        ],
+        "num_steps": [],
+        "seed": [
+          "1000"
+        ],
+        "observation_height": [
+          "360"
+        ],
+        "batch_size": [
+          "1"
+        ],
+        "n_episodes": [
+          "50",
+          "500"
+        ],
+        "episode_length": [
+          "None"
+        ],
+        "fps": [
+          "20"
+        ]
+      },
+      "budget": [
+        280
+      ],
+      "traj_sha256": "5ff5c7ad199ff120c25887ec4d6cb5cf8d52774683595a2d63af43baf2beee46",
+      "total_episodes": 500,
+      "association": "canonical_json_after_EMB_ROOT_replacement"
+    },
+    {
+      "id": "s500/pi0_drop_wrist",
+      "public_eval_sha256": "955ee3968d994c70c0d080cc61190ca4e6e342a0e7ee0d90daa82fa941870f77",
+      "canonical_matches": [
+        "logs/eval/s500_pi0_drop_wrist"
+      ],
+      "source_eval_sha256": "94568412d6d5375bc1ac8d3b4b33243d4758e272074b122ce9a2f3be05d5d465",
+      "log_sha256": "453014d4138eb3ee75d3032349064afc5ca91e51ff58fceb6551bc2f0c30a3f7",
+      "exit_codes": [
+        0
+      ],
+      "tracebacks": 0,
+      "settings": {
+        "n_action_steps": [
+          "5"
+        ],
+        "chunk_size": [
+          "50"
+        ],
+        "num_inference_steps": [
+          "10"
+        ],
+        "num_steps": [],
+        "seed": [
+          "1000"
+        ],
+        "observation_height": [
+          "360"
+        ],
+        "batch_size": [
+          "1"
+        ],
+        "n_episodes": [
+          "50",
+          "500"
+        ],
+        "episode_length": [
+          "None"
+        ],
+        "fps": [
+          "20"
+        ]
+      },
+      "budget": [
+        280
+      ],
+      "traj_sha256": "3bdb70da90873bdad64f733142e8d6ca20f10230c7f912c927fb2b4954a0af1a",
+      "total_episodes": 500,
+      "association": "canonical_json_after_EMB_ROOT_replacement"
+    },
+    {
+      "id": "s500/pi0_drop_wrist_r2",
+      "public_eval_sha256": "104f34b75d1d35bec3f6e85ed712fe0383796ded03dbe643c792779eeb5ed0da",
+      "canonical_matches": [
+        "logs/eval/s500_pi0_drop_wrist_r2"
+      ],
+      "source_eval_sha256": "35ae2d8ab98cd710031bbb7b0cd330b0db8ffca3cc6be7f82d8b7cbba81e370d",
+      "log_sha256": "40605f2df980dde2b83fc918fd1d605a3abff3c83a64a7e375be8758986dfd73",
+      "exit_codes": [
+        0
+      ],
+      "tracebacks": 0,
+      "settings": {
+        "n_action_steps": [
+          "5"
+        ],
+        "chunk_size": [
+          "50"
+        ],
+        "num_inference_steps": [
+          "10"
+        ],
+        "num_steps": [],
+        "seed": [
+          "1000"
+        ],
+        "observation_height": [
+          "360"
+        ],
+        "batch_size": [
+          "1"
+        ],
+        "n_episodes": [
+          "50",
+          "500"
+        ],
+        "episode_length": [
+          "None"
+        ],
+        "fps": [
+          "20"
+        ]
+      },
+      "budget": [
+        280
+      ],
+      "traj_sha256": "52b0bd54a4705b7bd7645b3b9463bd951249ed73cb12812b645773765c44bb57",
+      "total_episodes": 500,
+      "association": "canonical_json_after_EMB_ROOT_replacement"
+    },
+    {
+      "id": "s500/pi0_freeze_wrist",
+      "public_eval_sha256": "4722378465bd350c21c6cf3d204f4e2d45c1bd8d79d80835f8d5c1f23b1615c9",
+      "canonical_matches": [
+        "logs/eval/s500_pi0_freeze_wrist"
+      ],
+      "source_eval_sha256": "3e9969e53c1982606ae725e56a6c86550c243a30769ded5cf7efbba780287660",
+      "log_sha256": "ec8184dff34f5a76a5665fc54548fbe510291758c36ee7b4e8b678f0d07a9b10",
+      "exit_codes": [
+        0
+      ],
+      "tracebacks": 0,
+      "settings": {
+        "n_action_steps": [
+          "5"
+        ],
+        "chunk_size": [
+          "50"
+        ],
+        "num_inference_steps": [
+          "10"
+        ],
+        "num_steps": [],
+        "seed": [
+          "1000"
+        ],
+        "observation_height": [
+          "360"
+        ],
+        "batch_size": [
+          "1"
+        ],
+        "n_episodes": [
+          "50",
+          "500"
+        ],
+        "episode_length": [
+          "None"
+        ],
+        "fps": [
+          "20"
+        ]
+      },
+      "budget": [
+        280
+      ],
+      "traj_sha256": "315d765674fa088e2e09be5d9b323cf57c43eaa7d2e031223516cd69c12adcf3",
+      "total_episodes": 500,
+      "association": "canonical_json_after_EMB_ROOT_replacement"
+    },
+    {
+      "id": "s500/pi0_none",
+      "public_eval_sha256": "11e39539b694914d0168f7d150dbf3ae28e769f7cf15fe8ec23ab4dfdddab477",
+      "canonical_matches": [
+        "logs/eval/s500_pi0_none"
+      ],
+      "source_eval_sha256": "936ea2f6e685de97fb557da17754b2543d9e98bb4e38d32640641e81c81080f7",
+      "log_sha256": "6e7746c54cf9cdf674ea94f18a7ee40b7bbf1a1199e91d57ea49cc5722404e35",
+      "exit_codes": [
+        0
+      ],
+      "tracebacks": 0,
+      "settings": {
+        "n_action_steps": [
+          "5"
+        ],
+        "chunk_size": [
+          "50"
+        ],
+        "num_inference_steps": [
+          "10"
+        ],
+        "num_steps": [],
+        "seed": [
+          "1000"
+        ],
+        "observation_height": [
+          "360"
+        ],
+        "batch_size": [
+          "1"
+        ],
+        "n_episodes": [
+          "50",
+          "500"
+        ],
+        "episode_length": [
+          "None"
+        ],
+        "fps": [
+          "20"
+        ]
+      },
+      "budget": [
+        280
+      ],
+      "traj_sha256": "ad92505c3d7019f35c9b03904d6175df1cebe0f569c3e128fa9d623a7b0f06b7",
+      "total_episodes": 500,
+      "association": "canonical_json_after_EMB_ROOT_replacement"
+    },
+    {
+      "id": "s500/pi0_none_r2",
+      "public_eval_sha256": "00dba64912cb841ae6934a4d7ee80b4bc6da6313294511b01100f243e70913a0",
+      "canonical_matches": [
+        "logs/eval/s500_pi0_none_r2"
+      ],
+      "source_eval_sha256": "73f920c5477656f5415a97af7426b4e6592f62fe3c6563d598864e23f7b40fe7",
+      "log_sha256": "6b824a0d2420e48df997937c8102e126271da1b62d3eb13f58deb82cf7bd6cd0",
+      "exit_codes": [
+        0
+      ],
+      "tracebacks": 0,
+      "settings": {
+        "n_action_steps": [
+          "5"
+        ],
+        "chunk_size": [
+          "50"
+        ],
+        "num_inference_steps": [
+          "10"
+        ],
+        "num_steps": [],
+        "seed": [
+          "1000"
+        ],
+        "observation_height": [
+          "360"
+        ],
+        "batch_size": [
+          "1"
+        ],
+        "n_episodes": [
+          "50",
+          "500"
+        ],
+        "episode_length": [
+          "None"
+        ],
+        "fps": [
+          "20"
+        ]
+      },
+      "budget": [
+        280
+      ],
+      "traj_sha256": "68917825aa91e051a9fb1817157522ed477d24f8c4e87b15bba616dccc7e158a",
+      "total_episodes": 500,
+      "association": "canonical_json_after_EMB_ROOT_replacement"
+    },
+    {
+      "id": "s500/pi0_wrist",
+      "public_eval_sha256": "363e4876e28c2474bc969c890944864089edd60da0f96c9fae714e08433978de",
+      "canonical_matches": [
+        "logs/eval/s500_pi0_wrist"
+      ],
+      "source_eval_sha256": "b6f29c3dc14e5adac53375b4bda23d3cf2371bfd68a337271f063fef73d0a41b",
+      "log_sha256": "088081360e8eabae4e1a0c416f3f7c02ac3e1197896c02640b64b0fb5fd645da",
+      "exit_codes": [
+        0
+      ],
+      "tracebacks": 0,
+      "settings": {
+        "n_action_steps": [
+          "5"
+        ],
+        "chunk_size": [
+          "50"
+        ],
+        "num_inference_steps": [
+          "10"
+        ],
+        "num_steps": [],
+        "seed": [
+          "1000"
+        ],
+        "observation_height": [
+          "360"
+        ],
+        "batch_size": [
+          "1"
+        ],
+        "n_episodes": [
+          "50",
+          "500"
+        ],
+        "episode_length": [
+          "None"
+        ],
+        "fps": [
+          "20"
+        ]
+      },
+      "budget": [
+        280
+      ],
+      "traj_sha256": "4b5e8cef6c4e55ec1130d42a6cf5a874acacae065eeabfd2c48533e55a38883c",
+      "total_episodes": 500,
+      "association": "canonical_json_after_EMB_ROOT_replacement"
+    },
+    {
+      "id": "smol2_black_all",
+      "public_eval_sha256": "3d88c8144641d08899493a7794c860d2a7eff743dad5876b006846481bd43a76",
+      "canonical_matches": [
+        "logs/eval/smol2_black_all"
+      ],
+      "source_eval_sha256": "c8f169f098aa0c4084f37fe3a9ecddce4658b7da2c7b93198c86179ebd1f7790",
+      "log_sha256": "21ef399091835734a59e81304bbf07cf944dc7bfe789a3f9389a1d340faf7d06",
+      "exit_codes": [
+        0
+      ],
+      "tracebacks": 0,
+      "settings": {
+        "n_action_steps": [
+          "10"
+        ],
+        "chunk_size": [
+          "50"
+        ],
+        "num_inference_steps": [],
+        "num_steps": [
+          "10"
+        ],
+        "seed": [
+          "1000"
+        ],
+        "observation_height": [
+          "360"
+        ],
+        "batch_size": [
+          "1"
+        ],
+        "n_episodes": [
+          "10",
+          "100"
+        ],
+        "episode_length": [
+          "None"
+        ],
+        "fps": [
+          "20"
+        ]
+      },
+      "budget": [
+        280
+      ],
+      "total_episodes": 100,
+      "association": "canonical_json_after_EMB_ROOT_replacement"
+    },
+    {
+      "id": "smolvla2_spatial_500",
+      "public_eval_sha256": "61094512f383f8c9e55e52ee9ab2a3dc170ab8d7de807fda2ff6a17c8c34f60e",
+      "canonical_matches": [
+        "logs/eval/smolvla2_spatial_500"
+      ],
+      "source_eval_sha256": "e188c800e7fb09239749466b7b164f8b626c15b29b605ad92fc8f8ef4f68ddf3",
+      "log_sha256": "fc72518633423e2d7d82019afa9ddd7991e9d8a0d91e4099211b459a67a7b34a",
+      "exit_codes": [
+        0
+      ],
+      "tracebacks": 0,
+      "settings": {
+        "n_action_steps": [
+          "10"
+        ],
+        "chunk_size": [
+          "50"
+        ],
+        "num_inference_steps": [],
+        "num_steps": [
+          "10"
+        ],
+        "seed": [
+          "1000"
+        ],
+        "observation_height": [
+          "360"
+        ],
+        "batch_size": [
+          "1"
+        ],
+        "n_episodes": [
+          "50",
+          "500"
+        ],
+        "episode_length": [
+          "None"
+        ],
+        "fps": [
+          "20"
+        ]
+      },
+      "budget": [
+        280
+      ],
+      "total_episodes": 500,
+      "association": "canonical_json_after_EMB_ROOT_replacement"
+    },
+    {
+      "id": "state_feedback/r0_A",
+      "traj_sha256": "ff6991858daf377e1805e0227ffe46eebe561a854a8ab2da97b856e855d0ec81",
+      "source_evidence_sha256": "91a91aa4c48e6a743a27e91e8dde191eb8b63e16ee836b27474bb8c08b850f3c",
+      "public_eval_sha256": "0215c5eb9d01458431d6e5c36556fd3afffdb735f270e08c63cd6b5207d7434d",
+      "association": "hash_bound_original_P1_evidence_and_local_NPZ",
+      "budget": [
+        280
+      ],
+      "video_checked": 100,
+      "video_action_mismatches": 0,
+      "image_tensor_saved": false,
+      "stepwise_terminal_flags_saved": false
+    },
+    {
+      "id": "state_feedback/r0_B",
+      "traj_sha256": "16cfa000cebe6682bb6c991030d3ae609b0d734c108d3780fd35098b423c72fd",
+      "source_evidence_sha256": "7907868a21cb4cfbcdc056a67b97f2c86f99ebc9379aed228f33cc309ad61a54",
+      "public_eval_sha256": "f40e8f99a6a6d3221a8cb5a0ede01e181e8b5e3e797043a1da0e3d02c1b99bad",
+      "association": "hash_bound_original_P1_evidence_and_local_NPZ",
+      "budget": [
+        280
+      ],
+      "video_checked": 100,
+      "video_action_mismatches": 0,
+      "image_tensor_saved": false,
+      "stepwise_terminal_flags_saved": false
+    },
+    {
+      "id": "state_feedback/r0_C",
+      "traj_sha256": "ca25b3c7b477a0744deb87f75b9751e394ac7c18bf5b3ae837055d83952e1555",
+      "source_evidence_sha256": "ff1bc7175da92aaf78114660fd0871eb95249d9a10483edda41d1cf2d9b491a9",
+      "public_eval_sha256": "d1e79893daf2e84c1f80df267de20f51c718e52bec88a5aeccdd7be94ab2a193",
+      "association": "hash_bound_original_P1_evidence_and_local_NPZ",
+      "budget": [
+        280
+      ],
+      "video_checked": 100,
+      "video_action_mismatches": 0,
+      "image_tensor_saved": false,
+      "stepwise_terminal_flags_saved": false
+    },
+    {
+      "id": "state_feedback/r0_D",
+      "traj_sha256": "65fab4f38b3968675f8a63a73b7786bc53d5f50168c553d3bec7312648db3408",
+      "source_evidence_sha256": "c8beaf5bde6f213af4dc2e1c8a818cec47f19a5fe00481c89abab55031839bc7",
+      "public_eval_sha256": "959fefd99bd3e5234f217e16858f4ce67fb7ed0a8a72aaf2f7ad18ecdcd912cc",
+      "association": "hash_bound_original_P1_evidence_and_local_NPZ",
+      "budget": [
+        280
+      ],
+      "video_checked": 100,
+      "video_action_mismatches": 0,
+      "image_tensor_saved": false,
+      "stepwise_terminal_flags_saved": false
+    },
+    {
+      "id": "state_feedback/r1_A",
+      "traj_sha256": "f6bc2491a3548f380684acfaaf66701503d82df239991480540cf9471c62f05f",
+      "source_evidence_sha256": "ffb04a66763aca201ec01064e977cd8774b3423696113a3e1c1afffa64edfc93",
+      "public_eval_sha256": "cd326547e0c70d6310f42d95852b8dbb0ea4b8b0bb2ebce7b331348457dc2e3e",
+      "association": "hash_bound_original_P1_evidence_and_local_NPZ",
+      "budget": [
+        280
+      ],
+      "video_checked": 100,
+      "video_action_mismatches": 0,
+      "image_tensor_saved": false,
+      "stepwise_terminal_flags_saved": false
+    },
+    {
+      "id": "state_feedback/r1_B",
+      "traj_sha256": "43a89ca7eb994cfe59e23da329cb178b1c911bf2d429ba0119d9ddbad54e07eb",
+      "source_evidence_sha256": "80f5c094b92b550eeaaf78e09f2d3a9a07c907a8eb6ff099877b3d55b14b892a",
+      "public_eval_sha256": "220dc2653c320866b62a09c4a2093b4fec100fca2c18290aa70619ec2977acc4",
+      "association": "hash_bound_original_P1_evidence_and_local_NPZ",
+      "budget": [
+        280
+      ],
+      "video_checked": 100,
+      "video_action_mismatches": 0,
+      "image_tensor_saved": false,
+      "stepwise_terminal_flags_saved": false
+    },
+    {
+      "id": "state_feedback/r1_C",
+      "traj_sha256": "98b777e752e92a7fb6152d308afac89b60cd344b4c16eef2dd09803c9adc50a1",
+      "source_evidence_sha256": "58726d2c0cdde6fd5f41e1f41e06b0d124511f8ca938e997fa61f35e39871f8a",
+      "public_eval_sha256": "604a4102b26313c7290c93ccbde218a58d9477d1b732b69f65988e92ff7f762a",
+      "association": "hash_bound_original_P1_evidence_and_local_NPZ",
+      "budget": [
+        280
+      ],
+      "video_checked": 100,
+      "video_action_mismatches": 0,
+      "image_tensor_saved": false,
+      "stepwise_terminal_flags_saved": false
+    },
+    {
+      "id": "state_feedback/r1_D",
+      "traj_sha256": "8e52e5191a81d7d766f1d2e538f83049b9c14c668706bd4c67e20d5ef41c8d52",
+      "source_evidence_sha256": "ff89d5e9a31ea0bdee568c8703e9722832cde41004749ebc77b7895e08e45e9a",
+      "public_eval_sha256": "41b67b87f0b140d6f543b4a434d5b06ec562b2dfe5a79e688b0574f006f6e3fd",
+      "association": "hash_bound_original_P1_evidence_and_local_NPZ",
+      "budget": [
+        280
+      ],
+      "video_checked": 100,
+      "video_action_mismatches": 0,
+      "image_tensor_saved": false,
+      "stepwise_terminal_flags_saved": false
+    },
+    {
+      "id": "state_feedback/r2_A",
+      "traj_sha256": "4484f449c0d2d4139ba0ec11d5e80844352a155770aa3872594a9ab060cbc0cd",
+      "source_evidence_sha256": "636889a99d785e5775837028f314da77d4c5aa34c770f6b381e8c3a45351582d",
+      "public_eval_sha256": "fb1f8d896e6e14980b83650e3ef0c63847bc39a680cab0859fa5fb570b0af704",
+      "association": "hash_bound_original_P1_evidence_and_local_NPZ",
+      "budget": [
+        280
+      ],
+      "video_checked": 100,
+      "video_action_mismatches": 0,
+      "image_tensor_saved": false,
+      "stepwise_terminal_flags_saved": false
+    },
+    {
+      "id": "state_feedback/r2_B",
+      "traj_sha256": "2b135e998f4dc7636af5d1179921ea6e922e675ab65322e86a49275a9b0eb500",
+      "source_evidence_sha256": "5af480ea2d5a82d43667a6ee143322f7f368ee0700eec2918509c979e1c2196d",
+      "public_eval_sha256": "dd2d4e1aebceb34a01fd821a19a113495c386aa5c624af5d85d85478ca6f562d",
+      "association": "hash_bound_original_P1_evidence_and_local_NPZ",
+      "budget": [
+        280
+      ],
+      "video_checked": 100,
+      "video_action_mismatches": 0,
+      "image_tensor_saved": false,
+      "stepwise_terminal_flags_saved": false
+    },
+    {
+      "id": "state_feedback/r2_C",
+      "traj_sha256": "e6405fa802b97f4e5ff46e12718a05f71ec6947c331011f53d44082ddf3dedcc",
+      "source_evidence_sha256": "d1909ea25e0ea2d6af58d5f18b3aff28a0cf987aee110eda743ac9c45210c4ac",
+      "public_eval_sha256": "bc2b96c01e52ec66d8eaffa9239dc02633a5a874929b2b72a8670989a86661ef",
+      "association": "hash_bound_original_P1_evidence_and_local_NPZ",
+      "budget": [
+        280
+      ],
+      "video_checked": 100,
+      "video_action_mismatches": 0,
+      "image_tensor_saved": false,
+      "stepwise_terminal_flags_saved": false
+    },
+    {
+      "id": "state_feedback/r2_D",
+      "traj_sha256": "a170bb824fbfa38a41ecd37513b420298120c3226980ff12482fe19579cdc8fd",
+      "source_evidence_sha256": "a38ccdba8601c221786833d8bc1995f455aa786f79a411efbd6ae193dbd6c657",
+      "public_eval_sha256": "d2fdaf98452f70849db74503da039a0727c7ca596b838b5917acc2f32ad6524b",
+      "association": "hash_bound_original_P1_evidence_and_local_NPZ",
+      "budget": [
+        280
+      ],
+      "video_checked": 100,
+      "video_action_mismatches": 0,
+      "image_tensor_saved": false,
+      "stepwise_terminal_flags_saved": false
+    },
+    {
+      "id": "state_feedback/smoke_A",
+      "traj_sha256": "e16818f9cf8bba76a984df4cb0d48075532a3947ca4ac2b1db18c1bf4eed4520",
+      "source_evidence_sha256": "c14d4a72c035cea919b70d8ce5ffbae7abf428cd108e30a65fadcc91b6e8c688",
+      "public_eval_sha256": "33efbb524f6144d6f7869cb9130a1f7fb806a690e0147ae02d335d96e83c1a2d",
+      "association": "hash_bound_original_P1_evidence_and_local_NPZ",
+      "budget": [
+        280
+      ],
+      "video_checked": 10,
+      "video_action_mismatches": 0,
+      "image_tensor_saved": false,
+      "stepwise_terminal_flags_saved": false
+    },
+    {
+      "id": "state_feedback/smoke_B",
+      "traj_sha256": "f56e7d4c49409ddd3499e1481ef7fc1d572f4b03451c31fb1a8e7649db80f14a",
+      "source_evidence_sha256": "617a80eda6639447b1542c244317487f91124c9c7c2d10d533d4ca2b63ba38a8",
+      "public_eval_sha256": "259f2e334e9d4ddc40374fa2a162e410282d86447412d86d1df87e732131d9b2",
+      "association": "hash_bound_original_P1_evidence_and_local_NPZ",
+      "budget": [
+        280
+      ],
+      "video_checked": 10,
+      "video_action_mismatches": 0,
+      "image_tensor_saved": false,
+      "stepwise_terminal_flags_saved": false
+    },
+    {
+      "id": "state_feedback/smoke_C",
+      "traj_sha256": "299e0300e35cba638ea4f185ae8e026b4f32a55c74e90cd3a7d46a7a95f15f80",
+      "source_evidence_sha256": "2fda1b54a84f8cc9b5261df97732291ca8c905e612485f4547181744a9c274eb",
+      "public_eval_sha256": "3753715cc55cd59584bac19a4fb085c73ab32f5843e4eba97443df936e1169d8",
+      "association": "hash_bound_original_P1_evidence_and_local_NPZ",
+      "budget": [
+        280
+      ],
+      "video_checked": 10,
+      "video_action_mismatches": 0,
+      "image_tensor_saved": false,
+      "stepwise_terminal_flags_saved": false
+    },
+    {
+      "id": "state_feedback/smoke_D",
+      "traj_sha256": "6d139777b7b20c18ee852e9de2c1c3e6645b032b3e3fd3c1d3f27703dcd12cb9",
+      "source_evidence_sha256": "a01bedd76d9225d39f1181ef30a7f78ad260a4fa2945287b91bee0add5424a5e",
+      "public_eval_sha256": "9cc15f075ab2c24d5da63d49dd68f56b69a3a918b35e203e46569c0e3244d182",
+      "association": "hash_bound_original_P1_evidence_and_local_NPZ",
+      "budget": [
+        280
+      ],
+      "video_checked": 10,
+      "video_action_mismatches": 0,
+      "image_tensor_saved": false,
+      "stepwise_terminal_flags_saved": false
+    },
+    {
+      "id": "traj_pi05_agent",
+      "public_eval_sha256": "39cd7f61075032b946e8cbbb458439fa9e5d74b98642c657521ca386bd3c0831",
+      "canonical_matches": [
+        "logs/eval/traj_pi05_agent"
+      ],
+      "source_eval_sha256": "116433e82dea6860f067881295fd09917873f9206a39dff646ac5079a0118334",
+      "log_sha256": "a21b5427f87e909a1a3beccb74ae5ef45b3112049e7490015f9173a1aba2dc53",
+      "exit_codes": [
+        0
+      ],
+      "tracebacks": 0,
+      "settings": {
+        "n_action_steps": [
+          "10"
+        ],
+        "chunk_size": [
+          "50"
+        ],
+        "num_inference_steps": [
+          "10"
+        ],
+        "num_steps": [],
+        "seed": [
+          "1000"
+        ],
+        "observation_height": [
+          "360"
+        ],
+        "batch_size": [
+          "1"
+        ],
+        "n_episodes": [
+          "10",
+          "100"
+        ],
+        "episode_length": [
+          "None"
+        ],
+        "fps": [
+          "20"
+        ]
+      },
+      "budget": [
+        280
+      ],
+      "traj_sha256": "b1f0202b736ef9c92f87b0b7e8e12507acfee82c4ccbff0a30a023cc851d9115",
+      "total_episodes": 100,
+      "association": "canonical_json_after_EMB_ROOT_replacement"
+    },
+    {
+      "id": "traj_pi05_normal",
+      "public_eval_sha256": "978dac6d04ccc0bb9c46fac135550f62b14b25d8f5bf16250acf389bdaf9996f",
+      "canonical_matches": [
+        "logs/eval/traj_pi05_normal"
+      ],
+      "source_eval_sha256": "358a6851e0f9e0262dc9123fc98ec3c254f12eb95254492e7d0e0f806bfa2fb8",
+      "log_sha256": "3231e88ae2223da79de3be4a1799b79e2e286704b7e7c47f3e412cf478358579",
+      "exit_codes": [
+        0
+      ],
+      "tracebacks": 0,
+      "settings": {
+        "n_action_steps": [
+          "10"
+        ],
+        "chunk_size": [
+          "50"
+        ],
+        "num_inference_steps": [
+          "10"
+        ],
+        "num_steps": [],
+        "seed": [
+          "1000"
+        ],
+        "observation_height": [
+          "360"
+        ],
+        "batch_size": [
+          "1"
+        ],
+        "n_episodes": [
+          "10",
+          "100"
+        ],
+        "episode_length": [
+          "None"
+        ],
+        "fps": [
+          "20"
+        ]
+      },
+      "budget": [
+        280
+      ],
+      "traj_sha256": "4e2683c0dd0eafd902135177c9635426ae51382f759f3f468a7864fc252d3629",
+      "total_episodes": 100,
+      "association": "canonical_json_after_EMB_ROOT_replacement"
+    },
+    {
+      "id": "traj_pi05_wrist",
+      "public_eval_sha256": "13eff5ead67b17f9acf73292eaa07e21fc7c78bafd5264c405b448c19ea8cf22",
+      "canonical_matches": [
+        "logs/eval/traj_pi05_wrist"
+      ],
+      "source_eval_sha256": "9966bab7ceca080dea1eaf120292d0e897ecaa0861cc83ef66add90b80552a59",
+      "log_sha256": "8da6097996057583ec2bc11081c8a53af27eb01d74839253300d99a49ee3e11e",
+      "exit_codes": [
+        0
+      ],
+      "tracebacks": 0,
+      "settings": {
+        "n_action_steps": [
+          "10"
+        ],
+        "chunk_size": [
+          "50"
+        ],
+        "num_inference_steps": [
+          "10"
+        ],
+        "num_steps": [],
+        "seed": [
+          "1000"
+        ],
+        "observation_height": [
+          "360"
+        ],
+        "batch_size": [
+          "1"
+        ],
+        "n_episodes": [
+          "10",
+          "100"
+        ],
+        "episode_length": [
+          "None"
+        ],
+        "fps": [
+          "20"
+        ]
+      },
+      "budget": [
+        280
+      ],
+      "traj_sha256": "1097e5a0c95aeaf29d49f546de91865d6e8698cc79976908edad26c31062f920",
+      "total_episodes": 100,
+      "association": "canonical_json_after_EMB_ROOT_replacement"
+    },
+    {
+      "id": "traj_pi0_agent",
+      "public_eval_sha256": "257b76d27141b5f24d229e85080bc980aab8cc465a1471cc745de16ae5905f7d",
+      "canonical_matches": [
+        "logs/eval/traj_pi0_agent"
+      ],
+      "source_eval_sha256": "45d16824ba6c3499e72eb2656d2a38f6d12c79a995e8b924b63c6be7141c5a2e",
+      "log_sha256": "54c4924c6314457a1b0c295a3f8be755f9a7bdf16e373287d3dd997bca1c37dd",
+      "exit_codes": [
+        0
+      ],
+      "tracebacks": 0,
+      "settings": {
+        "n_action_steps": [
+          "5"
+        ],
+        "chunk_size": [
+          "50"
+        ],
+        "num_inference_steps": [
+          "10"
+        ],
+        "num_steps": [],
+        "seed": [
+          "1000"
+        ],
+        "observation_height": [
+          "360"
+        ],
+        "batch_size": [
+          "1"
+        ],
+        "n_episodes": [
+          "10",
+          "100"
+        ],
+        "episode_length": [
+          "None"
+        ],
+        "fps": [
+          "20"
+        ]
+      },
+      "budget": [
+        280
+      ],
+      "traj_sha256": "20f148d881be274444edd5d9e33583c5b3055f0a563997f04533c774be77517c",
+      "total_episodes": 100,
+      "association": "canonical_json_after_EMB_ROOT_replacement"
+    },
+    {
+      "id": "traj_pi0_black",
+      "public_eval_sha256": "315dfcd49c26f1eb29da4d66350586b7f00a74debaa22cc356135754a256f791",
+      "canonical_matches": [
+        "logs/eval/traj_pi0_black"
+      ],
+      "source_eval_sha256": "9a0320fa35884711c390f19c5f641ba12178f30b13a9a7cf05bf37ff62edc2d2",
+      "log_sha256": "d78a727d439552c1ed39f076a190645b0ea005f6d3ac3902dae0dd8fbb6651c4",
+      "exit_codes": [
+        0
+      ],
+      "tracebacks": 0,
+      "settings": {
+        "n_action_steps": [
+          "5"
+        ],
+        "chunk_size": [
+          "50"
+        ],
+        "num_inference_steps": [
+          "10"
+        ],
+        "num_steps": [],
+        "seed": [
+          "1000"
+        ],
+        "observation_height": [
+          "360"
+        ],
+        "batch_size": [
+          "1"
+        ],
+        "n_episodes": [
+          "10",
+          "100"
+        ],
+        "episode_length": [
+          "None"
+        ],
+        "fps": [
+          "20"
+        ]
+      },
+      "budget": [
+        280
+      ],
+      "traj_sha256": "4cb174d549cc055e850f877d8f36a0bdd374de695636fb98a420db4685b1bc3c",
+      "total_episodes": 100,
+      "association": "canonical_json_after_EMB_ROOT_replacement"
+    },
+    {
+      "id": "traj_pi0_normal",
+      "public_eval_sha256": "f316a17f48a20b928e36c888e4108354c26edd0fa50d95afa48e52557aa1b8ae",
+      "canonical_matches": [
+        "logs/eval/traj_pi0_normal"
+      ],
+      "source_eval_sha256": "4b5a54833faa16ed9297c53f600de83138d462b52b54113e878c73db7362d209",
+      "log_sha256": "e62fa1149f3b2f2cc21811c7bba985ee75f713214d60b5a0601e199a7aa62d49",
+      "exit_codes": [
+        0
+      ],
+      "tracebacks": 0,
+      "settings": {
+        "n_action_steps": [
+          "5"
+        ],
+        "chunk_size": [
+          "50"
+        ],
+        "num_inference_steps": [
+          "10"
+        ],
+        "num_steps": [],
+        "seed": [
+          "1000"
+        ],
+        "observation_height": [
+          "360"
+        ],
+        "batch_size": [
+          "1"
+        ],
+        "n_episodes": [
+          "10",
+          "100"
+        ],
+        "episode_length": [
+          "None"
+        ],
+        "fps": [
+          "20"
+        ]
+      },
+      "budget": [
+        280
+      ],
+      "traj_sha256": "6944786d14620cae584d5419120d014bf80b95f94a8d648094c2e775fd59b165",
+      "total_episodes": 100,
+      "association": "canonical_json_after_EMB_ROOT_replacement"
+    },
+    {
+      "id": "traj_pi0_normal2",
+      "public_eval_sha256": "e48bcc350a17f51cd6df6b04d8bd95a20523c692f33b52e4ee4f2344cfd6690d",
+      "canonical_matches": [
+        "logs/eval/traj_pi0_normal2"
+      ],
+      "source_eval_sha256": "9b70dd43acbf2eb8f61640f2b125c36b0034c8553f24cf8b75fa62639bdf87f1",
+      "log_sha256": "f23bbaa394e21fcce5e52d6aba64147fd0b1439483336dce9fd617e38a9b93a7",
+      "exit_codes": [
+        0
+      ],
+      "tracebacks": 0,
+      "settings": {
+        "n_action_steps": [
+          "5"
+        ],
+        "chunk_size": [
+          "50"
+        ],
+        "num_inference_steps": [
+          "10"
+        ],
+        "num_steps": [],
+        "seed": [
+          "1000"
+        ],
+        "observation_height": [
+          "360"
+        ],
+        "batch_size": [
+          "1"
+        ],
+        "n_episodes": [
+          "10",
+          "100"
+        ],
+        "episode_length": [
+          "None"
+        ],
+        "fps": [
+          "20"
+        ]
+      },
+      "budget": [
+        280
+      ],
+      "traj_sha256": "872821d7c5df981bc3834924361338c9d7738294dcc23fa0374d73f938f0a75a",
+      "total_episodes": 100,
+      "association": "canonical_json_after_EMB_ROOT_replacement"
+    },
+    {
+      "id": "traj_pi0_wrist",
+      "public_eval_sha256": "2e316e4abef8c66a91c6a7b4dec568eed1329b6f5cef9aa7c611bd34da17ac38",
+      "canonical_matches": [
+        "logs/eval/traj_pi0_wrist"
+      ],
+      "source_eval_sha256": "74f45640be9c349897b9139df7329839aad2424f7b3f30ab2f7c57b35b9bbd3b",
+      "log_sha256": "4dc6da79dd65af148df16cf1b35addd6ed2045f04ddd464d5160a85f3c2a9179",
+      "exit_codes": [
+        0
+      ],
+      "tracebacks": 0,
+      "settings": {
+        "n_action_steps": [
+          "5"
+        ],
+        "chunk_size": [
+          "50"
+        ],
+        "num_inference_steps": [
+          "10"
+        ],
+        "num_steps": [],
+        "seed": [
+          "1000"
+        ],
+        "observation_height": [
+          "360"
+        ],
+        "batch_size": [
+          "1"
+        ],
+        "n_episodes": [
+          "10",
+          "100"
+        ],
+        "episode_length": [
+          "None"
+        ],
+        "fps": [
+          "20"
+        ]
+      },
+      "budget": [
+        280
+      ],
+      "traj_sha256": "7678d7c139df787b77f3f8368d381defb32729cf9ab3b26e8aac52b1650d17e0",
+      "total_episodes": 100,
+      "association": "canonical_json_after_EMB_ROOT_replacement"
+    },
+    {
+      "id": "traj_smol2_agent",
+      "public_eval_sha256": "1c47705274e8e84283165a489413d200ae65045956adddbf6d60c19ff26c2c07",
+      "canonical_matches": [
+        "logs/eval/traj_smol2_agent"
+      ],
+      "source_eval_sha256": "2caf53850661d9771acdf7ceda82b8d2eab657da238d24f62bb009e09b71b3f7",
+      "log_sha256": "3539743fd36a0ac4767f37add78518a8036344485754e58071248efc77bcb72c",
+      "exit_codes": [
+        0
+      ],
+      "tracebacks": 0,
+      "settings": {
+        "n_action_steps": [
+          "10"
+        ],
+        "chunk_size": [
+          "50"
+        ],
+        "num_inference_steps": [],
+        "num_steps": [
+          "10"
+        ],
+        "seed": [
+          "1000"
+        ],
+        "observation_height": [
+          "360"
+        ],
+        "batch_size": [
+          "1"
+        ],
+        "n_episodes": [
+          "10",
+          "100"
+        ],
+        "episode_length": [
+          "None"
+        ],
+        "fps": [
+          "20"
+        ]
+      },
+      "budget": [
+        280
+      ],
+      "traj_sha256": "a73bafb9f48e95f093fc4cdf7dde48026eefadc533214866b9666b584978be28",
+      "total_episodes": 100,
+      "association": "canonical_json_after_EMB_ROOT_replacement"
+    },
+    {
+      "id": "traj_smol2_wrist",
+      "public_eval_sha256": "48e6c270ccff5b1b25165005a9cc1178547336ba6dffa59cf7ceeaaec9061e7b",
+      "canonical_matches": [
+        "logs/eval/traj_smol2_wrist"
+      ],
+      "source_eval_sha256": "675c45e6e7213c76491308cc875b8798c36ffb4bcd824e01f5486dd3c5ca090a",
+      "log_sha256": "ee91a633749bade1144691fb8e7a0f4f9cdca631e18b7832c952fc23ee013317",
+      "exit_codes": [
+        0
+      ],
+      "tracebacks": 0,
+      "settings": {
+        "n_action_steps": [
+          "10"
+        ],
+        "chunk_size": [
+          "50"
+        ],
+        "num_inference_steps": [],
+        "num_steps": [
+          "10"
+        ],
+        "seed": [
+          "1000"
+        ],
+        "observation_height": [
+          "360"
+        ],
+        "batch_size": [
+          "1"
+        ],
+        "n_episodes": [
+          "10",
+          "100"
+        ],
+        "episode_length": [
+          "None"
+        ],
+        "fps": [
+          "20"
+        ]
+      },
+      "budget": [
+        280
+      ],
+      "traj_sha256": "d6f639a910240c0683f2366fc8ddeb3b00b4909218277290c074172d495583f8",
+      "total_episodes": 100,
+      "association": "canonical_json_after_EMB_ROOT_replacement"
+    }
+  ],
+  "episode_lengths_sha256": "9352749b49c4baf8f0ecb88d9682e781bb3e899219af556b46478490e89109f8"
+}

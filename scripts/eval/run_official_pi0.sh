@@ -10,7 +10,7 @@ set -e
 #   freeze_wrist 官方 π0 只冻结腕部(整回合给第 1 帧真实画面,掩码为真)100 回合,与 ojx_drop_wrist 同一批初始状态
 #   res360    官方 π0 改用 360 渲染(与 LeRobot 一侧相同):正常 / 全涂黑 / 两路槽位都屏蔽各 100 回合
 #   replay    开环回放基线:官方 π0 在 360 渲染、正常条件下跑 100 回合并记录动作,再把动作原样回放到同一任务的其他初始状态
-# LeRobot 转换版 lerobot/pi0_libero_base(冒烟不通过,留作记录):
+# HF试用检查点 lerobot/pi0_libero_base(冒烟及同源性核验未通过,保留历史诊断):
 #   conv_smoke  50 回合正常条件
 #   conv_diag   三组对照,各 20 回合(每任务 2):a 夹带统计量且不加增量;b 增量用当前步状态;c 渲染分辨率 256
 source "$(dirname "$0")/../common.sh"; R=$SCRIPTS/eval/run_libero.sh

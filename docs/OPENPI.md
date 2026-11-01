@@ -2,7 +2,7 @@
 
 [中文](OPENPI_CN.md) · [Installation](INSTALL.md) · [Scripts](../scripts/README.md) · [Results](EXPERIMENTS.md#15-official-π0-control)
 
-This guide reconstructs the **native OpenPI/JAX server + LeRobot LIBERO client** used on 2026-10-28–29. It is the path that passed acceptance: smoke **50/50**, then normal **482/500 = 96.4%**. The LeRobot conversion scored **0/50** in its smoke test and is retained as a failed path, not an installation prerequisite.
+This guide reconstructs the **native OpenPI/JAX server + LeRobot LIBERO client** used on 2026-10-28–29. It is the path that passed acceptance: smoke **50/50**, then normal **482/500 = 96.4%**. A separate HF candidate scored **0/50** and fails identity verification against the native checkpoint. It is not a verified conversion of those weights, and remains a failed diagnostic rather than an installation prerequisite ([evidence](../dashboard/data/protocol_audit/checkpoint_identity.json)).
 
 It reproduces this repository's historical client protocol: **280 control steps plus ten settling steps** for Spatial. The pinned [upstream OpenPI example](https://github.com/Physical-Intelligence/openpi/blob/215abfb217dbac7d5f1273282331b9b1866c0479/examples/libero/main.py) uses 220 plus ten. The 96.4% result evaluates official weights under our protocol, rather than reproducing the 96.8% reference under identical conditions; see [protocols and audit scope](EXPERIMENTS.md#3-evaluation-protocols-and-audit-scope).
 
@@ -92,7 +92,7 @@ The [downloader](../scripts/openpi/download_checkpoint.py) uses the public bucke
 
 An existing matching file is skipped; a mismatching file can be replaced. Do not use this downloader as a read-only verifier of an existing accepted checkpoint, and do not refresh an old manifest in place merely to check installation.
 
-The checkpoint root must contain `params/` and `assets/physical-intelligence/libero/norm_stats.json`. Pass this root, not `params/`, to the server. Native Orbax parameters and their accompanying normalization assets are used together; `model.safetensors` from the LeRobot conversion is not used.
+The checkpoint root must contain `params/` and `assets/physical-intelligence/libero/norm_stats.json`. Pass this root, not `params/`, to the server. Native Orbax parameters and their accompanying normalization assets are used together; the HF candidate's `model.safetensors` is not used.
 
 The pinned [OpenPI tokenizer](https://github.com/Physical-Intelligence/openpi/blob/215abfb217dbac7d5f1273282331b9b1866c0479/src/openpi/models/tokenizer.py) requests `gs://big_vision/paligemma_tokenizer.model`. With `OPENPI_DATA_HOME` above, its cache location is:
 
@@ -104,7 +104,7 @@ That file exists in the recorded installation. A new installation may download i
 
 ## 4. Prepare the client's configuration-only directory
 
-The remote client still parses `--policy.path`, so it needs a valid PI0 `config.json`. The historical directory is `ckpt/pi0_libero_base@98ac51b8_openpi`. With `WRAP=probe` and `POLICY_SERVER` set, [eval_probe.py](../scripts/eval/eval_probe.py) replaces policy creation with the remote proxy and pre/postprocessing with identities: it does **not** load the conversion's PyTorch weights or processor files.
+The remote client still parses `--policy.path`, so it needs a valid PI0 `config.json`. The historical directory is `ckpt/pi0_libero_base@98ac51b8_openpi`. With `WRAP=probe` and `POLICY_SERVER` set, [eval_probe.py](../scripts/eval/eval_probe.py) replaces policy creation with the remote proxy and pre/postprocessing with identities: it does **not** load the HF candidate's PyTorch weights or processor files.
 
 For a new setup, the following downloads **only the small public configuration**, changes its dtype field as in the historical copy, and refuses an existing target. It is reconstructed from source and hash-checked, not a fresh-machine model test. Skip it when reusing the accepted directory.
 
@@ -138,7 +138,7 @@ print("Configuration matches the recorded client")
 PY
 ```
 
-Expected fields: `type=pi0`, `chunk_size=50`, two `[3,256,256]` images, state `[8]`, action `[7]`. The CLI overrides the stored `n_action_steps=10` to **5**. The dtype field describes this configuration; the native model uses OpenPI's own config. Do not run `adapt_openpi_pi0.py` or download conversion weights just to supply this proxy configuration.
+Expected fields: `type=pi0`, `chunk_size=50`, two `[3,256,256]` images, state `[8]`, action `[7]`. The CLI overrides the stored `n_action_steps=10` to **5**. The dtype field describes this configuration; the native model uses OpenPI's own config. Do not run `adapt_openpi_pi0.py` or download the HF candidate's weights just to supply this proxy configuration.
 
 ## 5. Start the local server, then the client
 
@@ -188,7 +188,7 @@ WRAP=probe BLACKOUT=none POLICY_SERVER="$OPENPI_PORT" \
   --env.observation_height=256 --env.observation_width=256
 ```
 
-The wrapper activates `smolvla`, requires cached assets (`HF_HUB_OFFLINE=1`), and runs **five episodes per task, 50 total**, with batch1 and seed1000. `POLICY_SERVER` selects native OpenPI inference; omitting it selects the failed conversion path for this configuration. Existing output directories/files/symlinks are rejected and failed outputs retained. Do not delete an old run to bypass protection.
+The wrapper activates `smolvla`, requires cached assets (`HF_HUB_OFFLINE=1`), and runs **five episodes per task, 50 total**, with batch1 and seed1000. `POLICY_SERVER` selects native OpenPI inference; omitting it selects the failed HF-candidate path for this configuration. Existing output directories/files/symlinks are rejected and failed outputs retained. Do not delete an old run to bypass protection.
 
 Within each task, the recorded protocol uses initial-state indices0–4 for smoke,0–49 for the gate and0–9 for 100-episode conditions. The client allows 280 control steps plus ten separate settling steps, differing from the upstream example's 220 control steps. The evaluation seed does not fix the separate OpenPI server's random-number stream.
 
@@ -207,7 +207,7 @@ The client rotates both views by 180°, sends raw eight-dimensional state and ta
 | `freeze_wrist` | `ojx_freeze_wrist` | 100 / 256 |
 | `res360` | `ojx360_none`, `ojx360_all`, `ojx360_drop_all` | 100 each / 360 |
 | `replay` | `ojx360_replay`, then its `replay.json` | 100 source episodes / 360, then fixed-action replay without a policy |
-| `conv_smoke`, `conv_diag` | `opi0_*` | Failed conversion diagnostics; excluded from the accepted native path |
+| `conv_smoke`, `conv_diag` | `opi0_*` | Historical failed HF-candidate diagnostics; identity unverified, outside the accepted native path |
 
 `ablation` also requires the separate LeRobot v044 checkpoint; the configuration-only directory above does not supply it. Historical replay is not P2: [P2](../scripts/README.md#state-input-and-replay-follow-ups) reuses bundled frozen actions and needs no OpenPI server or new source generation.
 

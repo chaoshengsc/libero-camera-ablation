@@ -2,7 +2,7 @@
 
 [English](OPENPI.md) · [安装指南](INSTALL_CN.md) · [脚本索引](../scripts/README_CN.md) · [完整结果](EXPERIMENTS_CN.md#15-官方-π0-对照)
 
-本文按2026-10-28至29日的记录整理 **OpenPI/JAX原版服务端 + LeRobot LIBERO客户端**。这是通过验收的路径：冒烟 **50/50**，随后正常条件 **482/500 = 96.4%**。LeRobot转换路径冒烟为 **0/50**，作为失败记录保留，不是安装前提。
+本文按2026-10-28至29日的记录整理 **OpenPI/JAX原版服务端 + LeRobot LIBERO客户端**。这是通过验收的路径：冒烟 **50/50**，随后正常条件 **482/500 = 96.4%**。另行试用的HF检查点冒烟 **0/50**，其同源性核验未通过，不能视为原生权重的验证转换；保留为失败诊断，不是安装前提（[证据](../dashboard/data/protocol_audit/checkpoint_identity.json)）。
 
 这里复现本仓库的历史客户端协议：Spatial为**280控制步＋10步稳定等待**；固定版本的[OpenPI上游示例](https://github.com/Physical-Intelligence/openpi/blob/215abfb217dbac7d5f1273282331b9b1866c0479/examples/libero/main.py)为220＋10步。96.4%是本协议下的官方权重评测结果，不是与上游96.8%完全同协议的复现；对照范围见[协议与验收表](EXPERIMENTS_CN.md#3-评测协议与验收范围)。
 
@@ -92,7 +92,7 @@ mkdir -p "$EMB_ROOT/ckpt"
 
 已有且匹配的文件会跳过，不匹配的文件可能被替换。因此它不是对已有验收权重的只读校验工具，不要为了检查安装就原地刷新旧清单。
 
-权重根目录应含`params/`与`assets/physical-intelligence/libero/norm_stats.json`。服务端接收根目录，不是`params/`子目录。原生Orbax参数必须与配套归一化资产一起使用，不使用LeRobot转换版的`model.safetensors`。
+权重根目录应含`params/`与`assets/physical-intelligence/libero/norm_stats.json`。服务端接收根目录，不是`params/`子目录。原生Orbax参数必须与配套归一化资产一起使用，不使用HF试用检查点的`model.safetensors`。
 
 固定版本的[OpenPI分词器](https://github.com/Physical-Intelligence/openpi/blob/215abfb217dbac7d5f1273282331b9b1866c0479/src/openpi/models/tokenizer.py)请求`gs://big_vision/paligemma_tokenizer.model`。按上面的`OPENPI_DATA_HOME`设置，缓存位置为：
 
@@ -104,7 +104,7 @@ $EMB_ROOT/cache/openpi/big_vision/paligemma_tokenizer.model
 
 ## 4. 准备客户端的纯配置目录
 
-远程客户端仍会解析`--policy.path`，因此需要有效的PI0 `config.json`。历史目录为`ckpt/pi0_libero_base@98ac51b8_openpi`。同时设置`WRAP=probe`与`POLICY_SERVER`时，[eval_probe.py](../scripts/eval/eval_probe.py)用远程代理替代策略创建、用恒等函数替代前后处理，**不会加载转换版PyTorch权重或处理器文件**。
+远程客户端仍会解析`--policy.path`，因此需要有效的PI0 `config.json`。历史目录为`ckpt/pi0_libero_base@98ac51b8_openpi`。同时设置`WRAP=probe`与`POLICY_SERVER`时，[eval_probe.py](../scripts/eval/eval_probe.py)用远程代理替代策略创建、用恒等函数替代前后处理，**不会加载HF试用检查点的PyTorch权重或处理器文件**。
 
 新安装可用下面的命令**只下载小型公开配置**，按历史副本调整dtype字段，并拒绝已有目标。此步骤由源码重建并核对哈希，不是全新机器上的模型实跑；复用既有目录时跳过。
 
@@ -138,7 +138,7 @@ print("Configuration matches the recorded client")
 PY
 ```
 
-预期字段：`type=pi0`、`chunk_size=50`、两路`[3,256,256]`图像、状态`[8]`、动作`[7]`。CLI将配置中的`n_action_steps=10`覆盖为 **5**。dtype字段属于这个客户端配置；原生模型按OpenPI自身配置加载。无需为了提供代理配置而运行`adapt_openpi_pi0.py`或下载转换版权重。
+预期字段：`type=pi0`、`chunk_size=50`、两路`[3,256,256]`图像、状态`[8]`、动作`[7]`。CLI将配置中的`n_action_steps=10`覆盖为 **5**。dtype字段属于这个客户端配置；原生模型按OpenPI自身配置加载。无需为了提供代理配置而运行`adapt_openpi_pi0.py`或下载HF试用检查点权重。
 
 ## 5. 先启动本机服务端，再运行客户端
 
@@ -188,7 +188,7 @@ WRAP=probe BLACKOUT=none POLICY_SERVER="$OPENPI_PORT" \
   --env.observation_height=256 --env.observation_width=256
 ```
 
-入口激活`smolvla`，要求素材已缓存（`HF_HUB_OFFLINE=1`），运行**每任务5回合、共50回合**，batch1、seed1000。`POLICY_SERVER`选择OpenPI原版推理；漏掉它会对这个配置走未通过验收的转换路径。已有输出目录/文件/符号链接都会被拒绝，失败工件保留，不删除旧目录绕过保护。
+入口激活`smolvla`，要求素材已缓存（`HF_HUB_OFFLINE=1`），运行**每任务5回合、共50回合**，batch1、seed1000。`POLICY_SERVER`选择OpenPI原版推理；漏掉它会对这个配置走未通过验收的HF试用路径。已有输出目录/文件/符号链接都会被拒绝，失败工件保留，不删除旧目录绕过保护。
 
 历史协议中，每任务的初始状态序号为：冒烟0–4、门槛0–49、100回合条件0–9。客户端采用280控制步上限，另有10步稳定等待；这与上游示例的220控制步不同。评测seed不会固定独立OpenPI服务端的随机数流。
 
@@ -207,7 +207,7 @@ WRAP=probe BLACKOUT=none POLICY_SERVER="$OPENPI_PORT" \
 | `freeze_wrist` | `ojx_freeze_wrist` | 100 / 256 |
 | `res360` | `ojx360_none`、`ojx360_all`、`ojx360_drop_all` | 各100 / 360 |
 | `replay` | `ojx360_replay`，然后生成其`replay.json` | 100个来源回合 / 360，再不调用策略地回放固定动作 |
-| `conv_smoke`、`conv_diag` | `opi0_*` | 失败的转换诊断，不属于已验收原版路径 |
+| `conv_smoke`、`conv_diag` | `opi0_*` | HF试用检查点的历史失败诊断；未验证同源，不属于已验收原版路径 |
 
 `ablation`还需要独立的LeRobot v044权重，上面的纯配置目录不提供它。历史回放不是P2：[P2](../scripts/README_CN.md#状态与回放补充实验)使用仓库内冻结动作，不需要OpenPI服务端或重新生成来源。
 

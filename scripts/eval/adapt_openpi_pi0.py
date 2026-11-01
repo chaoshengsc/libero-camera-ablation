@@ -1,4 +1,5 @@
-"""把 lerobot/pi0_libero_base(OpenPI 官方 pi0_libero 的 PyTorch 转换版)整理成能按 OpenPI 原样推理的本地副本。不改原下载目录。
+"""为历史HF试用检查点 lerobot/pi0_libero_base 注入OpenPI统计量与增量处理，不改原下载目录。
+该HF文件未通过与原生pi0_libero的同源性核验，不能称已验证的官方转换；本脚本仅保留历史诊断用途。
 用法: python adapt_openpi_pi0.py <原权重目录> <输出目录> <分词器目录> [embedded]
   embedded(诊断用):改用 model.safetensors 里夹带的旧格式归一化缓冲区,且不加增量还原(第 1、2 条换成这一种)。
   这些缓冲区的状态统计与 OpenPI 完全一致,动作统计却像未减状态的原始动作,两者只能有一个与训练时一致。
