@@ -2,7 +2,8 @@
 
 [中文](#中文说明) · [Experiments](../../../docs/EXPERIMENTS.md#3-evaluation-protocols-and-audit-scope)
 
-This is a retrospective, CPU-only audit export. No policy or simulator was run.
+This directory contains retrospective CPU audits plus an explicitly authorized
+CPU policy-loading check. No policy forward or simulator was run.
 Original success labels, checkpoint files and published 280-step results are unchanged.
 
 | File | Scope |
@@ -10,6 +11,7 @@ Original success labels, checkpoint files and published 280-step results are unc
 | [provenance.json](provenance.json) | 79 core records plus 16 P1 runs: original-file hashes and association methods.75 canonical JSON matches, one ACT JSON match, three ordered OpenVLA text logs, and 16 hash-bound P1 records. |
 | [episode_lengths.json](episode_lengths.json) | 13150 recorded episode lengths across 90 runs. Columns identify task/state, control steps and available action/EEF/video witnesses. Missing witnesses are null, not fabricated. |
 | [checkpoint_identity.json](checkpoint_identity.json) | Rechecked 19-file native manifest and fixed-revision HF LFS hash; pinned CPU array mapping finds 775 comparable tensors different under declared precision. |
+| [checkpoint_loading.json](checkpoint_loading.json) | One authorized CPU model load: all 778 model-state entries match the HF candidate after target-dtype conversion despite the six legacy-buffer warnings. No inference or rollout. |
 
 Video slicing in the recorded LIBERO batch1 evaluator retains exactly one frame
 per control step, not steps+1. Cross-checks cover 6110 older EEF/video pairs,
@@ -62,6 +64,19 @@ negative identity result, not a successful conversion or a failed simulation.
 Incomplete matches/invalid inputs exit 2, and only complete mapped matching exits 0.
 Even exit 0 does not prove functional equivalence or a unique failure mechanism.
 
+The separate A0 loading check reads the loaded `state_dict()` against the HF file,
+not against native GCS parameters. Its 778 entries use 777 source keys because of
+the declared tied embedding alias; they are not 778 independent tensors.
+All match after target-dtype casting (523 float32, 255 bfloat16), with no missing,
+unknown, differing or nonfinite model entries. The caught strict-load warning for
+six obsolete normalization buffers remains. The CPU result does not recreate the
+historical GPU state or test actions, processors or simulator behavior. Source
+fingerprints, per-entry counts, loader output, script/raw-report hashes and the
+74.593-second execution receipt are retained in the metadata. The exact A0
+instrumentation remains a local audit artifact; this export does not supply it
+or make the full runtime replayable. This result does not reverse the failed
+native/HF identity check or establish a unique reason for the old 0/50 score.
+
 P1's full policy-image tensors and stepwise terminal flags were not saved and
 remain absent. Environment-view videos are not the two camera tensors received
 by the policy. The recovered lengths and assertions strengthen execution
@@ -69,7 +84,8 @@ acceptance; they cannot restore missing fields or identify online correction.
 
 ## 中文说明
 
-本目录是既有工件的CPU回溯审计，没有新跑策略或仿真，也没有改写原成功标记。
+本目录含既有工件的CPU回溯审计和另行授权的CPU策略载入核验，没有策略前向或新仿真，
+也没有改写原成功标记。
 95组来源包括79组核心记录和16组P1；六次旧补跑已用完整JSON关联，OpenVLA用有序
 逐回合文本关联，不能只用相同的全零成功数识别运行。
 
@@ -85,6 +101,14 @@ Torch/JAX，不写权重。已存在输出、来源源码指纹不同或输入�
 观察到参数不一致，返回2表示证据不完整/错误，返回0也只核对映射参数，不证明功能等价。
 原生19文件MD5和HF固定revision的LFS SHA均通过；775个可比较张量在声明精度下均不同，
 所以不能把旧HF检查点0/50当成同一官方权重仅换管线的结果，也不据此宣称唯一失败原因。
+
+另行授权的A0核验比较的是载入后的`state_dict()`与HF文件，不是原生GCS权重。
+778条状态字典项使用777个不同源键（含共享embedding别名），不能当成778个独立张量；
+按目标dtype比较全部一致（523个float32、255个bfloat16），缺失/未知/不一致/非有限项为0，
+6个旧归一化buffer的严格加载告警仍保留。本次74.593秒CPU重检不还原历史GPU状态，
+也未测试动作、处理器或仿真行为。元数据保留输入指纹、逐条计数、加载输出及脚本/原报告哈希；
+具体A0取证脚本仍属本地工件，公开导出不提供它或使完整运行可重放。同源性失败结论不变，
+不能由此确定旧0/50的唯一原因。
 
 完整录像/NPZ仍在Git外；公开元数据不替代它们。P1原完整模型图像与逐步终止字段
 仍缺失，环境录像也不等于模型收到的两路图像。补证加强了执行验收，不能补造字段或识别唯一机制。
