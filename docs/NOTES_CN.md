@@ -730,3 +730,9 @@
 - 首版验收脚本因tqdm在证据行前拼接进度条而发生StopIteration，相机本体已退出0。保留该失败脚本/日志，修正既有stdout的读取后只继续尚未启动的自回放，相机回合未重跑。工件保留于`${EMB_ROOT}/tmp/repro_v15_20261101_1410/`及上述相机运行目录；五个实际执行公开源码SHA256与候选版本一致。所有本轮计算进程已退出，GPU显存恢复预检基线。
 - 补记上一批发布回执：main `af025884762757d87da991b2f1ed5a257621029f`的[CI](https://github.com/chaoshengsc/libero-camera-ablation/actions/runs/41306644583)与[Pages](https://github.com/chaoshengsc/libero-camera-ablation/actions/runs/41306644251)均成功；Release v1.4正文更正已发布，旧标签仍为`6c54c5db0a903344d6b1b9cc7ff0278ecc9de279`。上一轮只读审查已确认线上抽查的11个网页/数据文件与该提交一致。v1.5将于本次验收、复审后发布，实际回执另行追加。
 - 最终候选复审：191项测试通过，含新增五项self-only/默认完整流程/失败门槛/CLI检查；实现前这些新检查先暴露四项缺失模式/入口失败。43个结果、媒体及网页数据产物重建不变。ruff0.17.0、Shell/JS语法、19份文档的534个相对链接/锚点、15组中英一致Bash块及引用/版本一致性通过。安装示例中会被Shell当重定向的尖括号占位符已换成带引号的权重变量和未使用运行名。仅暂存13个范围内文件，原私有恢复笔记排除，Git身份/钩子保持原样、提交说明署名扫描为空。发布不再增加物理运行。
+
+## v1.5发布回执（2026-11-01）
+
+- [Release v1.5](https://github.com/chaoshengsc/libero-camera-ablation/releases/tag/v1.5)已于2026-11-01 14:30:45 UTC发布，为Latest、非草稿、非预发行。标签精确指向`4d23f488f63979e367f64f932b3c6c40d732ff0c`（`Update reproduction checks`），包含已完成P1/P2公开数据、统计、指南与有界工程验收；CITATION、项目版本和两份README引用统一为1.5.0。
+- 该提交的[CI](https://github.com/chaoshengsc/libero-camera-ablation/actions/runs/41316258021)与[Pages部署](https://github.com/chaoshengsc/libero-camera-ablation/actions/runs/41316257629)均成功。线上抽查21个网页、数据、版本、指南及日志文件，均返回200并与提交逐字一致；日志按Git对象比较，未把本地未公开追加当线上内容。
+- 六个原有标签引用全部保持不变；Release v1.4保留原正文、标签和发布日期，不移动旧单相机快照。本回执追加在v1.5快照之后，不改结果或可执行代码。原本地恢复笔记仍未公开，恢复/P3继续暂停，没有再启动物理评测。
