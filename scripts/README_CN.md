@@ -88,7 +88,7 @@ WRAP=probe BLACKOUT=all bash scripts/eval/run_libero.sh \
 
 | 目的 | 入口 | 要求与产物 |
 |---|---|---|
-| 重算已完成P1/P2 | [summarize_followup.py](analysis/summarize_followup.py) | NumPy；无需模型/GPU；生成6个CSV与中英文统计图 |
+| 重算已完成P1/P2 | [summarize_followup.py](analysis/summarize_followup.py) | NumPy；无需模型/GPU；生成6个CSV、中英文统计图与网页摘要数据 |
 | 重复P1状态输入评测 | [run_state_feedback.py](eval/run_state_feedback.py) → [eval_state_feedback.py](eval/eval_state_feedback.py) | 已配置模型/EGL环境；40工程＋1200正式回合；逐阶段验收 |
 | 重复P2冻结动作回放 | [replay_holdout.py](analysis/replay_holdout.py) | 已配置LIBERO/MuJoCo 3.3.2/EGL；10自回放通过至少8个后才执行400正式回合；不加载策略 |
 

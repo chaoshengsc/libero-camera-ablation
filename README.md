@@ -61,8 +61,8 @@ Both the weights and the inference pipeline differ between the two sides; the di
 A re-run of official π0 at 360 rendering still scores 0/100 with black input; this resolution change did not restore success. Further checks add context:
 
 - **Image-freezing sensitivity.** The tested π0.5 and SmolVLA checkpoints score 0% with frozen first frames in both runs. Masking the wrist camera in its original slot brings π0.5 from 98.4% to 4.6% (500 episodes per condition). Freezing changes both visual updates and image–state synchronization; their effects remain unseparated.
-- **Fixed actions also succeed.** P2 replays one preselected official π0 sequence per task on states excluded from action selection: **262/400 = 65.5%**, with a **61.0–69.8%** stratified-bootstrap interval and **10/10** self-replay checks. This strengthens the baseline without identifying the LeRobot π0 mechanism. [Protocol, earlier replay and limits](docs/EXPERIMENTS.md#16-fixed-action-replay).
-- **State updates still matter.** In P1, LeRobot π0 v044 averages **73.3% / 55.3%** with normal/black images across three repeats; both score **0%** when the model receives its frozen first state. This measures update sensitivity, not a unique correction or phase mechanism. [Paired statistics](docs/EXPERIMENTS.md#17-state-input-update-sensitivity).
+- **Fixed actions also succeed.** P2 replays one preselected official π0 sequence per task on states excluded from action selection: **262/400 = 65.5%**, with a **61.0–69.8%** stratified-bootstrap interval and **10/10** self-replay checks. This strengthens the baseline without identifying the LeRobot π0 mechanism. [Protocol, earlier replay and limits](docs/EXPERIMENTS.md#16-fixed-action-replay) · [Data](results/replay_holdout_summary.csv).
+- **State-input freezing sensitivity.** In P1, LeRobot π0 v044 averages **73.3% / 55.3%** with normal/black images across three repeats; both score **0%** when the model receives its frozen first state. This measures update sensitivity without separating correction, phase cues and input mismatch. [Paired statistics](docs/EXPERIMENTS.md#17-state-input-update-sensitivity) · [Data](results/state_feedback_comparisons.csv).
 
 See the [full experiments](docs/EXPERIMENTS.md) for designs, repeated runs, per-task results, and statistical scope. The [notes](docs/NOTES.md) retain chronological records and corrections.
 
@@ -130,7 +130,7 @@ libero-camera-ablation/
 
 ## Acknowledgements and licenses
 
-Code is [MIT licensed](LICENSE). Upstream projects, checkpoints, and the tokenizer retain their own terms. Model weights and the tokenizer are not included.
+Code is [MIT licensed](LICENSE). Upstream projects, checkpoints, and tokenizers retain their own terms. Model weights and tokenizer files are not included.
 
 <details>
 <summary>Upstream projects, checkpoints, and papers</summary>
@@ -141,12 +141,14 @@ This repository contains no model weights and no upstream source code. It builds
 |---|---|---|
 | [LeRobot](https://github.com/huggingface/lerobot) v0.6.1 | ACT, Diffusion Policy, SmolVLA, π0, π0.5 evaluation and π0 fine-tuning | Apache-2.0 |
 | [OpenVLA](https://github.com/openvla/openvla) | OpenVLA evaluation | MIT |
-| [OpenPI](https://github.com/Physical-Intelligence/openpi) | π0 and π0.5 reference numbers | Apache-2.0 |
+| [OpenPI](https://github.com/Physical-Intelligence/openpi) | Native π0 inference and π0 / π0.5 reference numbers | Apache-2.0 |
 | [LIBERO](https://github.com/Lifelong-Robot-Learning/LIBERO) | benchmark | MIT |
 | [Diffusion Policy](https://github.com/real-stanford/diffusion_policy), [ACT](https://github.com/tonyzhaozh/act) | original methods | MIT |
 | [MuJoCo](https://github.com/google-deepmind/mujoco), [gym-aloha](https://github.com/huggingface/gym-aloha), [gym-pusht](https://github.com/huggingface/gym-pusht) | simulation | Apache-2.0 |
 
-Checkpoints: `lerobot/act_aloha_sim_transfer_cube_human`, `openvla/openvla-7b-finetuned-libero-spatial`, `lerobot/smolvla_libero`, `lerobot/pi05_libero_finetuned_v044`, `lerobot/pi0_libero_finetuned_v044`, `lerobot/diffusion_pusht`. Exact commits are in [`results/reproduction.csv`](results/reproduction.csv) and [`docs/NOTES.md`](docs/NOTES.md). Each checkpoint has its own license. The π0 tokenizer comes from the gated `google/paligemma-3b-pt-224` repository under the Gemma terms and is not included.
+Hugging Face checkpoints: `lerobot/act_aloha_sim_transfer_cube_human`, `openvla/openvla-7b-finetuned-libero-spatial`, `lerobot/smolvla_libero`, `lerobot/pi05_libero_finetuned_v044`, `lerobot/pi0_libero_finetuned_v044`, `lerobot/diffusion_pusht`. Revision prefixes are in [`results/reproduction.csv`](results/reproduction.csv); provenance and corrections are in [`docs/NOTES.md`](docs/NOTES.md). Each checkpoint retains its own license.
+
+Native OpenPI π0 uses `gs://openpi-assets/checkpoints/pi0_libero`; the [OpenPI guide](docs/OPENPI.md) records its pinned implementation, download manifest and separate GCS tokenizer cache. LeRobot π0 / π0.5 use the gated `google/paligemma-3b-pt-224` tokenizer under its terms. Neither tokenizer files nor access credentials are distributed here.
 
 Papers: [ACT](https://arxiv.org/abs/2304.13705) · [Diffusion Policy](https://arxiv.org/abs/2303.04137) · [OpenVLA](https://arxiv.org/abs/2406.09246) · [LIBERO](https://arxiv.org/abs/2306.03310) · [SmolVLA](https://arxiv.org/abs/2506.01844) · [π0](https://arxiv.org/abs/2410.24164) · [π0.5](https://arxiv.org/abs/2504.16054)
 
@@ -167,3 +169,5 @@ If you use these results or scripts, please cite:
 ```
 
 The same entry is in [`CITATION.cff`](CITATION.cff), which GitHub's "Cite this repository" button reads.
+
+The v1.4 tag is the earlier single-camera snapshot. P1/P2 were added later on `main`; record the commit used when citing those later results.

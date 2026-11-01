@@ -1,4 +1,4 @@
-"""Recompute P1/P2 tables, paired bootstrap intervals and bilingual figures.
+"""Recompute P1/P2 tables, paired bootstrap intervals, figures and website data.
 
 Run from the repository root: python scripts/analysis/summarize_followup.py
 Requires NumPy, never imports a policy or simulator. Full NPZ audits are separate
@@ -265,10 +265,20 @@ def main():
     replay_rows = [{"stage": stage, **r} for stage in ("self", "formal") for r in outcomes[stage]]
     write_csv("replay_holdout_episodes.csv", replay_rows)
     figures(point, comparisons, runs, replay)
+    primary = next(row for row in comparisons if row["role"] == "primary")
+    payload = {
+        "p1": {"initial_states": int(y.shape[0] * y.shape[1]), "repeats": int(y.shape[2]),
+               "formal_episodes": int(y.size), "smoke_episodes": sum(r["episodes"] for r in runs if r["stage"] == "smoke"),
+               "rates": dict(zip(GROUPS, [round(v, 6) for v in point], strict=True)),
+               "primary": {k: round(v, 6) if isinstance(v, float) else v for k, v in primary.items()}},
+        "p2": {**{k: round(replay[-1][k], 6) for k in ("episodes", "successes", "success_pc", "ci95_lo", "ci95_hi")},
+               "self_episodes": len(outcomes["self"]), "self_successes": sum(r["success"] for r in outcomes["self"]), "task_count": len(selection["tasks"])},
+    }
+    (ROOT / "dashboard/followup.js").write_text("window.FOLLOWUP_RESULTS = " + json.dumps(payload, ensure_ascii=False, indent=2, allow_nan=False) + ";\n")
     print(f"P1: {len(episodes)} records (40 smoke + 1200 formal); paired rates {point}")
     print(f"P2: {replay[-1]['successes']}/400; self {sum(r['success'] for r in outcomes['self'])}/10; "
           f"formal reasons {dict(Counter(r['reason'] for r in outcomes['formal']))}")
-    print("Wrote 6 CSVs and 4 bilingual SVGs; no model or simulation was run.")
+    print("Wrote 6 CSVs, 4 bilingual SVGs and dashboard/followup.js; no model or simulation was run.")
 
 
 if __name__ == "__main__":

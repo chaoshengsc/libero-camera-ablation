@@ -36,7 +36,7 @@ README 给出主要结论；这里按阅读、复现与核查组织完整材料�
 
 ## 怎样更新结果
 
-在仓库根目录依次运行 `python3 dashboard/build.py`、`python3 scripts/analysis/make_figures.py`、`python3 scripts/analysis/summarize_followup.py`。前两步使用标准库生成原有结果；第三步用NumPy从逐回合记录重算P1/P2配对统计、6个CSV与中英文SVG，不执行模型或仿真。环境准备见[快速开始](../README_CN.md#快速开始)。
+在仓库根目录依次运行 `python3 dashboard/build.py`、`python3 scripts/analysis/make_figures.py`、`python3 scripts/analysis/summarize_followup.py`。前两步使用标准库生成原有结果；第三步用NumPy从逐回合记录重算P1/P2配对统计、6个CSV、中英文SVG与[网页摘要数据](../dashboard/followup.js)，不执行模型或仿真。环境准备见[快速开始](../README_CN.md#快速开始)。
 
 [tests/](../tests/) 和 [CI](../.github/workflows/ci.yml)核对派生数字与原始记录的一致性。新增一组结果的执行入口与数据接入方式见[脚本索引](../scripts/README_CN.md)。
 

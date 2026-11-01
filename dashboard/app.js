@@ -6,6 +6,21 @@ const sum = (a) => a.reduce((p, q) => p + q, 0);
 // ---- 语言：默认跟随浏览器，？lang=zh|en 或右上角按钮切换。英文版在渲染后按词典替换文本（整句在前，短词在后）。
 const LANG = new URLSearchParams(location.search).get("lang") || ((navigator.language || "").toLowerCase().startsWith("zh") ? "zh" : "en");
 const DICT = [
+  ["状态输入更新（P1）", "State-input updates (P1)"],
+  ["选择外固定动作回放（P2）", "Selection-external replay (P2)"],
+  ["补充结果数据加载中；可直接查看下方CSV和原始记录。", "Follow-up data is loading; CSVs and raw records are linked below."],
+  ["P2将每任务预先选定的一套官方π0动作，在未参与动作选择的状态上原样回放。目标曾用于旧评测，并非隐藏测试集。", "P2 replays one preselected official π0 action sequence per task on states excluded from action selection. Targets appeared in earlier evaluations; they are not a hidden test set."],
+  ["底层控制器仍有反馈；区间固定十任务，不覆盖动作来源选择或新任务泛化。不能将P2与P1的成功率相减来分配机制贡献。", "The low-level controller retains feedback. The interval fixes the ten tasks and excludes source-selection uncertainty and new-task generalization. P2 and P1 rates cannot be subtracted to assign mechanism contributions."],
+  ["LeRobot π0 v044在所测冻结状态条件下均未成功；仿真环境、底层控制和动作后处理仍继续运行。", "LeRobot π0 v044 has no successes in the tested frozen-state conditions; the simulator, low-level control and action postprocessing continue running."],
+  ["这测得状态更新敏感性，尚不能区分在线纠偏、动作阶段线索与输入失配。P1未保存逐步终止标记和完整图像；公开记录支持统计重算，完整NPZ审计工件不在Git内。", "This measures state-update sensitivity without separating online correction, action-phase cues and input mismatch. P1 did not save stepwise terminal flags or full images. Public records reproduce statistics; full NPZ audit artifacts remain outside Git."],
+  ["早期回放与选择偏差", "Earlier replay and selection bias"],
+  ["逐任务与区间 CSV", "Task results & intervals CSV"], ["逐回合 CSV", "Episode results CSV"],
+  ["原始回放结果 JSON", "Raw replay outcomes JSON"], ["冻结动作 JSON", "Frozen actions JSON"],
+  ["完整设计与局限", "Full protocol & limitations"], ["早期回放 CSV", "Earlier replay CSV"],
+  ["三轮成功率均值", "Mean success rates across three repeats"], ["输入画面", "Image input"],
+  ["实时状态", "Live state"], ["冻结首状态", "Frozen first state"],
+  ["分组与重复 CSV", "Conditions & repeats CSV"], ["配对比较 CSV", "Paired comparisons CSV"],
+  ["原始结果与配对", "Raw outcomes & pairing"],
   ["已完成补充实验：状态更新与选择外固定动作回放", "Completed follow-ups: state updates and selection-external replay"],
   ["完整实验与P1/P2", "Full experiments and P1/P2"],
   ["选择外固定动作回放、状态更新与解释边界", "Selection-external replay, state updates and interpretation limits"],
@@ -353,8 +368,35 @@ $("themeBtn").onclick = () => {
   themeLabel();
 };
 themeLabel();
-for (const link of document.querySelectorAll("[data-doc]")) link.href = `https://github.com/chaoshengsc/libero-camera-ablation/blob/main/${link.dataset.doc}${LANG === "en" ? "" : "_CN"}.md`;
+for (const link of document.querySelectorAll("[data-doc]")) {
+  const anchor = LANG === "en" ? link.dataset.anchorEn : link.dataset.anchorZh;
+  link.href = `https://github.com/chaoshengsc/libero-camera-ablation/blob/main/${link.dataset.doc}${LANG === "en" ? "" : "_CN"}.md${anchor ? "#" + anchor : ""}`;
+}
 for (const link of document.querySelectorAll("[data-figure]")) link.href = `../media/${LANG === "en" ? "" : "zh/"}${link.dataset.figure}.svg`;
+const followups = window.FOLLOWUP_RESULTS;
+if (followups?.p1 && followups?.p2) {
+  const { p1, p2 } = followups, primary = p1.primary;
+  for (const group of ["A", "B", "C", "D"]) $("p1" + group).textContent = fmt(p1.rates[group]);
+  $("p1Scope").textContent = LANG === "en"
+    ? `Means across ${p1.repeats} repeats on the same ${p1.initial_states} initial states`
+    : `同一批${p1.initial_states}个初始状态，${p1.repeats}轮成功率均值`;
+  $("p1Primary").textContent = LANG === "en"
+    ? `Primary contrast with black images: live minus frozen state = ${primary.difference_pp.toFixed(1)} pp (95% paired bootstrap CI ${primary.ci95_lo.toFixed(1)}–${primary.ci95_hi.toFixed(1)} pp).`
+    : `全黑条件主比较：实时−冻结首状态 = ${primary.difference_pp.toFixed(1)}个百分点（95%配对bootstrap区间 ${primary.ci95_lo.toFixed(1)}–${primary.ci95_hi.toFixed(1)}个百分点）。`;
+  $("p1Coverage").textContent = LANG === "en"
+    ? `${p1.formal_episodes} formal executions across four conditions; ${p1.smoke_episodes} engineering checks excluded. Repeats do not add independent initial states.`
+    : `四条件共${p1.formal_episodes}次正式执行，${p1.smoke_episodes}次工程检查不进入统计；重复不增加独立初始状态。`;
+  $("p2Finding").textContent = LANG === "en"
+    ? `P2: ${p2.successes}/${p2.episodes} = ${fmt(p2.success_pc)} (95% stratified bootstrap CI ${p2.ci95_lo.toFixed(1)}–${p2.ci95_hi.toFixed(1)}%).`
+    : `P2：${p2.successes}/${p2.episodes} = ${fmt(p2.success_pc)}（95%分层bootstrap区间 ${p2.ci95_lo.toFixed(1)}–${p2.ci95_hi.toFixed(1)}%）。`;
+  $("p2Scope").textContent = LANG === "en"
+    ? `Self-replay: ${p2.self_successes}/${p2.self_episodes}. ${p2.task_count} fixed tasks, ${p2.episodes / p2.task_count} selection-external target states per task.`
+    : `自回放${p2.self_successes}/${p2.self_episodes}；固定${p2.task_count}个任务，每任务${p2.episodes / p2.task_count}个未参与动作选择的目标状态。`;
+} else {
+  const missing = LANG === "en" ? "Follow-up data could not be loaded; use the linked records." : "补充结果数据未加载，请查看所链接的记录。";
+  $("p2Finding").textContent = missing;
+  $("p1Scope").textContent = missing;
+}
 const replay = window.REPLAY_BASELINE;
 if (replay) {
   const pc = (100 * replay.cross_ok / replay.cross_n).toFixed(1);

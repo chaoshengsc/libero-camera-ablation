@@ -39,7 +39,7 @@ python3 scripts/analysis/make_figures.py
 python3 scripts/analysis/summarize_followup.py
 ```
 
-These build dashboard data, earlier CSVs/figures, then P1/P2 CSVs/figures. P1 keeps repeats and paired conditions together within initial state; P2 resamples targets within fixed tasks. Their denominators are separate.
+These build dashboard data, earlier CSVs/figures, then P1/P2 CSVs/figures and [dashboard/followup.js](../dashboard/followup.js), which supplies the website summaries from the same records. P1 keeps repeats and paired conditions together within initial state; P2 resamples targets within fixed tasks. Their denominators are separate.
 
 `trajectories_task4.json` and `trajectories_task7.json` contain compact XY trajectories (cm) for the trajectory figure. [export_trajectories.py](../scripts/analysis/export_trajectories.py) exports them separately from raw NPZ files; it needs NumPy and the raw trajectories. The commands above do not regenerate them.
 

@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Do robot policies actually use their cameras?</title>
 <meta name="description" content="Camera ablations of four robot policies on LIBERO-Spatial, with public checkpoints, repeated runs, and traceable evaluation data.">
-<link rel="stylesheet" href="styles.css?v=layout-4">
+<link rel="stylesheet" href="styles.css?v=followup-1">
 </head>
 <body>
 <a class="skip-link" href="#main">跳到正文</a>
@@ -28,6 +28,7 @@
   <a class="sub" href="#single-camera">单路相机</a>
   <a class="sub" href="#official">官方 π0 对照</a>
   <a class="sub" href="#open-loop">开环回放</a>
+  <a class="sub" href="#state-feedback">状态输入更新（P1）</a>
   <a href="#repro">复现结果</a>
   <a href="#resources">文档与数据</a>
   <a href="#replay">本地录像</a>
@@ -51,7 +52,7 @@
 
   <section id="vision">
     <h2>相机消融</h2>
-    <p class="intro"><a id="followupReport" data-doc="docs/EXPERIMENTS" href="https://github.com/chaoshengsc/libero-camera-ablation/blob/main/docs/EXPERIMENTS_CN.md">已完成补充实验：状态更新与选择外固定动作回放</a></p>
+    <p class="intro"><a href="#state-feedback">状态输入更新（P1）</a> · <a href="#open-loop">选择外固定动作回放（P2）</a></p>
     <p class="intro">相机消融只改变画面输入；OpenVLA只接收主视角和指令，其余三个检查点还接收腕部画面与状态。</p>
     <p class="intro">早期相机消融每次100回合，按相同初始状态比较。区间取决于配对与重复结构，不设统一的13点阈值；π0早期同条件重复最多相差18点。</p>
     <p class="intro">早期π0相机实验使用LeRobot v044，一组500回合正常评测为73%。官方π0/OpenPI的全黑对照为0/100（1.5节）；结果限于各自所测检查点、管线和干预，不能推广到所有π0。</p>
@@ -112,11 +113,44 @@
 
     <div class="block" id="open-loop">
       <h3><span class="n">1.6</span>开环回放：固定动作能完成多少任务</h3>
-      <p class="note">此图保留早期选择集上的交叉回放；已完成的选择外回放和状态更新检查见下方完整实验入口。</p>
-      <p class="take" id="replayFinding"></p>
-      <div class="fig"><img id="figReplay" width="760" height="511" src="../media/zh/open_loop_replay.svg?v=claims-1" alt="固定动作交叉回放、事后挑选与选择偏差的比较" loading="lazy"></div>
-      <p class="note">动作来自官方π0正常运行。每任务事后挑出的最好一套为77.8%，存在选择偏差，不能当作无偏基线。固定的是高层动作，底层控制器仍有反馈；回放不识别LeRobot π0全黑成功的内部机制。</p>
-      <div class="figure-tools"><a data-figure="open_loop_replay" href="../media/zh/open_loop_replay.svg" target="_blank" rel="noopener">查看原图 SVG</a><a href="../results/open_loop_replay.csv">结果 CSV</a></div>
+      <p class="take" id="p2Finding">补充结果数据加载中；可直接查看下方CSV和原始记录。</p>
+      <p class="intro">P2将每任务预先选定的一套官方π0动作，在未参与动作选择的状态上原样回放。目标曾用于旧评测，并非隐藏测试集。</p>
+      <p class="note" id="p2Scope"></p>
+      <p class="note">底层控制器仍有反馈；区间固定十任务，不覆盖动作来源选择或新任务泛化。不能将P2与P1的成功率相减来分配机制贡献。</p>
+      <div class="figure-tools">
+        <a href="../results/replay_holdout_summary.csv">逐任务与区间 CSV</a><a href="../results/replay_holdout_episodes.csv">逐回合 CSV</a>
+        <a href="data/replay_holdout/outcomes.json">原始回放结果 JSON</a><a href="data/replay_holdout/source_actions.json">冻结动作 JSON</a>
+        <a data-doc="docs/EXPERIMENTS" data-anchor-zh="16-固定动作回放" data-anchor-en="16-fixed-action-replay" href="https://github.com/chaoshengsc/libero-camera-ablation/blob/main/docs/EXPERIMENTS_CN.md#16-固定动作回放">完整设计与局限</a>
+      </div>
+      <details class="evidence"><summary>早期回放与选择偏差</summary>
+        <p class="cap" id="replayFinding"></p>
+        <div class="fig"><img id="figReplay" width="760" height="511" src="../media/zh/open_loop_replay.svg?v=claims-1" alt="固定动作交叉回放、事后挑选与选择偏差的比较" loading="lazy"></div>
+        <p class="note">动作来自官方π0正常运行。每任务事后挑出的最好一套为77.8%，存在选择偏差，不能当作无偏基线。固定的是高层动作，底层控制器仍有反馈；回放不识别LeRobot π0全黑成功的内部机制。</p>
+        <div class="figure-tools"><a data-figure="open_loop_replay" href="../media/zh/open_loop_replay.svg" target="_blank" rel="noopener">查看原图 SVG</a><a href="../results/open_loop_replay.csv">早期回放 CSV</a></div>
+      </details>
+    </div>
+
+    <div class="block" id="state-feedback">
+      <h3><span class="n">1.7</span>状态输入更新（P1）</h3>
+      <p class="take">LeRobot π0 v044在所测冻结状态条件下均未成功；仿真环境、底层控制和动作后处理仍继续运行。</p>
+      <div class="panel">
+        <table class="followup-table">
+          <caption id="p1Scope">三轮成功率均值</caption>
+          <thead><tr><th scope="col">输入画面</th><th scope="col">实时状态</th><th scope="col">冻结首状态</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">正常画面</th><td id="p1A">—</td><td id="p1C">—</td></tr>
+            <tr><th scope="row">全涂黑</th><td id="p1B">—</td><td id="p1D">—</td></tr>
+          </tbody>
+        </table>
+        <p class="note" id="p1Primary"></p>
+      </div>
+      <p class="note" id="p1Coverage"></p>
+      <p class="note">这测得状态更新敏感性，尚不能区分在线纠偏、动作阶段线索与输入失配。P1未保存逐步终止标记和完整图像；公开记录支持统计重算，完整NPZ审计工件不在Git内。</p>
+      <div class="figure-tools">
+        <a href="../results/state_feedback_runs.csv">分组与重复 CSV</a><a href="../results/state_feedback_comparisons.csv">配对比较 CSV</a>
+        <a href="../results/state_feedback_episodes.csv">逐回合 CSV</a><a href="https://github.com/chaoshengsc/libero-camera-ablation/tree/main/dashboard/data/state_feedback">原始结果与配对</a>
+        <a data-doc="docs/EXPERIMENTS" data-anchor-zh="17-状态输入更新敏感性" data-anchor-en="17-state-input-update-sensitivity" href="https://github.com/chaoshengsc/libero-camera-ablation/blob/main/docs/EXPERIMENTS_CN.md#17-状态输入更新敏感性">完整设计与局限</a>
+      </div>
     </div>
 
   </section>
@@ -179,7 +213,8 @@
 </main>
 </div>
 <script src="results.js?v=replay-1"></script>
-<script src="app.js?v=claims-1"></script>
+<script src="followup.js?v=p1p2-1"></script>
+<script src="app.js?v=followup-1"></script>
 <noscript><p class="no-script">交互图表需要 JavaScript。<a href="https://github.com/chaoshengsc/libero-camera-ablation">Read the results on GitHub</a>.</p></noscript>
 </body>
 </html>

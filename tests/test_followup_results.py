@@ -1,6 +1,7 @@
 """P1/P2 source integrity, grouped statistics and target-shaped failure checks."""
 
 import copy
+import csv
 import json
 import shutil
 from pathlib import Path
@@ -105,3 +106,34 @@ def test_followup_numbers_in_bilingual_reports():
         text = (ROOT / name).read_text()
         for value in ["262/400", "65.5%", "61.0–69.8%", "73.3%", "55.3%"]:
             assert value in text, (name, value)
+
+
+def test_dashboard_followups_match_source_outcomes_and_intervals():
+    text = (ROOT / "dashboard/followup.js").read_text()
+    payload = json.loads(text.removeprefix("window.FOLLOWUP_RESULTS = ").strip().removesuffix(";"))
+    _, episodes, runs, _ = load_state_feedback()
+    formal = [e for e in episodes if e["stage"] != "smoke"]
+    p1 = payload["p1"]
+    assert p1["initial_states"] == len({(e["task"], e["initial"]) for e in formal}) == 100
+    assert p1["repeats"] == len({e["repeat"] for e in formal}) == 3
+    assert p1["formal_episodes"] == len(formal) == 1200
+    assert p1["smoke_episodes"] == len(episodes) - len(formal) == 40
+    rates = {g: 100 * sum(e["success"] for e in formal if e["group"] == g) / sum(e["group"] == g for e in formal) for g in "ABCD"}
+    assert p1["rates"] == pytest.approx(rates)
+    with (ROOT / "results/state_feedback_comparisons.csv").open() as stream:
+        primary = next(row for row in csv.DictReader(stream) if row["role"] == "primary")
+    assert p1["primary"]["comparison"] == primary["comparison"]
+    for key in ("difference_pp", "ci95_lo", "ci95_hi"):
+        assert p1["primary"][key] == pytest.approx(float(primary[key]))
+    selection, outcomes, _ = load_replay_holdout()
+    p2 = payload["p2"]
+    assert p2["episodes"] == len(outcomes["formal"]) == 400
+    assert p2["successes"] == sum(r["success"] for r in outcomes["formal"]) == 262
+    assert p2["success_pc"] == 100 * p2["successes"] / p2["episodes"]
+    assert p2["self_episodes"] == len(outcomes["self"]) == 10
+    assert p2["self_successes"] == sum(r["success"] for r in outcomes["self"]) == 10
+    assert p2["task_count"] == len(selection["tasks"]) == 10
+    with (ROOT / "results/replay_holdout_summary.csv").open() as stream:
+        total = next(row for row in csv.DictReader(stream) if row["task"] == "all")
+    for key in ("ci95_lo", "ci95_hi"):
+        assert p2[key] == pytest.approx(float(total[key]))

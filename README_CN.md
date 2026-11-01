@@ -57,8 +57,8 @@ Camera ablations of four robot policies on LIBERO-Spatial
 其他检查补全了这幅图景：
 
 - **画面冻结敏感性。** 所测 π0.5 和 SmolVLA 检查点冻结首帧后，两次运行都为 0%；屏蔽原槽位的腕部相机时，π0.5 从 98.4% 降到 4.6%（各 500 回合）。冻结同时改变视觉内容更新与图像—状态同步，尚不能分离两者的作用。
-- **固定动作也能成功。** P2 将每任务预先选定的一套官方 π0 动作原样回放，在未参与动作选择的状态上成功 **262/400 = 65.5%**（95% 分层 bootstrap 区间 **61.0–69.8%**），自回放 **10/10**。这补强固定动作基线，不能识别 LeRobot π0 的内部机制。[协议、历史回放与边界](docs/EXPERIMENTS_CN.md#16-固定动作回放)。
-- **状态更新仍重要。** P1 中 LeRobot π0 v044 正常画面/全黑画面下的三轮均值为 **73.3% / 55.3%**；冻结模型接收的首状态后两者均为 **0%**。这说明状态更新敏感性，尚不能区分在线纠偏、动作阶段线索与输入失配。[配对统计](docs/EXPERIMENTS_CN.md#17-状态输入更新敏感性)。
+- **固定动作也能成功。** P2 将每任务预先选定的一套官方 π0 动作原样回放，在未参与动作选择的状态上成功 **262/400 = 65.5%**（95% 分层 bootstrap 区间 **61.0–69.8%**），自回放 **10/10**。这补强固定动作基线，不能识别 LeRobot π0 的内部机制。[协议、历史回放与边界](docs/EXPERIMENTS_CN.md#16-固定动作回放) · [数据](results/replay_holdout_summary.csv)。
+- **状态输入冻结敏感性。** P1 中 LeRobot π0 v044 正常画面/全黑画面下的三轮均值为 **73.3% / 55.3%**；冻结模型接收的首状态后两者均为 **0%**。这说明状态更新敏感性，尚不能区分在线纠偏、动作阶段线索与输入失配。[配对统计](docs/EXPERIMENTS_CN.md#17-状态输入更新敏感性) · [数据](results/state_feedback_comparisons.csv)。
 
 完整设计、重复运行、逐任务结果与统计口径见[实验说明](docs/EXPERIMENTS_CN.md)；原始记录与更正见[实验日志](docs/NOTES_CN.md)。
 
@@ -137,12 +137,14 @@ libero-camera-ablation/
 |---|---|---|
 | [LeRobot](https://github.com/huggingface/lerobot) v0.6.1 | ACT、Diffusion Policy、SmolVLA、π0、π0.5 的评测与 π0 微调 | Apache-2.0 |
 | [OpenVLA](https://github.com/openvla/openvla) | OpenVLA 评测 | MIT |
-| [OpenPI](https://github.com/Physical-Intelligence/openpi) | π0、π0.5 的基准数字 | Apache-2.0 |
+| [OpenPI](https://github.com/Physical-Intelligence/openpi) | 原生π0推理与π0 / π0.5参考数字 | Apache-2.0 |
 | [LIBERO](https://github.com/Lifelong-Robot-Learning/LIBERO) | 基准 | MIT |
 | [Diffusion Policy](https://github.com/real-stanford/diffusion_policy)、[ACT](https://github.com/tonyzhaozh/act) | 原始方法 | MIT |
 | [MuJoCo](https://github.com/google-deepmind/mujoco)、[gym-aloha](https://github.com/huggingface/gym-aloha)、[gym-pusht](https://github.com/huggingface/gym-pusht) | 仿真 | Apache-2.0 |
 
-权重：`lerobot/act_aloha_sim_transfer_cube_human`、`openvla/openvla-7b-finetuned-libero-spatial`、`lerobot/smolvla_libero`、`lerobot/pi05_libero_finetuned_v044`、`lerobot/pi0_libero_finetuned_v044`、`lerobot/diffusion_pusht`，具体 commit 见 [`results/reproduction.csv`](results/reproduction.csv) 和 [`docs/NOTES_CN.md`](docs/NOTES_CN.md)。各权重有自己的许可证。π0 的分词器来自受限仓库 `google/paligemma-3b-pt-224`，受 Gemma 条款约束，本仓库不包含。
+Hugging Face权重：`lerobot/act_aloha_sim_transfer_cube_human`、`openvla/openvla-7b-finetuned-libero-spatial`、`lerobot/smolvla_libero`、`lerobot/pi05_libero_finetuned_v044`、`lerobot/pi0_libero_finetuned_v044`、`lerobot/diffusion_pusht`。Revision前缀见[`results/reproduction.csv`](results/reproduction.csv)，来源和更正见[`docs/NOTES_CN.md`](docs/NOTES_CN.md)；各权重保留自己的许可证。
+
+OpenPI原版π0使用`gs://openpi-assets/checkpoints/pi0_libero`；[OpenPI指南](docs/OPENPI_CN.md)记录固定实现、下载清单及独立GCS分词器缓存。LeRobot π0 / π0.5使用受限的`google/paligemma-3b-pt-224`分词器，适用其自身条款；仓库不分发分词器文件或访问凭证。
 
 论文：[ACT](https://arxiv.org/abs/2304.13705) · [Diffusion Policy](https://arxiv.org/abs/2303.04137) · [OpenVLA](https://arxiv.org/abs/2406.09246) · [LIBERO](https://arxiv.org/abs/2306.03310) · [SmolVLA](https://arxiv.org/abs/2506.01844) · [π0](https://arxiv.org/abs/2410.24164) · [π0.5](https://arxiv.org/abs/2504.16054)
 
@@ -163,3 +165,5 @@ libero-camera-ablation/
 ```
 
 同样的条目也在 [`CITATION.cff`](CITATION.cff) 里，GitHub 页面上的 “Cite this repository” 按钮读的就是它。
+
+v1.4标签是较早的单相机实验快照；P1/P2后来加入`main`，引用这些后续结果时应同时记录实际使用的提交。

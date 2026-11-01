@@ -87,7 +87,7 @@ Require a zero shell exit code, then inspect `stdout.log` for `exit=0` and `out/
 
 | Goal | Entry | Requirements and outputs |
 |---|---|---|
-| Recompute completed P1/P2 | [summarize_followup.py](analysis/summarize_followup.py) | NumPy; no model/GPU; six CSVs and bilingual statistics figures |
+| Recompute completed P1/P2 | [summarize_followup.py](analysis/summarize_followup.py) | NumPy; no model/GPU; six CSVs, bilingual statistics figures and website summary data |
 | Repeat P1 state-input evaluation | [run_state_feedback.py](eval/run_state_feedback.py) → [eval_state_feedback.py](eval/eval_state_feedback.py) | Configured policy/EGL runtime;40 engineering+1200 formal episodes, gated stages |
 | Repeat P2 frozen replay | [replay_holdout.py](analysis/replay_holdout.py) | Configured LIBERO/MuJoCo 3.3.2/EGL; at least 8/10 self-replays before 400 formal episodes; no policy |
 

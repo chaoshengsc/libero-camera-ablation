@@ -36,7 +36,7 @@ The README presents the key findings. This guide connects the full study, reprod
 
 ## Update the results
 
-From the repository root, run `python3 dashboard/build.py`, `python3 scripts/analysis/make_figures.py`, then `python3 scripts/analysis/summarize_followup.py`. The first two use the standard library for earlier results; the third uses NumPy to recompute P1/P2 paired statistics, six CSVs and bilingual SVGs from episode records. No model or simulation is invoked. Prepare the environment via the [quick start](../README.md#quick-start).
+From the repository root, run `python3 dashboard/build.py`, `python3 scripts/analysis/make_figures.py`, then `python3 scripts/analysis/summarize_followup.py`. The first two use the standard library for earlier results; the third uses NumPy to recompute P1/P2 paired statistics, six CSVs, bilingual SVGs and [website summary data](../dashboard/followup.js) from episode records. No model or simulation is invoked. Prepare the environment via the [quick start](../README.md#quick-start).
 
 [tests/](../tests/) and [CI](../.github/workflows/ci.yml) check derived numbers against raw records. See the [script index](../scripts/README.md) for evaluation entry points and adding a new result.
 

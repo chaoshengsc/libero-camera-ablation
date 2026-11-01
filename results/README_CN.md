@@ -39,8 +39,8 @@ python3 scripts/analysis/make_figures.py
 python3 scripts/analysis/summarize_followup.py
 ```
 
-依次生成看板数据、原有CSV/图件和P1/P2的CSV/图件。P1重采样保留同一状态的三轮与四条件，P2按固定任务内目标状态分层；不混用两者分母。
+依次生成看板数据、原有CSV/图件和P1/P2的CSV/图件，以及供网页摘要使用的[dashboard/followup.js](../dashboard/followup.js)，数字来自同一批记录。P1重采样保留同一状态的三轮与四条件，P2按固定任务内目标状态分层；不混用两者分母。
 
-`trajectories_task4.json` 与 `trajectories_task7.json` 是轨迹图使用的精简 XY 数据（cm）。它们由 [export_trajectories.py](../scripts/analysis/export_trajectories.py) 从原始 NPZ 单独导出，需要 NumPy 与原始轨迹，不由上述两条命令重新生成。
+`trajectories_task4.json` 与 `trajectories_task7.json` 是轨迹图使用的精简 XY 数据（cm）。它们由 [export_trajectories.py](../scripts/analysis/export_trajectories.py) 从原始 NPZ 单独导出，需要 NumPy 与原始轨迹，不由上述三条命令重新生成。
 
 P1/P2公开来源分别为[state_feedback](../dashboard/data/state_feedback/)和[replay_holdout](../dashboard/data/replay_holdout/)，哈希绑定逐运行/逐回合记录；原始完整NPZ不入Git，张量审计范围与记录缺口见各目录README。
