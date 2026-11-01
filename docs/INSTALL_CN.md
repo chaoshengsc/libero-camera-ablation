@@ -2,7 +2,7 @@
 
 [English](INSTALL.md) · [项目首页](../README_CN.md) · [文档导航](README_CN.md)
 
-按当时在工作站上实际执行的步骤整理（Ubuntu 24.04，RTX A5000，驱动 570，无 sudo、不用 apt）。
+原环境步骤按工作站实际执行记录整理（Ubuntu 24.04，RTX A5000，驱动570，无sudo、不用apt）；后续重建的补充步骤另行注明。
 **没有在全新机器上从头重跑验证过**；版本号与 `constraints-*.txt` 一致。
 
 **OpenPI/JAX原版π0服务端 + LeRobot客户端**另见[官方OpenPI安装与复现](OPENPI_CN.md)，其中补充独立环境、固定上游锁文件、原生权重、分词器缓存与验收步骤；下面三个环境不包含该服务端。
@@ -88,7 +88,7 @@ CMAKE_POLICY_VERSION_MINIMUM=3.5 pip install --prefer-binary -c $EMB_ROOT/logs/p
 
 ## 4. 权重
 
-用 `hf download <仓库> --revision <commit> --local-dir $EMB_ROOT/ckpt/<目录名>` 下载，目录名见 `scripts/common.sh`（格式 `仓库名@commit 前 8 位`），完整 commit 见 `results/reproduction.csv`。例如：
+用 `hf download <仓库> --revision <commit> --local-dir $EMB_ROOT/ckpt/<目录名>` 下载，目录名见 `scripts/common.sh`（格式 `仓库名@commit 前 8 位`）；`results/reproduction.csv`也使用短revision。后续底座准备使用完整revision。例如：
 
 ```bash
 hf download lerobot/pi05_libero_finetuned_v044 --revision 8e174154 --local-dir $EMB_ROOT/ckpt/pi05_libero_finetuned_v044@8e174154
@@ -108,6 +108,62 @@ hf download lerobot/pi05_libero_finetuned_v044 --revision 8e174154 --local-dir $
   再把权重目录里 `policy_preprocessor.json` 的 `tokenizer_name` 改成本地路径。本仓库不提供该分词器。
 - **OpenPI原版π0**使用原生Orbax检查点及独立GCS分词器缓存，按[OpenPI指南](OPENPI_CN.md#3-原生权重归一化与分词器)准备，不套用上面的LeRobot权重/分词器步骤。
 - **状态置零微调的训练数据**：`lerobot/libero` 数据集（约 1.9 GB），放在 `$EMB_ROOT/cache/lerobot/lerobot/libero@<commit>`。
+
+### 4.1 离线评测前准备
+
+`run_libero.sh`会设置`HF_HUB_OFFLINE=1`。先按所选模型准备本地策略及依赖，LIBERO素材也须就绪；下载SmolVLA策略权重不等于底座已缓存。**下方底座下载块仅用于SmolVLA，P1和OpenPI原版不需要它。** 这里的补充步骤按既有版本和源码整理，**本次未执行下载、模型加载或新机器验收**。
+
+SmolVLA复现使用的底座为`HuggingFaceTB/SmolVLM2-500M-Video-Instruct@7b375e1b73b11138ff12fe22c8f2822d8fe03467`。公开策略配置的`load_vlm_weights=True`，初始化仍会读取底座权重和processor；只准备配置文件不够。[策略配置](https://huggingface.co/lerobot/smolvla_libero/blob/31d453f7/config.json)及[固定底座文件](https://huggingface.co/HuggingFaceTB/SmolVLM2-500M-Video-Instruct/tree/7b375e1b73b11138ff12fe22c8f2822d8fe03467)可核对来源。
+
+**以下会下载和写缓存。** 在Linux工作站任意目录、完成前述环境安装后执行；`EMB_ROOT`已设置。保留`HF_HUB_CACHE`设置供后续评测使用。只取所需权重与配置，不下载ONNX变体：
+
+```bash
+source "$EMB_ROOT/env.sh"
+conda activate smolvla
+export HF_HUB_CACHE="$HF_HOME/hub"
+(
+  set -e
+  export BASE_REPO=HuggingFaceTB/SmolVLM2-500M-Video-Instruct
+  export BASE_REV=7b375e1b73b11138ff12fe22c8f2822d8fe03467
+  hf download "$BASE_REPO" --revision "$BASE_REV" \
+    --include '*.json' '*.txt' '*.model' model.safetensors
+  python - <<'PY'
+import os
+from pathlib import Path
+
+from huggingface_hub import hf_hub_download
+
+repo_id, revision = os.environ["BASE_REPO"], os.environ["BASE_REV"]
+cache = Path(os.environ["HF_HUB_CACHE"])
+model = cache / ("models--" + repo_id.replace("/", "--"))
+snapshot = model / "snapshots" / revision
+required = ("config.json", "model.safetensors", "tokenizer.json",
+            "tokenizer_config.json", "preprocessor_config.json", "processor_config.json")
+if not all((snapshot / name).is_file() for name in required):
+    raise SystemExit("Incomplete pinned base-model snapshot; stop")
+ref = model / "refs/main"
+if ref.exists() or ref.is_symlink():
+    if ref.read_text().strip() != revision:
+        raise SystemExit("Existing main cache reference differs; do not overwrite it")
+else:
+    ref.parent.mkdir(parents=True, exist_ok=True)
+    with ref.open("x") as output:
+        output.write(revision)
+for name in required:
+    path = hf_hub_download(repo_id, name, revision="main",
+                           cache_dir=str(cache), local_files_only=True)
+    if Path(path).parent.name != revision:
+        raise SystemExit("Offline lookup resolved to a different revision")
+print("Pinned base-model files resolve offline; no model loaded")
+PY
+)
+```
+
+按commit下载不会自动建立`refs/main`，而该版LeRobot以仓库名读取底座，未传revision；此步骤将**本项目缓存的main别名**固定到已下载commit，不修改远端分支。已有别名不一致会停止，不删除或覆盖旧缓存。需要时核查原来源后另准备隔离缓存，不能直接改指针强行通过。
+
+末尾预期为`Pinned base-model files resolve offline; no model loaded`。这是本地文件存在和离线解析检查，不是权重内容哈希校验、模型推理或成功率验收。每个新评测终端加载`env.sh`后同样设置`HF_HUB_CACHE="$HF_HOME/hub"`；缺文件应补齐固定版本，不通过解除离线模式混入新版本。
+
+LeRobot π0/π0.5仍按上一节配置本地分词器；OpenPI原版按独立指南准备GCS缓存。LIBERO的BDDL、初始状态与assets目录也须在本地，并与固定的`hf-libero`/LIBERO源码配置一致。**单纯评测无需下载`lerobot/libero`训练数据。** 完成这些准备后，再选择[最小相机入口](../scripts/README_CN.md#最小相机评测)或[P1启动步骤](../scripts/README_CN.md#p1启动步骤仅供获准的独立重复)。
 
 ## 5. 跑评测
 

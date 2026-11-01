@@ -33,7 +33,26 @@ The reproduction table uses `lerobot/smolvla_libero`. Its extra arguments are de
 
 - `--policy.n_action_steps=10`.
 - `--rename_map` maps `observation.images.image` / `image2` to `observation.images.camera1` / `camera2`.
-- The base model `HuggingFaceTB/SmolVLM2-500M-Video-Instruct` must be in the Hugging Face cache.
+- Cache `HuggingFaceTB/SmolVLM2-500M-Video-Instruct` at the fixed revision and verify its local main alias using [offline preparation](../docs/INSTALL.md#41-prepare-for-offline-evaluation).
+
+## Convert and summarize existing results
+
+These tools process existing files without a model or simulator. Run-name lookup requires `EMB_ROOT`; `summarize_eval.py --file` reads an explicit JSON without the workstation environment.
+
+```bash
+RUN=openvla_spatial_500
+python scripts/analysis/ovla_to_json.py "$RUN" novideo
+python scripts/analysis/summarize_eval.py --file \
+  "$EMB_ROOT/logs/eval/$RUN/dash/eval_info.json"
+```
+
+Run from the repository root. Conversion reads the unique `.txt` under `logs/eval/$RUN/logs/`, validates Task/video/Success blocks, then creates a new `dash/`. `novideo` only skips video copying; omitting it selects the first success/failure video per task and checks selected files before creating output. Result JSON is written last. A failed copy retains the failed output directory and artifacts.
+
+Existing directories, files and symlinks, including dangling links, are rejected; old `dash/` is never deleted. For another conversion, pass an unused directory such as `--output "$EMB_ROOT/logs/eval/$RUN/dash_check_01"`. With multiple logs, select `--log FILE` explicitly rather than silently taking the first. Exceptions, empty logs and incomplete episode blocks fail. Still verify planned task/episode coverage and the original evaluation exit status manually: complete blocks can come from a partial run.
+
+The original `python scripts/analysis/summarize_eval.py RUN [RUN ...]` remains supported. Each run must contain exactly one `eval_info.json`; select `--file PATH` if there are several. The tool checks overall counts/rate against per-task outcomes and accepts converted OpenVLA results without timing fields.
+
+Exit codes: **0** means all selected inputs were processed; **1** means missing, ambiguous or invalid data, or an I/O failure; **2** means invalid arguments or required environment configuration. Batch summaries still show valid runs but return 1 if any input fails. Intervals retain the historical binomial normal approximation; use the specialized results for official Wilson intervals and P1/P2 paired bootstrap. A generic summary is not an experiment-acceptance gate.
 
 ## Camera ablations and official π0
 
@@ -72,7 +91,34 @@ Require a zero shell exit code, then inspect `stdout.log` for `exit=0` and `out/
 | Repeat P1 state-input evaluation | [run_state_feedback.py](eval/run_state_feedback.py) → [eval_state_feedback.py](eval/eval_state_feedback.py) | Configured policy/EGL runtime;40 engineering+1200 formal episodes, gated stages |
 | Repeat P2 frozen replay | [replay_holdout.py](analysis/replay_holdout.py) | Configured LIBERO/MuJoCo 3.3.2/EGL; at least 8/10 self-replays before 400 formal episodes; no policy |
 
-For P1, place the complete `scripts/` tree in a fresh isolated job directory and use an unused `STATE_RUN_PREFIX`. Its `started.flag` also rejects duplicate starts. The wrapper depends on the recorded configured LeRobot environment; this is not a fresh-machine validation. The optional prefix and packaging were not used for a new model run during integration.
+### P1 launch steps: for an authorized independent repeat
+
+Complete [offline preparation](../docs/INSTALL.md#41-prepare-for-offline-evaluation) for the LeRobot π0 v044 checkpoint, local tokenizer and LIBERO assets; skip the SmolVLA base-model download block. This entry uses the current Python interpreter; it does not load `env.sh` or activate conda itself. Explicitly activate `smolvla` on the Linux workstation. Set `REPO` to this checkout's absolute path and `EMB_ROOT` to the configured working directory.
+
+**The following starts 40 engineering + 1,200 formal episodes with model/GPU inference and simulation; it was not executed during this documentation update.** Run only for an authorized repetition, not to recompute public statistics. Choose an unused prefix and isolated JOB directory; run from any directory:
+
+```bash
+(
+  set -e
+  source "$EMB_ROOT/env.sh"
+  conda activate smolvla
+  export HF_HUB_CACHE="$HF_HOME/hub"
+  export STATE_RUN_PREFIX=statefb_repeat_01
+  P1_JOB="$EMB_ROOT/tmp/$STATE_RUN_PREFIX"
+  mkdir -- "$P1_JOB"
+  cp -R -- "$REPO/scripts" "$P1_JOB/scripts"
+  mkdir -p -- "$EMB_ROOT/logs/eval"
+  python -u "$P1_JOB/scripts/eval/run_state_feedback.py" > "$P1_JOB/pipeline.log" 2>&1
+)
+```
+
+`set -e` stops after preparation failures; the subshell leaves the current terminal's activation unchanged. `mkdir` refuses an existing JOB. Copying the complete `scripts/` tree lets the entry locate its sibling wrappers. Copy public scripts only, not weights, tokenizer or papers. The log parent is created before execution; the original entry reserves each group's output exclusively.
+
+Expect `manifest.json`, `started.flag`, `smoke_pass.flag`, `r0_pass.flag`, `r1_pass.flag`, `r2_pass.flag` and finally `done.flag` in the JOB; require outer exit 0. The 16 runs live under `logs/eval/${STATE_RUN_PREFIX}_{smoke,r0,r1,r2}_{A,B,C,D}/`. Check each `exit_code` is 0 (this entry does not append the shell wrapper's `exit=0` to stdout), plus `out/eval_info.json`, `evidence.json`, `traj.npz` and state NPZ files. Engineering runs have 10 episodes per group; each formal group/repeat has 100. Preserve 360 rendering, five executed actions, seed=1000 and the original groups/pairing criteria.
+
+The entry gates engineering checks, cross-condition pairing and three formal repeats; technical/evidence failure stops progression. Keep failed directories/markers. Changing `STATE_RUN_PREFIX` does not bypass the same JOB's `started.flag`; audit the cause and choose a new JOB/prefix rather than delete the marker. The workflow depends on the configured environment. Commands have static checks, not clean-machine or new model-run acceptance. Recovery experiments and P3 remain paused.
+
+### P2 frozen-action replay
 
 P2's ten selected action arrays are bundled in [data/replay_holdout](../dashboard/data/replay_holdout/); no OpenPI server or source-trajectory regeneration is needed. From the checkout root in the configured simulation environment, the following runs all 410 episodes, not offline analysis:
 

@@ -2,7 +2,7 @@
 
 [中文](INSTALL_CN.md) · [Project overview](../README.md) · [Docs & data](README.md)
 
-These are the steps that were actually run on the workstation (Ubuntu 24.04, RTX A5000, driver 570, no sudo, no apt).
+The original environment setup follows recorded workstation steps (Ubuntu 24.04, RTX A5000, driver 570, no sudo, no apt). Reconstructed additions are identified separately.
 **They have not been re-run from scratch on a clean machine.** Version numbers match `constraints-*.txt`.
 
 For the native **OpenPI/JAX π0 server plus LeRobot client**, use the separate [OpenPI installation and reproduction guide](OPENPI.md). It records the additional environment, pinned upstream lock, native checkpoint, tokenizer cache and acceptance steps; the three environments below do not include that server.
@@ -88,7 +88,7 @@ CMAKE_POLICY_VERSION_MINIMUM=3.5 pip install --prefer-binary -c $EMB_ROOT/logs/p
 
 ## 4. Checkpoints
 
-Download with `hf download <repo> --revision <commit> --local-dir $EMB_ROOT/ckpt/<dir>`. Directory names are listed in `scripts/common.sh` (format: `repo name@first 8 characters of the commit`); full commits are in `results/reproduction.csv`. For example:
+Download with `hf download <repo> --revision <commit> --local-dir $EMB_ROOT/ckpt/<dir>`. Directory names are listed in `scripts/common.sh` (format: `repo name@first 8 characters of the commit`); `results/reproduction.csv` also uses short revisions. The base-model preparation below uses a full revision. For example:
 
 ```bash
 hf download lerobot/pi05_libero_finetuned_v044 --revision 8e174154 --local-dir $EMB_ROOT/ckpt/pi05_libero_finetuned_v044@8e174154
@@ -108,6 +108,62 @@ hf download lerobot/pi05_libero_finetuned_v044 --revision 8e174154 --local-dir $
   then set `tokenizer_name` in the checkpoint's `policy_preprocessor.json` to the local path. This repo does not distribute the tokenizer.
 - **Native OpenPI π0** uses its original Orbax checkpoint and a separate GCS tokenizer cache; follow [the OpenPI guide](OPENPI.md#3-native-weights-normalization-and-tokenizer), not the LeRobot checkpoint/tokenizer procedure above.
 - **Training data for the state-zeroing fine-tune**: the `lerobot/libero` dataset (about 1.9 GB), placed at `$EMB_ROOT/cache/lerobot/lerobot/libero@<commit>`.
+
+### 4.1 Prepare for offline evaluation
+
+`run_libero.sh` sets `HF_HUB_OFFLINE=1`. Prepare the selected policy and its local dependencies, plus LIBERO assets; downloading a SmolVLA policy does not cache its base model. **The base-model download block below applies only to SmolVLA; P1 and native OpenPI do not need it.** These additional steps are reconstructed from recorded versions and source. **No download, model load or clean-machine acceptance was performed during this update.**
+
+SmolVLA reproduction uses `HuggingFaceTB/SmolVLM2-500M-Video-Instruct@7b375e1b73b11138ff12fe22c8f2822d8fe03467`. The public policy sets `load_vlm_weights=True`, so initialization still reads base-model weights and its processor; configuration files alone are insufficient. Sources: [policy config](https://huggingface.co/lerobot/smolvla_libero/blob/31d453f7/config.json) and [pinned base-model files](https://huggingface.co/HuggingFaceTB/SmolVLM2-500M-Video-Instruct/tree/7b375e1b73b11138ff12fe22c8f2822d8fe03467).
+
+**Downloads and writes cache files.** Run from any directory on the Linux workstation after installing the environments, with `EMB_ROOT` set. Keep `HF_HUB_CACHE` set for subsequent evaluations. Select the required weights/configuration without ONNX variants:
+
+```bash
+source "$EMB_ROOT/env.sh"
+conda activate smolvla
+export HF_HUB_CACHE="$HF_HOME/hub"
+(
+  set -e
+  export BASE_REPO=HuggingFaceTB/SmolVLM2-500M-Video-Instruct
+  export BASE_REV=7b375e1b73b11138ff12fe22c8f2822d8fe03467
+  hf download "$BASE_REPO" --revision "$BASE_REV" \
+    --include '*.json' '*.txt' '*.model' model.safetensors
+  python - <<'PY'
+import os
+from pathlib import Path
+
+from huggingface_hub import hf_hub_download
+
+repo_id, revision = os.environ["BASE_REPO"], os.environ["BASE_REV"]
+cache = Path(os.environ["HF_HUB_CACHE"])
+model = cache / ("models--" + repo_id.replace("/", "--"))
+snapshot = model / "snapshots" / revision
+required = ("config.json", "model.safetensors", "tokenizer.json",
+            "tokenizer_config.json", "preprocessor_config.json", "processor_config.json")
+if not all((snapshot / name).is_file() for name in required):
+    raise SystemExit("Incomplete pinned base-model snapshot; stop")
+ref = model / "refs/main"
+if ref.exists() or ref.is_symlink():
+    if ref.read_text().strip() != revision:
+        raise SystemExit("Existing main cache reference differs; do not overwrite it")
+else:
+    ref.parent.mkdir(parents=True, exist_ok=True)
+    with ref.open("x") as output:
+        output.write(revision)
+for name in required:
+    path = hf_hub_download(repo_id, name, revision="main",
+                           cache_dir=str(cache), local_files_only=True)
+    if Path(path).parent.name != revision:
+        raise SystemExit("Offline lookup resolved to a different revision")
+print("Pinned base-model files resolve offline; no model loaded")
+PY
+)
+```
+
+A commit download does not create `refs/main`; this LeRobot version requests the base by repository name without a revision. The step pins **this project's cached main alias** to the downloaded commit, without changing the remote branch. A differing existing alias stops preparation; old cache files are not deleted or overwritten. Audit their provenance or prepare a separate isolated cache instead of forcing the pointer to pass.
+
+Expect `Pinned base-model files resolve offline; no model loaded`. This checks file presence and offline resolution, not weight-content hashes, model inference or success rates. In each new evaluation terminal, load `env.sh` and set `HF_HUB_CACHE="$HF_HOME/hub"` again. Resolve missing files at the fixed revision rather than disabling offline mode and mixing versions.
+
+LeRobot π0/π0.5 still need the local tokenizer setup above; native OpenPI needs its separate GCS cache. LIBERO's BDDL, initial-state and asset directories must also be local and match the pinned `hf-libero`/LIBERO source configuration. **Evaluation alone does not require the `lerobot/libero` training dataset.** Then choose the [minimal camera entry](../scripts/README.md#minimal-camera-evaluation) or [P1 launch steps](../scripts/README.md#p1-launch-steps-for-an-authorized-independent-repeat).
 
 ## 5. Running evaluations
 

@@ -33,7 +33,26 @@ ACT的新输出统一为`logs/eval/act_cube_500/stdout.log`与`out/`；旧`logs/
 
 - `--policy.n_action_steps=10`。
 - `--rename_map` 把 `observation.images.image` / `image2` 映射到 `observation.images.camera1` / `camera2`。
-- 底座 `HuggingFaceTB/SmolVLM2-500M-Video-Instruct` 必须已在 Hugging Face 缓存中。
+- 底座 `HuggingFaceTB/SmolVLM2-500M-Video-Instruct`必须按[离线准备](../docs/INSTALL_CN.md#41-离线评测前准备)缓存固定revision，并核对本地main别名。
+
+## 转换与汇总已有结果
+
+以下工具只处理已有文件，不加载模型或仿真。按运行名查找时需要`EMB_ROOT`；`summarize_eval.py --file`可直接读取指定JSON，无需工作站环境。
+
+```bash
+RUN=openvla_spatial_500
+python scripts/analysis/ovla_to_json.py "$RUN" novideo
+python scripts/analysis/summarize_eval.py --file \
+  "$EMB_ROOT/logs/eval/$RUN/dash/eval_info.json"
+```
+
+从仓库根目录执行。第一步读取`logs/eval/$RUN/logs/`下唯一的`.txt`，验证逐回合Task/video/Success记录，再创建新的`dash/`；`novideo`只省略视频复制。省略它会挑选每任务第一段成功/失败视频，预先检查所选文件存在。输出JSON最后写出，复制失败时保留已创建的失败目录和工件。
+
+已有目录、文件或链接（含失效链接）一律拒绝，不删除旧`dash/`。需要重新转换时，传`--output "$EMB_ROOT/logs/eval/$RUN/dash_check_01"`等未用目录；有多个日志时用`--log FILE`显式选择，不静默取第一个。异常记录、空日志、未完成的逐回合块都会报错；仍需人工核对预定任务/回合覆盖和原评测退出码，完整块也可能只来自部分运行。
+
+原来的`python scripts/analysis/summarize_eval.py RUN [RUN ...]`调用仍可用；每个运行必须只有一份`eval_info.json`，多份时改用`--file PATH`。工具核对总体次数/成功率与逐任务结果一致，允许OpenVLA转换结果省略耗时字段。
+
+退出码：**0**表示所选输入均处理成功，**1**表示输入缺失、歧义、数据不合法或读写失败，**2**表示参数/所需环境配置错误。批量汇总中有效运行仍会显示，但任一失败使总退出码为1。区间保留历史二项正态近似；官方Wilson区间、P1/P2配对bootstrap应看对应专用结果，不把通用汇总当作实验验收门槛。
 
 ## 相机消融与官方 π0
 
@@ -73,8 +92,34 @@ WRAP=probe BLACKOUT=all bash scripts/eval/run_libero.sh \
 | 重复P1状态输入评测 | [run_state_feedback.py](eval/run_state_feedback.py) → [eval_state_feedback.py](eval/eval_state_feedback.py) | 已配置模型/EGL环境；40工程＋1200正式回合；逐阶段验收 |
 | 重复P2冻结动作回放 | [replay_holdout.py](analysis/replay_holdout.py) | 已配置LIBERO/MuJoCo 3.3.2/EGL；10自回放通过至少8个后才执行400正式回合；不加载策略 |
 
-P1保留原始执行入口，在独立目录中完整放置`scripts/`后运行，`STATE_RUN_PREFIX`设未使用的名字；目录内`started.flag`也拒绝重复启动。
-它的包装器依赖原已配置的LeRobot运行环境，不是独立的全新机器安装验证。本次仅整理入口、增加可选运行名前缀，未重新实跑模型。
+### P1启动步骤：仅供获准的独立重复
+
+先完成[离线准备](../docs/INSTALL_CN.md#41-离线评测前准备)中的LeRobot π0 v044权重、本地分词器及LIBERO素材配置，不需要运行SmolVLA底座下载块。此入口使用当前Python解释器，不自动加载`env.sh`或激活conda环境；应在Linux工作站显式激活`smolvla`。`REPO`是本仓库绝对路径，`EMB_ROOT`是已配置工作目录。
+
+**下面会启动40工程＋1200正式回合，使用模型/GPU和仿真；本次文档整理未执行。** 只有获准重复时才运行，不用于单纯重算公开统计。选未使用的运行前缀和独立JOB目录，从任意目录执行：
+
+```bash
+(
+  set -e
+  source "$EMB_ROOT/env.sh"
+  conda activate smolvla
+  export HF_HUB_CACHE="$HF_HOME/hub"
+  export STATE_RUN_PREFIX=statefb_repeat_01
+  P1_JOB="$EMB_ROOT/tmp/$STATE_RUN_PREFIX"
+  mkdir -- "$P1_JOB"
+  cp -R -- "$REPO/scripts" "$P1_JOB/scripts"
+  mkdir -p -- "$EMB_ROOT/logs/eval"
+  python -u "$P1_JOB/scripts/eval/run_state_feedback.py" > "$P1_JOB/pipeline.log" 2>&1
+)
+```
+
+`set -e`使准备失败就停止；子Shell不改变当前终端的激活状态。`mkdir`拒绝已有JOB，复制完整`scripts/`后入口才可定位同级包装器。只复制公开脚本，不复制权重、分词器或论文。日志父目录在运行前创建；各组输出仍由原入口独占创建。
+
+预期JOB中出现`manifest.json`、`started.flag`、`smoke_pass.flag`、`r0_pass.flag`、`r1_pass.flag`、`r2_pass.flag`和最终`done.flag`；外层退出码须为0。16个分组运行位于`logs/eval/${STATE_RUN_PREFIX}_{smoke,r0,r1,r2}_{A,B,C,D}/`。每组检查`exit_code`为0（这里不是Shell包装器的`stdout.log`末行`exit=0`）、`out/eval_info.json`、`evidence.json`、`traj.npz`及状态NPZ。工程检查每组10回合，三轮正式每组100回合；保持360渲染、每次执行5步、seed1000及原分组/配对判据。
+
+入口按工程检查→交叉配对→三轮正式推进，任一技术/证据门槛失败即停止。失败目录和标记保留；只换`STATE_RUN_PREFIX`不能绕过同一JOB的`started.flag`，应核查原因后另选JOB和前缀，不删除标记重跑。它依赖已有配置环境；文档命令仅静态核对，不声称新机器或本次模型运行通过。恢复实验与P3继续暂停。
+
+### P2冻结动作回放
 
 P2十条选定动作已保真导出在[data/replay_holdout](../dashboard/data/replay_holdout/)，不需要OpenPI服务或重新生成来源动作。
 在已激活的隔离仿真环境和仓库根目录执行下列命令，会运行完整410回合；不是离线统计命令：
