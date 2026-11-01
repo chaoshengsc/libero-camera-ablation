@@ -1,6 +1,7 @@
 """仓库里的派生结果必须能从原始评测 JSON 重算出来,README 与完整实验说明的数字必须与派生结果一致。"""
 import csv
 import json
+import re
 from pathlib import Path
 
 import pytest
@@ -254,3 +255,13 @@ def test_open_loop_replay_matches_raw_and_report():
     for md in REPORTS:
         for s in ("95/97", "77.8%", "348/873", "39.9%", "64.8%", "c7e9023"):
             assert s in md, s
+
+
+def test_dashboard_replay_summary_matches_raw_pairs():
+    raw = json.loads((DATA / "official_pi0/ojx360_replay/replay.json").read_text())
+    matched = re.search(r"window\.REPLAY_BASELINE = (\{[^\n]+\});", (ROOT / "dashboard/results.js").read_text())
+    assert matched, "dashboard replay summary missing"
+    actual = json.loads(matched.group(1))
+    own = [v for task in raw["tasks"] for v in task["self"].values()]
+    cross = [v for task in raw["tasks"] for source in task["cross"].values() for v in source.values()]
+    assert actual == {"self_ok": sum(own), "self_n": len(own), "cross_ok": sum(cross), "cross_n": len(cross)}

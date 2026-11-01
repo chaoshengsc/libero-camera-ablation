@@ -29,17 +29,20 @@ README 给出主要结论；这里按阅读、复现与核查组织完整材料�
 | [单路相机](EXPERIMENTS_CN.md#14-只去掉腕部相机500-回合) | [single_camera_summary.csv](../results/single_camera_summary.csv) | [原始记录](../dashboard/data/s500/) |
 | [官方 π0](EXPERIMENTS_CN.md#15-官方-π0-对照) | [official_pi0_summary.csv](../results/official_pi0_summary.csv) | [原始记录](../dashboard/data/official_pi0/) |
 | [固定动作回放](EXPERIMENTS_CN.md#16-固定动作回放) | [open_loop_replay.csv](../results/open_loop_replay.csv) | [原始记录](../dashboard/data/official_pi0/ojx360_replay/replay.json) |
+| [状态输入更新敏感性](EXPERIMENTS_CN.md#17-状态输入更新敏感性) | [state_feedback_comparisons.csv](../results/state_feedback_comparisons.csv) | [原始结果与配对](../dashboard/data/state_feedback/) |
+| [选择外固定动作回放](EXPERIMENTS_CN.md#16-固定动作回放) | [replay_holdout_summary.csv](../results/replay_holdout_summary.csv) | [冻结动作与全部结果](../dashboard/data/replay_holdout/) |
 | [公开权重复现](EXPERIMENTS_CN.md#2-公开权重的复现) | [reproduction.csv](../results/reproduction.csv) | [原始记录](../dashboard/build.py) |
 
 ## 怎样更新结果
 
-在仓库根目录先运行 `python3 dashboard/build.py`，再运行 `python3 scripts/analysis/make_figures.py`；分别更新看板数据、CSV 与中英文 SVG，不执行模型评测。
+在仓库根目录依次运行 `python3 dashboard/build.py`、`python3 scripts/analysis/make_figures.py`、`python3 scripts/analysis/summarize_followup.py`。前两步使用标准库生成原有结果；第三步用NumPy从逐回合记录重算P1/P2配对统计、6个CSV与中英文SVG，不执行模型或仿真。环境准备见[快速开始](../README_CN.md#快速开始)。
 
 [tests/](../tests/) 和 [CI](../.github/workflows/ci.yml)核对派生数字与原始记录的一致性。新增一组结果的执行入口与数据接入方式见[脚本索引](../scripts/README_CN.md)。
 
 <details>
 <summary>历史更新与更正</summary>
 
+- **2026-11-01** · 完成并整合P1状态更新敏感性与P2选择外固定动作基线；保留旧相机数据与回放结果，补充配对/重复、输入失配和选择范围的解释。恢复实验与P3暂缓。
 - **2026-10-29** · 官方 π0 对照（[1.5 节](EXPERIMENTS_CN.md#15-官方-π0-对照)）：OpenPI 原版正常 96.4%，去掉视觉后 0%；只屏蔽腕部 0%，只屏蔽主视角 77%。旧版说 LeRobot π0 权重“训练不足”，本仓库没有检验过这一点，已改为陈述事实。
 - **2026-10-28** · 单相机实验，每个条件 500 回合（[1.4 节](EXPERIMENTS_CN.md#14-只去掉腕部相机500-回合)）。搭实验时发现 LeRobot 在缺一路相机时会悄悄错位相机槽位：已报告为 [lerobot#5118](https://github.com/huggingface/lerobot/issues/5118)，修复提交为 [lerobot#5129](https://github.com/huggingface/lerobot/pull/5129)。
 - **2026-10-14** · [v1.3](https://github.com/chaoshengsc/libero-camera-ablation/releases/tag/v1.3)：所有消融各重跑一次；撤回了“π0 依赖腕部相机”的结论。

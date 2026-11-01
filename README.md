@@ -14,7 +14,7 @@ Camera ablations of four robot policies on LIBERO-Spatial
 
 </div>
 
-**Does completing a simulated task mean a robot uses its cameras?** We reproduce five public checkpoints and test how π0, π0.5, OpenVLA, and SmolVLA depend on vision on LIBERO-Spatial.
+**Does completing a simulated task mean a robot uses its cameras?** We ablate camera inputs for public π0, π0.5, OpenVLA, and SmolVLA checkpoints, then use an official π0 control, fixed-action replay and state-input checks to bound the interpretation. Reproduction of five public checkpoints provides the engineering foundation.
 
 **With every camera blacked out, three policies score 0%. LeRobot π0 v044 retains 53–56%; official π0 in OpenPI scores 0/100.**
 
@@ -61,7 +61,8 @@ Both the weights and the inference pipeline differ between the two sides; the di
 A re-run at 360 rendering ruled out rendering resolution. Two further checks add context:
 
 - **Live images.** π0.5 and SmolVLA score 0% with frozen first frames in both runs. Removing the wrist camera brings π0.5 from 98.4% to 4.6% (500 episodes per condition).
-- **Fixed-action replay.** Cross-replay succeeds in **348/873 = 39.9%**; self-replay is 95/97. The post-hoc best per-task score of 77.8% is selection-biased. Replay does not establish the mechanism behind blind LeRobot π0.
+- **Fixed actions also succeed.** P2 replays one preselected official π0 sequence per task on states excluded from action selection: **262/400 = 65.5%**, with a **61.0–69.8%** stratified-bootstrap interval and **10/10** self-replay checks. This strengthens the baseline without identifying the LeRobot π0 mechanism. [Protocol, earlier replay and limits](docs/EXPERIMENTS.md#16-fixed-action-replay).
+- **State updates still matter.** In P1, LeRobot π0 v044 averages **73.3% / 55.3%** with normal/black images across three repeats; both score **0%** when the model receives its frozen first state. This measures update sensitivity, not a unique correction or phase mechanism. [Paired statistics](docs/EXPERIMENTS.md#17-state-input-update-sensitivity).
 
 See the [full experiments](docs/EXPERIMENTS.md) for designs, repeated runs, per-task results, and statistical scope. The [notes](docs/NOTES.md) retain chronological records and corrections.
 
@@ -83,32 +84,22 @@ See [reproduction details](docs/EXPERIMENTS.md#2-reproduction-of-the-public-chec
 
 ## Quick start
 
-These results were obtained on Ubuntu 24.04 with an RTX A5000 24 GB. Follow [installation](docs/INSTALL.md) for environment versions and setup. Find checkpoint sources and revisions in the [results guide](results/README.md).
-
-After configuring the environments, `EMB_ROOT`, and checkpoints, run an ACT example from the repository root:
+**Recompute included results first: no GPU or model weights required.** From the repository root, with Python 3.10+:
 
 ```bash
-bash scripts/eval/run_act.sh
-python3 scripts/analysis/summarize_eval.py act_cube_500
+python3 -m venv .venv
+. .venv/bin/activate
+python -m pip install numpy
+python dashboard/build.py
+python scripts/analysis/make_figures.py
+python scripts/analysis/summarize_followup.py
 ```
 
-The first runs 500 GPU evaluation episodes; the second summarizes the output. For missing environments or checkpoints, use [installation](docs/INSTALL.md) and [troubleshooting](docs/TROUBLESHOOTING.md).
+The first three commands create/activate a local analysis environment and install NumPy for the P1/P2 bootstrap; skip them if your environment is ready. The last three build dashboard data, the original tables/figures, and the P1/P2 episode tables and grouped intervals. Outputs are in [results/](results/README.md) and [media/](media/); the [data guide](docs/README.md#experiments-and-evidence) links their sources.
 
-Find other models and ablations in the [script index](scripts/README.md).
+For a missing NumPy import, check the active environment. Missing raw files require checking the checkout, not another model run.
 
-<details>
-<summary>No GPU: regenerate tables and figures from included data</summary>
-
-From the repository root, use Python 3.10+ and the standard library:
-
-```bash
-python3 dashboard/build.py
-python3 scripts/analysis/make_figures.py
-```
-
-The first builds dashboard data from raw records; the second generates CSVs and bilingual SVGs. Inspect [results/](results/README.md) and [media/](media/) afterward. Missing raw files require investigation.
-
-</details>
+**Run a camera ablation:** configure Ubuntu/EGL, `EMB_ROOT` and the checkpoint using [installation](docs/INSTALL.md), then follow the [minimal camera evaluation](scripts/README.md#minimal-camera-evaluation). It runs ten simulation episodes as an entry-point check. Full reproduction, P1 and P2 entries are in the [script index](scripts/README.md).
 
 ## Repository layout
 
@@ -131,10 +122,10 @@ libero-camera-ablation/
 
 ## Limitations
 
-- One benchmark suite (LIBERO-Spatial) and one seed.
-- The ablations in [experiments 1.1–1.3](docs/EXPERIMENTS.md#11-all-cameras-black) use 100 episodes per run ([the single-camera experiment](docs/EXPERIMENTS.md#14-wrist-camera-removed-500-episodes) uses 500), so differences under about 13 points are not meaningful; for π0, repeated runs of one condition differed by up to 18 points.
+- Camera studies cover LIBERO-Spatial only. Earlier camera runs fix the environment seed; P1 adds three policy-noise repeats on the same 100 initial states, without new tasks or real robots.
+- [Experiments 1.1–1.3](docs/EXPERIMENTS.md#11-all-cameras-black) use 100 episodes per run; the [single-camera study](docs/EXPERIMENTS.md#14-wrist-camera-removed-500-episodes) uses 500. Repeating initial states does not add independent samples. Comparisons depend on pairing and repeat structure, not a universal 13-point threshold. Earlier π0 repeats of one condition differed by up to 18 points.
 - The π0 ablation results come from LeRobot's v044 checkpoint. Official π0 was tested only in OpenPI's own pipeline; the two sides differ in pipeline (rendering resolution was ruled out by a re-run at 360), so the difference cannot be attributed to the weights alone. Each official π0 ablation condition was run once, 100 episodes.
-- The [official control and replay study](docs/EXPERIMENTS.md#15-official-π0-control) measures object positions across 50 initial states per task: the largest coordinate spans are 3–9 cm, and fixed-action cross-replay succeeds in 39.9% of trials. This describes the tested states and sequences; it does not determine the visual requirements of the entire benchmark or the mechanism behind LeRobot π0's success without vision.
+- [Replay](docs/EXPERIMENTS.md#16-fixed-action-replay) concerns the selected sequences and states. P2 targets were excluded from action selection but had appeared in earlier evaluations; they are not a hidden test set. P1/P2 use different checkpoint/state protocols and cannot be subtracted to assign mechanism contributions. P1 lacks stepwise terminal flags and full images; state freezing does not identify a unique mechanism. Full NPZ audit artifacts remain outside Git; published records reproduce rates and intervals.
 - Diffusion Policy was evaluated on PushT (2-D physics), not in MuJoCo.
 
 ## Acknowledgements and licenses

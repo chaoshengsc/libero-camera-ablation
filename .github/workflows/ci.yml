@@ -24,5 +24,6 @@ jobs:
         run: |
           python dashboard/build.py
           python scripts/analysis/make_figures.py
+          python scripts/analysis/summarize_followup.py
           git status --porcelain -- dashboard/results.js results media
           test -z "$(git status --porcelain -- dashboard/results.js results media)"

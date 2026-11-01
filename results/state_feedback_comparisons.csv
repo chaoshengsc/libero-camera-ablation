@@ -1,0 +1,4 @@
+comparison,role,difference_pp,ci95_lo,ci95_hi
+black_live_minus_frozen,primary,55.333333,50.0,60.333333
+vision_live_minus_frozen,secondary,73.333333,67.666667,78.666667
+interaction_black_minus_vision,exploratory,-18.0,-23.0,-13.0

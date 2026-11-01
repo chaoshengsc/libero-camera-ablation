@@ -4,17 +4,17 @@
 
 Full results for camera ablations, the official π0 control, open-loop replay, and public-checkpoint reproduction. The [notes](NOTES.md) retain chronological designs and corrections; this report does not replace the raw records.
 
-[All black](#11-all-cameras-black) · [Noise & freeze](#12-one-camera-noise-frozen-image) · [Trajectories](#13-where-blind-π0-succeeds-it-follows-the-sighted-path) · [Single camera](#14-wrist-camera-removed-500-episodes) · [Official π0](#15-official-π0-control) · [Fixed-action replay](#16-fixed-action-replay) · [Reproduction](#2-reproduction-of-the-public-checkpoints)
+[All black](#11-all-cameras-black) · [Noise & freeze](#12-one-camera-noise-frozen-image) · [Trajectories](#13-where-blind-π0-succeeds-it-follows-the-sighted-path) · [Single camera](#14-wrist-camera-removed-500-episodes) · [Official π0](#15-official-π0-control) · [Fixed-action replay](#16-fixed-action-replay) · [State updates](#17-state-input-update-sensitivity) · [Reproduction](#2-reproduction-of-the-public-checkpoints)
 
 ---
 
 ## 1. Camera ablations
 
-A LIBERO policy receives two camera images, the robot state (end-effector pose and gripper opening) and a language instruction. Each experiment changes only the camera input.
+π0, π0.5 and SmolVLA receive two images, robot state and an instruction; OpenVLA receives the agent view and instruction only. Sections 1.1–1.5 alter camera inputs, 1.6 provides a fixed-action baseline, and 1.7 separately alters model state input.
 
 ![What the policy receives and what each experiment changes](../media/inputs.svg)
 
-Except in section 1.4, every number in this section is a success rate over 100 episodes (10 tasks × 10 initial states, same seed for every condition). Sampling error alone means two conditions have to differ by about 13 points. For π0 the bar is higher: the same condition run twice differed by up to 18 points (section 1.2).
+Sections 1.1–1.3 use 100 episodes per run (ten tasks x ten initial states) with matched initial states; later sections specify their own counts. Repeats do not add independent initial states. Comparison uncertainty depends on pairing and repeat structure, not a universal 13-point threshold. Earlier π0 repeats of one condition differed by up to 18 points (section 1.2).
 
 ### 1.1 All cameras black
 
@@ -25,7 +25,7 @@ Except in section 1.4, every number in this section is a success rate over 100 e
 | SmolVLA | 83% | 0% |
 | **π0** | 76% | **56%** |
 
-Three models cannot act without images, and a second run of each gave 0% again. π0 succeeds in 56% of episodes: 6 to 9 out of 10 on seven tasks, and 0 or 1 out of 10 on the other three. Four more runs gave 54%, 56%, 54% and 53%, and [lerobot#3591](https://github.com/huggingface/lerobot/issues/3591) reports about 60% for the same checkpoint.
+Three policies did not complete any tested all-black episode, including the repeat. Zero task success does not mean no movement. π0 succeeds in 56% of episodes: 6 to 9 out of 10 on seven tasks, and 0 or 1 out of 10 on the other three. Four more runs gave 54%, 56%, 54% and 53%, and [lerobot#3591](https://github.com/huggingface/lerobot/issues/3591) reports about 60% for the same checkpoint.
 
 ### 1.2 One camera, noise, frozen image
 
@@ -39,7 +39,7 @@ Success rate (%) in two runs of 100 episodes each, first run / second run. The s
 | π0.5 | 99 / 98 | 99 / 97 | 0 / 0 | 51 / 57 | 0 / 0 | 0 / 0 |
 | SmolVLA | 83 / – | 78 / 73 | 0 / 0 | 33 / 31 | 4 / 4 | 0 / 0 |
 
-- **π0.5 and SmolVLA need a live image.** A frozen first frame is a real, in-distribution image, and it takes both to 0% in both runs. Noise changes neither beyond sampling error.
+- **π0.5 and SmolVLA are sensitive to image freezing.** Both score 0% in both repeats. A real first-frame image does not make the frozen image–state sequence in-distribution: temporal consistency changes too. Noise effects are smaller; visual content, synchronization and distribution shift are not separated.
 - **Only blacking out both cameras changes π0 reliably.** That costs about 20 points in every run. With noise, a frozen first frame, or one camera black, its two runs differ by 9 to 18 points and all land between 59% and 80%, around its normal 71–76%. These runs cannot show that π0 depends on either single camera (section 1.4 answers this with 500 episodes). The first run alone suggested a wrist-camera dependence (59%). Four more runs with the wrist camera black gave 77%, 72%, 67% and 70%, so the five average 69%, against 74% for five normal runs.
 - **For π0.5 and SmolVLA the wrist camera matters more than the agent view**, in both runs.
 
@@ -86,10 +86,10 @@ The design, acceptance checks and expected results were written down before the 
 | Frozen at frame 1 | 0.0% | 72.8% |
 | Agent view dropped, wrist only | 55.4% | 74.2% |
 
-- **π0.5 needs the live wrist image.** All three treatments are near 0, so the earlier 0% was not caused by the black image. A real but stale wrist image (0.0%) is worse than none (4.6%).
+- **π0.5 is highly sensitive to wrist-input interventions.** All three treatments are near 0%, so unfamiliar black images alone cannot cover the results. Freezing also changes image–state synchronization; current visual content is not uniquely identified. Frozen input scores 0.0%, masked input 4.6%, under their respective protocols.
 - **Removing the wrist camera does not change π0's success rate.** Paired by initial state against both cameras, every difference has a 95% interval inside the pre-set ±8-point margin (McNemar p ≥ 0.58). π0 also keeps 53–56% with both cameras black (section 1.1), so this shows that this checkpoint relies little on images, not that the agent view is enough.
 - **With the wrist view only, π0.5 keeps 55.4%**, in line with 51% and 57% for agent-view black in section 1.2; tasks differ widely (task 5: 1/50, task 2: 49/50).
-- **A pitfall.** In LeRobot v0.6.1, removing the agent-view key from the input moves the wrist image into the agent-view slot without any error ([lerobot#5118](https://github.com/huggingface/lerobot/issues/5118), proposed fix in [lerobot#5129](https://github.com/huggingface/lerobot/pull/5129), under review). "Dropped" here masks the camera in its own slot, and every run logs each slot's mask as evidence.
+- **A pitfall.** In LeRobot v0.6.1, removing the agent-view key from the input moves the wrist image into the agent-view slot without any error ([lerobot#5118](https://github.com/huggingface/lerobot/issues/5118), proposed fix in [lerobot#5129](https://github.com/huggingface/lerobot/pull/5129)). "Dropped" here masks the camera in its own slot, and every run logs each slot's mask as evidence.
 
 Per-episode results and first-frame hashes are in `results/single_camera.csv`; the summary and paired statistics are in `results/single_camera_summary.csv`.
 
@@ -120,11 +120,54 @@ LeRobot's π0 still scores 53–56% with every camera black. Is that π0 in gene
 
 ### 1.6 Fixed-action replay
 
-**Open-loop replay baseline: fixed sequences succeed a fair share of the time, but do not explain everything.** With no model and no vision, the actions logged in official π0's normal run are replayed unchanged on the other initial states of the same task (design pushed before the run, commit `c7e9023`). Self-replay is 95/97, so replay is valid. All cross-replays together score **348/873 = 39.9%**, and within a task object positions differ by at most 3–9 cm. The measure set in advance, "the best sequence per task", averages 77.8%, but it picks the maximum after the fact: even if every sequence scored only 39.9%, the expected best would be 64.8%, so we withdrew the reading attached to the advance rule ("mainly reflects the benchmark"). Tasks do not line up either: in tasks 5 and 7 a fixed sequence reaches 9/9, while LeRobot π0 all black scores 30% and 0% (per-task Spearman ρ = 0.40, p = 0.25). Conclusion: small scene variation explains part of LeRobot π0's success all black; without vision it is not just repeating one fixed sequence. This is 1 after-the-fact change to the advance reading; see the correction in [docs/NOTES.md](NOTES.md).
+**Earlier cross-replay and selection bias.** Actions from official π0 with normal vision were replayed unchanged under the advance record in `c7e9023`. Self-replay is **95/97**, pooled cross-replay **348/873 = 39.9%**; the largest within-task object-coordinate spans are 3–9 cm. The post-hoc best per task averages **77.8%**, which is selection-biased. Under the equal-rate independent-trials illustration at 39.9%, picking the best from the original candidate counts already gives an expectation of **64.8%**. The earlier “mainly reflects the benchmark” interpretation was withdrawn; the historical record and one post-hoc reading change remain in the [notes](NOTES.md). These different-source/state comparisons do not identify fixed replay inside LeRobot π0 or quantify any fraction of its success.
 
 ![Open-loop replay: one fixed sequence per task](../media/open_loop_replay.svg)
 
+**P2: freeze selection before evaluating selection-external states.** The selected source ids are 1,7,1,1,0,1,3,2,3,0, with lowest-id tie-breaking. Replay each sequence on its own source first; proceed only after the original minimum 8/10 recovery gate. Then replay once on each task's initial states 10–49. These targets were excluded from action selection but had appeared in earlier normal evaluations and position summaries; they are not a hidden test set. Preserve 128 rendering, relative control, ten settling steps and seed=1000+target; no model calls, extra clipping of the recorded actions or sequence extension.
+
+| Check / evaluation | Successes | Result |
+|---|---:|---|
+| Selected-source self-replay | 10/10 | Recovery gate passed; excluded from formal statistics |
+| Selection-external replay | **262/400** | **65.5%, 95% interval 61.0–69.8%** |
+
+![Fixed actions on selection-external states](../media/replay_holdout.svg)
+
+The interval resamples 40 target states within each of ten fixed tasks, 20000 draws, seed=20261031. Per-task intervals use Wilson. Coverage, frozen action hashes and sent-action prefixes passed audit. No invalid episodes; all 138 failures exhausted their source sequence without success, rather than recorded environment timeouts.
+
+**This strengthens the fixed-action baseline without identifying LeRobot π0's mechanism.** The low-level controller retains feedback. Do not subtract 65.5% from a different checkpoint/state protocol's 55.3% or infer that the whole benchmark needs no vision. The interval excludes source-selection uncertainty, repeated physics noise and new-task generalization.
+
+[Outcomes and frozen actions](../dashboard/data/replay_holdout/) · [Per-task results](../results/replay_holdout_summary.csv) · [All 410 episodes](../results/replay_holdout_episodes.csv) · [Packaged original replay loop](../scripts/analysis/replay_holdout.py)
+
+
 Raw data are in `dashboard/data/official_pi0/`, the summary and the initial-state check in `results/official_pi0_summary.csv` (its LeRobot all-black row sums five runs on the same 100 states), and the process and deviations in the 2026-10-28/29 sections of [docs/NOTES.md](NOTES.md).
+
+### 1.7 State-input update sensitivity
+
+P1 tests `lerobot/pi0_libero_finetuned_v044@45dcc8fc`: normal/black images crossed with live/frozen-initial model state. Only `prepare_state` output is replaced; true environment state, low-level control and action postprocessing remain live. Use 360 rendering, five executed actions per chunk, environment seed 1000 and batch1. Per-episode policy-noise seed is `20261031 + 1000*repeat + 50*task + initial`. These three paired repeats have their own controls; earlier normal rows do not substitute for them.
+
+| Condition | Three repeat successes (each /100) | Mean rate |
+|---|---|---:|
+| A: normal images + live state | 72 / 72 / 76 | **73.3%** |
+| B: black images + live state | 54 / 54 / 58 | **55.3%** |
+| C: normal images + frozen initial state | 0 / 0 / 0 | **0%** |
+| D: black images + frozen initial state | 0 / 0 / 0 | **0%** |
+
+![State-input update sensitivity](../media/state_feedback.svg)
+
+Forty engineering episodes are excluded. The 1200 formal executions represent 100 initial states, three repeats and four conditions, not 300 independent states per condition. Within each of ten fixed tasks, resample whole initial states, preserving their repeats and paired groups: 20000 draws, seed 20261031.
+
+| Contrast | Difference (percentage points) | 95% paired interval |
+|---|---:|---|
+| B−D, primary | **55.3** | **[50.0, 60.3]** |
+| A−C, secondary | 73.3 | [67.7, 78.7] |
+| (B−D)−(A−C), exploratory interaction | −18.0 | [−23.0, −13.0] |
+
+The advance primary rule is met: at least 15 points, lower interval bound>0, all three repeats in the same direction. C/D are both at the zero-success floor, so the interaction alone does not identify visual/state compensation. Frozen groups still move. Freezing changes state evolution and consistency: **it shows update sensitivity, without separating online correction, phase cues or input mismatch**. The model still replans; this is neither fixed-action replay nor a feedback-free system.
+
+Full input/trajectory artifacts were audited locally, but P1 did not save stepwise terminal flags or full image tensors. Public JSON reproduces outcomes, pairing and statistics, not the full NPZ tensor audit. The intervals concern these tasks and state protocol, not official OpenPI π0 or real robots.
+
+[Outcomes and pairing metadata](../dashboard/data/state_feedback/) · [All episodes](../results/state_feedback_episodes.csv) · [Per-run Wilson intervals](../results/state_feedback_runs.csv) · [Paired contrasts](../results/state_feedback_comparisons.csv) · [Execution and analysis entries](../scripts/README.md#state-input-and-replay-follow-ups)
 
 <details>
 <summary><b>Notes on these numbers</b>: the π0 checkpoint, the normal column, confidence intervals, run-to-run variation, noise, related work</summary>
@@ -132,7 +175,7 @@ Raw data are in `dashboard/data/official_pi0/`, the summary and the initial-stat
 - **π0 checkpoint.** `lerobot/pi0_libero_finetuned_v044` scores 73.4% over 500 normal episodes. An earlier OpenPI README gave 96.8% on Spatial for π0 trained with its `pi0_libero` config. OpenPI's README never listed that checkpoint, but it can be downloaded from OpenPI's public bucket (`gs://openpi-assets/checkpoints/pi0_libero`), and [LIBERO-Plus](https://arxiv.org/abs/2510.13626) reports 94.2% for it unperturbed and at most 2% with every camera black (their Table 1 and Figure 2); re-run here in OpenPI's own pipeline it scores 96.4% normally (section 1.5). An earlier version of this README said that no official π0 LIBERO checkpoint had been released; that was wrong (see the correction in [`docs/NOTES.md`](NOTES.md)). In [lerobot#2114](https://github.com/huggingface/lerobot/issues/2114) a LeRobot maintainer said an earlier LeRobot π0 checkpoint needed more training; whether that holds for v044 was not tested here, and the cause of its gap to the official checkpoint is unknown.
 - **Normal column.** The first number is the first 10 episodes per task of each model's 500-episode run, which use the same initial states as the ablation runs. The second is a separate 100-episode run; SmolVLA has none. π0's five normal runs gave 76%, 73%, 76%, 72% and 71%.
 - **Confidence intervals.** The 95% interval of a single number is up to ±10 points. Episodes of one task are correlated, which makes these intervals optimistic.
-- **Run-to-run variation.** Runs with the same seed are not identical: the evaluation fixes the random seed but does not make GPU computation deterministic, the end-effector paths of two π0 runs differ from the first step, and a repeat is in effect a new sample. π0.5 and SmolVLA repeat within 6 points; π0 differs by up to 18 points on the same condition.
+- **Run-to-run variation.** Runs with the same seed are not identical: the evaluation fixes the random seed but does not make GPU computation deterministic, the end-effector paths of two π0 runs differ from the first step, but a repeat does not add independent initial states. π0.5 and SmolVLA repeat within 6 points; π0 differs by up to 18 points on the same condition.
 - **Noise.** Gaussian, standard deviation 0.1, on pixels in [0, 1].
 - **Related work.** [LIBERO-PRO](https://arxiv.org/abs/2510.03827) and [LIBERO-Plus](https://arxiv.org/abs/2510.13626) study the robustness of LIBERO policies under a much wider set of perturbations.
 

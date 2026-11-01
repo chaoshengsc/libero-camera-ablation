@@ -138,9 +138,16 @@ followup = {
     "cam": _json("cam_summary.json"),
 }
 
+replay_info = _json("official_pi0/ojx360_replay/replay.json")
+replay_self = [v for t in replay_info["tasks"] for v in t["self"].values()]
+replay_cross = [v for t in replay_info["tasks"] for source in t["cross"].values() for v in source.values()]
+replay_baseline = {"self_ok": sum(replay_self), "self_n": len(replay_self),
+                   "cross_ok": sum(replay_cross), "cross_n": len(replay_cross)}
+
 (ROOT / "results.js").write_text("window.RESULTS = " + json.dumps(rows, ensure_ascii=False, indent=1) + ";\n"
                                  "window.LIBERO_TASKS = " + json.dumps(LIBERO_SPATIAL_TASKS, ensure_ascii=False) + ";\n"
                                  "window.BLACKOUT = " + json.dumps(blackout, ensure_ascii=False) + ";\n"
-                                 "window.FOLLOWUP = " + json.dumps(followup, ensure_ascii=False) + ";\n")
+                                 "window.FOLLOWUP = " + json.dumps(followup, ensure_ascii=False) + ";\n"
+                                 "window.REPLAY_BASELINE = " + json.dumps(replay_baseline) + ";\n")
 print(f"wrote results.js: {len(rows)} runs, {sum(r['status'] == 'done' for r in rows)} done, "
       f"{sum(len(r.get('videos', [])) for r in rows)} videos")

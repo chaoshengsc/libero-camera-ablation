@@ -16,6 +16,12 @@
 | [single_camera.csv](single_camera.csv) | 单路相机逐回合成功标记与首帧哈希 |
 | [official_pi0_summary.csv](official_pi0_summary.csv) | 官方/OpenPI、LeRobot 与渲染对照 |
 | [open_loop_replay.csv](open_loop_replay.csv) | 自回放、交叉回放与事后挑选偏差 |
+| [state_feedback_episodes.csv](state_feedback_episodes.csv) | P1全部1240回合，明确smoke/正式与状态配对 |
+| [state_feedback_runs.csv](state_feedback_runs.csv) | P1逐组/逐轮计数及Wilson区间 |
+| [state_feedback_per_task.csv](state_feedback_per_task.csv) | P1逐任务/条件/重复计数 |
+| [state_feedback_comparisons.csv](state_feedback_comparisons.csv) | P1预定主比较、次比较与探索性交互 |
+| [replay_holdout_episodes.csv](replay_holdout_episodes.csv) | P2全部410个自回放/正式结果，含结束原因 |
+| [replay_holdout_summary.csv](replay_holdout_summary.csv) | P2逐任务Wilson与总体分层bootstrap区间 |
 
 ## 数字怎样追溯
 
@@ -25,13 +31,16 @@
 
 ## 重新生成
 
-在仓库根目录执行，Python 3.10+、仅标准库，无需 GPU：
+在仓库根目录执行，Python3.10+；第三步P1/P2 bootstrap需要NumPy，前两步仅标准库。无需GPU或仿真；分析环境见[快速开始](../README_CN.md#快速开始)：
 
 ```bash
 python3 dashboard/build.py
 python3 scripts/analysis/make_figures.py
+python3 scripts/analysis/summarize_followup.py
 ```
 
-第一步生成看板数据，第二步更新本目录的 CSV 与 `media/` 图件。
+依次生成看板数据、原有CSV/图件和P1/P2的CSV/图件。P1重采样保留同一状态的三轮与四条件，P2按固定任务内目标状态分层；不混用两者分母。
 
 `trajectories_task4.json` 与 `trajectories_task7.json` 是轨迹图使用的精简 XY 数据（cm）。它们由 [export_trajectories.py](../scripts/analysis/export_trajectories.py) 从原始 NPZ 单独导出，需要 NumPy 与原始轨迹，不由上述两条命令重新生成。
+
+P1/P2公开来源分别为[state_feedback](../dashboard/data/state_feedback/)和[replay_holdout](../dashboard/data/replay_holdout/)，哈希绑定逐运行/逐回合记录；原始完整NPZ不入Git，张量审计范围与记录缺口见各目录README。

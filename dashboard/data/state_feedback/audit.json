@@ -1,0 +1,44 @@
+{
+  "status": "PASS_AVAILABLE_RECORDED_EVIDENCE",
+  "transferred_files_verified": 1352,
+  "source_scripts_verified": 25,
+  "excluded_metadata_sidecars": [
+    "scripts/analysis/._metrics.py",
+    "scripts/analysis/._export_trajectories.py",
+    "scripts/analysis/._summarize_blackout.py",
+    "scripts/analysis/._ovla_to_json.py",
+    "scripts/analysis/._summarize_eval.py",
+    "scripts/analysis/._summarize_single_camera.py",
+    "scripts/analysis/._replay_open_loop.py",
+    "scripts/analysis/._compare_videos.py",
+    "scripts/analysis/._analyze_trajectories.py",
+    "scripts/analysis/._make_figures.py",
+    "scripts/analysis/._summarize_statedrop.py",
+    "scripts/train/._train_statedrop.py",
+    "scripts/openpi/._download_checkpoint.py",
+    "scripts/openpi/._serve_pi0_libero.py",
+    "scripts/eval/._migrate_tuplefix.py",
+    "scripts/eval/._openvla_blackout.py",
+    "scripts/eval/._state_feedback.py",
+    "scripts/eval/._eval_blackout.py",
+    "scripts/eval/._eval_state_feedback.py",
+    "scripts/eval/._eval_probe.py",
+    "scripts/eval/._run_state_feedback.py",
+    "scripts/eval/._adapt_openpi_pi0.py",
+    "scripts/checks/._egl_smoke.py",
+    "scripts/checks/._codec_check.py",
+    "scripts/checks/._torch_check.py"
+  ],
+  "counts": {
+    "episodes": 1240,
+    "raw_steps": 277644,
+    "inference_blocks": 55689,
+    "state_movement_episodes": 1240
+  },
+  "normalization_max_abs_error": 0.0,
+  "limitations": [
+    "Full image tensors and per-step termination/truncation flags were not saved. Image black/mask checks rely on hash-bound runtime assertions, not retrospective pixel replay.",
+    "Frozen inputs may create distribution shift; an audit does not identify a correction mechanism.",
+    "Nondeterministic GPU runtime was retained; equal seeds are not bitwise-identical actions."
+  ]
+}

@@ -14,7 +14,7 @@ Camera ablations of four robot policies on LIBERO-Spatial
 
 </div>
 
-**机器人在仿真里完成了任务，是否就说明它在用相机？** 我们复现五个公开权重，并对 π0、π0.5、OpenVLA、SmolVLA 做相机输入消融，比较它们在 LIBERO-Spatial 上对画面的依赖。
+**机器人在仿真里完成了任务，是否就说明它在用相机？** 我们对 π0、π0.5、OpenVLA、SmolVLA 的公开检查点做相机输入消融，并用官方 π0 对照、固定动作回放和状态输入检查界定结果的含义。五个公开权重的复现是工程基础。
 
 **相机全涂黑后，三种模型成功率为 0%；LeRobot π0 v044 仍有 53–56%，官方 π0 在 OpenPI 中为 0/100。**
 
@@ -57,7 +57,8 @@ Camera ablations of four robot policies on LIBERO-Spatial
 其他检查补全了这幅图景：
 
 - **实时画面。** π0.5 和 SmolVLA 冻结首帧后，两次运行都为 0%；只去掉腕部相机时，π0.5 从 98.4% 降到 4.6%（各 500 回合）。
-- **固定动作回放。** 交叉回放合计 **348/873 = 39.9%**，自回放为 95/97。事后挑选每任务最好动作得到的 77.8% 有选择偏差，不能当作无偏基线，也不能据此确定 LeRobot π0 的机制。
+- **固定动作也能成功。** P2 将每任务预先选定的一套官方 π0 动作原样回放，在未参与动作选择的状态上成功 **262/400 = 65.5%**（95% 分层 bootstrap 区间 **61.0–69.8%**），自回放 **10/10**。这补强固定动作基线，不能识别 LeRobot π0 的内部机制。[协议、历史回放与边界](docs/EXPERIMENTS_CN.md#16-固定动作回放)。
+- **状态更新仍重要。** P1 中 LeRobot π0 v044 正常画面/全黑画面下的三轮均值为 **73.3% / 55.3%**；冻结模型接收的首状态后两者均为 **0%**。这说明状态更新敏感性，尚不能区分在线纠偏、动作阶段线索与输入失配。[配对统计](docs/EXPERIMENTS_CN.md#17-状态输入更新敏感性)。
 
 完整设计、重复运行、逐任务结果与统计口径见[实验说明](docs/EXPERIMENTS_CN.md)；原始记录与更正见[实验日志](docs/NOTES_CN.md)。
 
@@ -77,30 +78,24 @@ SmolVLA 使用 `lerobot/smolvla_libero`，`n_action_steps=10`，只在 LIBERO-Sp
 
 ## 快速开始
 
-本仓库的结果在 Ubuntu 24.04、RTX A5000 24 GB 上取得。环境版本与安装步骤见[安装指南](docs/INSTALL_CN.md)；权重来源与 revision 见[结果目录](results/README_CN.md)。
-
-先配置好环境、`EMB_ROOT` 与权重，再从仓库根目录运行一个 ACT 示例：
+**先从已有数据重算结果，无需 GPU 或模型权重。** 在仓库根目录，使用 Python 3.10+：
 
 ```bash
-bash scripts/eval/run_act.sh
-python3 scripts/analysis/summarize_eval.py act_cube_500
+python3 -m venv .venv
+. .venv/bin/activate
+python -m pip install numpy
+python dashboard/build.py
+python scripts/analysis/make_figures.py
+python scripts/analysis/summarize_followup.py
 ```
 
-第一条执行 500 回合 GPU 评测，第二条汇总已有输出。环境或权重未就绪时，回到[安装](docs/INSTALL_CN.md)与[排错](docs/TROUBLESHOOTING_CN.md)；其他模型和消融的入口见[脚本索引](scripts/README_CN.md)。
+前三条创建并启用本地分析环境、安装 NumPy（P1/P2 的 bootstrap 需要）；若已有合适环境，可跳过。
+后三条依次生成看板数据、原有表格和图件、P1/P2 的逐回合表与配对区间。
+产物在 [results/](results/README_CN.md) 和 [media/](media/)，原始结果入口见[数据导航](docs/README_CN.md#实验与证据对应)。
 
-<details>
-<summary>无需 GPU：从已有数据重算表格和图件</summary>
+若提示缺少 NumPy，检查是否启用了上述环境；缺少原始文件时应先核对完整检出，不用重新跑模型补表。
 
-在仓库根目录使用 Python 3.10+ 执行，仅依赖标准库：
-
-```bash
-python3 dashboard/build.py
-python3 scripts/analysis/make_figures.py
-```
-
-第一步从原始记录生成看板数据，第二步生成 CSV 与中英文 SVG。完成后可查看 [results/](results/README_CN.md) 和 [media/](media/)；缺少原始文件时应先排查数据来源。
-
-</details>
+**运行相机消融：** 先按[安装指南](docs/INSTALL_CN.md)配置 Ubuntu/EGL、`EMB_ROOT` 与对应权重，再使用[最小相机评测示例](scripts/README_CN.md#最小相机评测)。该示例执行10个仿真回合，只检查入口；完整复现、P1和P2入口均在[脚本索引](scripts/README_CN.md)。
 
 ## 仓库结构
 
@@ -123,10 +118,10 @@ libero-camera-ablation/
 
 ## 局限
 
-- 只用了一个基准套件（LIBERO-Spatial）和一个种子。
-- [实验 1.1–1.3](docs/EXPERIMENTS_CN.md#11-所有相机涂黑)的消融每次运行 100 回合，约 13 个百分点以内的差异没有意义（[单路相机实验](docs/EXPERIMENTS_CN.md#14-只去掉腕部相机500-回合)为 500 回合）；对 π0，同一个条件重复运行最多相差 18 个百分点。
+- 相机研究仅覆盖 LIBERO-Spatial。早期相机实验固定环境 seed；P1 在同一批100个初始状态上增加三轮模型噪声重复，未扩展新任务或真机。
+- [实验1.1–1.3](docs/EXPERIMENTS_CN.md#11-所有相机涂黑)每次100回合，[单路相机实验](docs/EXPERIMENTS_CN.md#14-只去掉腕部相机500-回合)为500回合。重复同一初始状态不增加独立样本；差异须按对应配对与重复结构解释，不设统一的13点阈值。π0 的早期同条件重复最多相差18点。
 - π0 的消融结论来自 LeRobot v044 权重；官方 π0 只在 OpenPI 原版管线下测过，两边的管线不同（渲染分辨率已用 360 复测排除），差别不能单独归因到权重。官方 π0 的消融条件各只跑了一次 100 回合。
-- [官方对照与回放](docs/EXPERIMENTS_CN.md#15-官方-π0-对照)已测量每任务 50 个初始状态中的物体位置变化，最大坐标跨度为 3–9 cm；固定动作交叉回放合计成功率为 39.9%。这只描述所测状态与动作序列，不能确定整个基准需要多少视觉，也不能确定 LeRobot π0 无视觉成功的机制。
+- [回放](docs/EXPERIMENTS_CN.md#16-固定动作回放)只覆盖所选动作与状态；P2目标未参与动作选择，但此前已用于其他评测，不是隐藏测试集。它与P1的模型/状态协议不同，不能相减计算机制贡献。P1未保存逐步终止标记和完整图像，冻结状态仍无法唯一识别机制。完整NPZ审计工件留在Git外；公开数据可独立重算成功率与区间。
 - Diffusion Policy 评测的是 PushT（2D 物理），不在 MuJoCo 里。
 
 ## 致谢与许可证

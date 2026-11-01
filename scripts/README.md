@@ -6,6 +6,8 @@ Choose an entry point by the result you want to reproduce. Tables link to source
 
 ## Prerequisites
 
+Recomputing included data needs neither a model, EGL nor `EMB_ROOT`; prepare the NumPy analysis environment in the [quick start](../README.md#quick-start). The prerequisites below apply to evaluation.
+
 Complete [installation](../docs/INSTALL.md) and [environment configuration](../env/README.md), set `EMB_ROOT`, and prepare the checkpoint. Shell evaluation entries load [common.sh](common.sh), then `$EMB_ROOT/env.sh` and local checkpoint paths.
 
 Wrappers replace functions at run time without changing LeRobot / OpenVLA sources. Model-evaluation entries and analysis of existing data are listed separately below.
@@ -40,6 +42,45 @@ The official OpenPI π0 path needs a separate environment and an active local [s
 
 Read the staged runner and [notes](../docs/NOTES.md) for the protocol. This is a different inference pipeline from the LeRobot conversion.
 
+## Minimal camera evaluation
+
+From the isolated checkout root, after configuring the environment, checkpoint and `EMB_ROOT`:
+
+```bash
+CK="$EMB_ROOT/ckpt/pi0_libero_finetuned_v044@45dcc8fc"
+RUN=pi0_camera_black_smoke
+if [ -e "$EMB_ROOT/logs/eval/$RUN" ]; then
+  echo "Choose an unused run name"
+else
+  WRAP=probe BLACKOUT=all bash scripts/eval/run_libero.sh \
+    "$RUN" 1 "$CK" 1 --policy.n_action_steps=5 \
+    --env.observation_height=360 --env.observation_width=360
+fi
+```
+
+`CK` selects the checkpoint; `RUN` selects a new output name. The guard protects old output because the historical lower-level entry clears a same-named directory. This runs one episode per task, ten in total, batch1, five executed actions per chunk and all-black model images. It checks the entry point, not a new success-rate benchmark.
+
+Inspect `stdout.log` for `exit=0` and `out/eval_info.json` for ten episodes under `$EMB_ROOT/logs/eval/$RUN/`. The outer shell status alone is insufficient. Resolve environment/checkpoint/EGL failures using [troubleshooting](../docs/TROUBLESHOOTING.md); do not overwrite old runs or blindly retry.
+
+## State-input and replay follow-ups
+
+| Goal | Entry | Requirements and outputs |
+|---|---|---|
+| Recompute completed P1/P2 | [summarize_followup.py](analysis/summarize_followup.py) | NumPy; no model/GPU; six CSVs and bilingual statistics figures |
+| Repeat P1 state-input evaluation | [run_state_feedback.py](eval/run_state_feedback.py) → [eval_state_feedback.py](eval/eval_state_feedback.py) | Configured policy/EGL runtime;40 engineering+1200 formal episodes, gated stages |
+| Repeat P2 frozen replay | [replay_holdout.py](analysis/replay_holdout.py) | Configured LIBERO/MuJoCo 3.3.2/EGL; at least 8/10 self-replays before 400 formal episodes; no policy |
+
+For P1, place the complete `scripts/` tree in a fresh isolated job directory and use an unused `STATE_RUN_PREFIX`. Its `started.flag` also rejects duplicate starts. The wrapper depends on the recorded configured LeRobot environment; this is not a fresh-machine validation. The optional prefix and packaging were not used for a new model run during integration.
+
+P2's ten selected action arrays are bundled in [data/replay_holdout](../dashboard/data/replay_holdout/); no OpenPI server or source-trajectory regeneration is needed. From the checkout root in the configured simulation environment, the following runs all 410 episodes, not offline analysis:
+
+```bash
+python scripts/analysis/replay_holdout.py \
+  --output "$EMB_ROOT/logs/eval/p2_replay_check"
+```
+
+The output directory must not exist. Inspect `self_gate.json`, `progress.json`, `done.json` and actual errors. Technical failures stop the run; sources are not reselected. The packaged entry retains the audited P2 replay loop; loading/directory checks have synthetic validation but no new simulation run during integration. Full NPZ files stay in the new output directory and outside Git; bundled [results](../results/README.md) are not overwritten. Recovery experiments and the original five-step-delay P3 remain deferred.
+
 ## Intervention configuration
 
 `WRAP` in [run_libero.sh](eval/run_libero.sh) chooses the evaluator:
@@ -72,9 +113,10 @@ To add a result, place its `eval_info.json` under `dashboard/data/<run>/`, regis
 ```bash
 python3 dashboard/build.py
 python3 scripts/analysis/make_figures.py
+python3 scripts/analysis/summarize_followup.py
 ```
 
-Run both from the repository root to update dashboard data and figures. The [results guide](../results/README.md) lists outputs; [CI](../.github/workflows/ci.yml) checks generation consistency.
+Run all three from the repository root for dashboard data, earlier figures, then P1/P2 statistics; the third requires NumPy. The [results guide](../results/README.md) lists outputs; [CI](../.github/workflows/ci.yml) checks generation consistency.
 
 ## Checks, diagnostics, and historical experiments
 

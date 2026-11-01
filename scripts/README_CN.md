@@ -6,6 +6,8 @@
 
 ## 先准备什么
 
+只重算已有数据时不需要模型、EGL或`EMB_ROOT`；按照[首页快速开始](../README_CN.md#快速开始)准备NumPy分析环境。以下配置仅用于实际评测。
+
 先完成[安装](../docs/INSTALL_CN.md)和[环境配置](../env/README_CN.md)，设置 `EMB_ROOT` 并准备相应权重。Shell 评测入口加载 [common.sh](common.sh)，再读取 `$EMB_ROOT/env.sh` 与本地权重路径。
 
 评测包装器通过运行时替换函数实现干预，不修改 LeRobot / OpenVLA 源码。需要 GPU 或模型前向的入口与只处理已有数据的分析脚本分开列在下面。
@@ -38,6 +40,51 @@
 
 官方 π0 的 OpenPI 路径需要独立环境和已启动的本机 [serve_pi0_libero.py](openpi/serve_pi0_libero.py) 服务。权重下载入口为 [download_checkpoint.py](openpi/download_checkpoint.py)，分阶段运行约定见入口文件和[实验日志](../docs/NOTES_CN.md)。它与 LeRobot 转换版不是同一条推理管线。
 
+## 最小相机评测
+
+在已完成安装与权重准备的环境中，从隔离仓库副本根目录运行。`EMB_ROOT`必须已设置：
+
+```bash
+CK="$EMB_ROOT/ckpt/pi0_libero_finetuned_v044@45dcc8fc"
+RUN=pi0_camera_black_smoke
+if [ -e "$EMB_ROOT/logs/eval/$RUN" ]; then
+  echo "Choose an unused run name"
+else
+  WRAP=probe BLACKOUT=all bash scripts/eval/run_libero.sh \
+    "$RUN" 1 "$CK" 1 --policy.n_action_steps=5 \
+    --env.observation_height=360 --env.observation_width=360
+fi
+```
+
+`CK`定位权重；`RUN`指定本次独立输出，必须未被使用。条件分支保护旧目录，因为底层历史入口会清空同名目录。
+评测每任务1回合、十任务共10回合，batch1、每次执行5步动作，模型接收全黑图；它只检查入口，不是新的成功率基准。
+输出在`$EMB_ROOT/logs/eval/$RUN/`，检查`stdout.log`里的`exit=0`和`out/eval_info.json`的10回合覆盖，不能只看外层shell退出码。
+缺环境、权重或EGL时按[排错](../docs/TROUBLESHOOTING_CN.md)处理；不要覆盖旧结果或盲目重跑。
+
+## 状态与回放补充实验
+
+| 目的 | 入口 | 要求与产物 |
+|---|---|---|
+| 重算已完成P1/P2 | [summarize_followup.py](analysis/summarize_followup.py) | NumPy；无需模型/GPU；生成6个CSV与中英文统计图 |
+| 重复P1状态输入评测 | [run_state_feedback.py](eval/run_state_feedback.py) → [eval_state_feedback.py](eval/eval_state_feedback.py) | 已配置模型/EGL环境；40工程＋1200正式回合；逐阶段验收 |
+| 重复P2冻结动作回放 | [replay_holdout.py](analysis/replay_holdout.py) | 已配置LIBERO/MuJoCo 3.3.2/EGL；10自回放通过至少8个后才执行400正式回合；不加载策略 |
+
+P1保留原始执行入口，在独立目录中完整放置`scripts/`后运行，`STATE_RUN_PREFIX`设未使用的名字；目录内`started.flag`也拒绝重复启动。
+它的包装器依赖原已配置的LeRobot运行环境，不是独立的全新机器安装验证。本次仅整理入口、增加可选运行名前缀，未重新实跑模型。
+
+P2十条选定动作已保真导出在[data/replay_holdout](../dashboard/data/replay_holdout/)，不需要OpenPI服务或重新生成来源动作。
+在已激活的隔离仿真环境和仓库根目录执行下列命令，会运行完整410回合；不是离线统计命令：
+
+```bash
+python scripts/analysis/replay_holdout.py \
+  --output "$EMB_ROOT/logs/eval/p2_replay_check"
+```
+
+`--output`必须不存在；查看`self_gate.json`、`progress.json`、`done.json`与实际异常。技术失败单列并停止，不重选动作。
+打包入口沿用已验收P2的回放循环；目录/数据加载代码经合成检查，本轮没有新增仿真验证。
+完整逐步NPZ只写新输出目录、不入Git；内置的[公开结果](../results/README_CN.md)不会被覆盖。
+恢复实验和原五步延迟P3不在本轮运行范围内。
+
 ## 干预怎样配置
 
 [run_libero.sh](eval/run_libero.sh) 的 `WRAP` 选择实际评测入口：
@@ -63,14 +110,15 @@
 | 逐帧比较视频 | [compare_videos.py](analysis/compare_videos.py) | 对应运行的录像 |
 | 指标实现 | [metrics.py](analysis/metrics.py) | CI、两比例检验、DTW 与抓取点；由 [tests/](../tests/) 核验 |
 
-新结果接入：把评测输出中的 `eval_info.json` 放到 `dashboard/data/<run>/`，在 `dashboard/build.py` 注册对应运行，再依次执行下列命令。官方对照等专题汇总还需提供对应的配对/哈希记录，不能只填一个成功率。
+相机评测新结果接入：把评测输出中的 `eval_info.json` 放到 `dashboard/data/<run>/`，在 `dashboard/build.py` 注册对应运行，再依次执行下列命令。官方对照等专题汇总还需提供对应的配对/哈希记录，不能只填一个成功率。
 
 ```bash
 python3 dashboard/build.py
 python3 scripts/analysis/make_figures.py
+python3 scripts/analysis/summarize_followup.py
 ```
 
-两条命令在仓库根目录执行，分别更新看板数据和结果图表。[结果目录](../results/README_CN.md)列出产物，[CI](../.github/workflows/ci.yml)核对生成一致性。
+三条命令在仓库根目录执行，依次更新看板数据、原有图表与P1/P2统计；第三条需要NumPy。[结果目录](../results/README_CN.md)列出产物，[CI](../.github/workflows/ci.yml)核对生成一致性。
 
 ## 自检、诊断与历史实验
 

@@ -29,17 +29,20 @@ The README presents the key findings. This guide connects the full study, reprod
 | [Single camera](EXPERIMENTS.md#14-wrist-camera-removed-500-episodes) | [single_camera_summary.csv](../results/single_camera_summary.csv) | [Raw records](../dashboard/data/s500/) |
 | [Official π0](EXPERIMENTS.md#15-official-π0-control) | [official_pi0_summary.csv](../results/official_pi0_summary.csv) | [Raw records](../dashboard/data/official_pi0/) |
 | [Fixed-action replay](EXPERIMENTS.md#16-fixed-action-replay) | [open_loop_replay.csv](../results/open_loop_replay.csv) | [Raw records](../dashboard/data/official_pi0/ojx360_replay/replay.json) |
+| [State-input update sensitivity](EXPERIMENTS.md#17-state-input-update-sensitivity) | [state_feedback_comparisons.csv](../results/state_feedback_comparisons.csv) | [Outcomes and pairing](../dashboard/data/state_feedback/) |
+| [Selection-external replay](EXPERIMENTS.md#16-fixed-action-replay) | [replay_holdout_summary.csv](../results/replay_holdout_summary.csv) | [Frozen actions and outcomes](../dashboard/data/replay_holdout/) |
 | [Public-checkpoint reproduction](EXPERIMENTS.md#2-reproduction-of-the-public-checkpoints) | [reproduction.csv](../results/reproduction.csv) | [Raw records](../dashboard/build.py) |
 
 ## Update the results
 
-From the repository root, run `python3 dashboard/build.py`, then `python3 scripts/analysis/make_figures.py`. They update dashboard data, CSVs, and bilingual SVGs without a model evaluation.
+From the repository root, run `python3 dashboard/build.py`, `python3 scripts/analysis/make_figures.py`, then `python3 scripts/analysis/summarize_followup.py`. The first two use the standard library for earlier results; the third uses NumPy to recompute P1/P2 paired statistics, six CSVs and bilingual SVGs from episode records. No model or simulation is invoked. Prepare the environment via the [quick start](../README.md#quick-start).
 
 [tests/](../tests/) and [CI](../.github/workflows/ci.yml) check derived numbers against raw records. See the [script index](../scripts/README.md) for evaluation entry points and adding a new result.
 
 <details>
 <summary>Updates & corrections</summary>
 
+- **2026-11-01** · Integrate completed P1 state-update sensitivity and P2 selection-external replay, keeping older camera/replay results and clarifying pairing, repeated states, input mismatch and selection scope. Recovery experiments and P3 remain deferred.
 - **2026-10-29** · Official π0 control ([section 1.5](EXPERIMENTS.md#15-official-π0-control)): OpenPI itself scores 96.4% normally and 0% without vision; 0% with only the wrist camera masked, 77% with only the main view masked. Earlier versions called LeRobot's π0 checkpoint "under-trained"; this repository never tested that, and the wording is replaced by facts.
 - **2026-10-28** · Single-camera experiment, 500 episodes per condition ([section 1.4](EXPERIMENTS.md#14-wrist-camera-removed-500-episodes)). While setting it up, found that LeRobot silently shifts camera slots when a camera is missing: reported as [lerobot#5118](https://github.com/huggingface/lerobot/issues/5118), fix proposed in [lerobot#5129](https://github.com/huggingface/lerobot/pull/5129).
 - **2026-10-14** · [v1.3](https://github.com/chaoshengsc/libero-camera-ablation/releases/tag/v1.3): every ablation run a second time; the claim that π0 depends on the wrist camera was withdrawn.

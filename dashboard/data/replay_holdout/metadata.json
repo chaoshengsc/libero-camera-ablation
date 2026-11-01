@@ -1,0 +1,15 @@
+{
+  "study": "P2",
+  "checkpoint": "OpenPI original pi0_libero (recorded normal-vision actions)",
+  "bootstrap_seed": 20261031,
+  "bootstrap_draws": 20000,
+  "original_selection_sha256": "6592882f0b068d2696b02aff48a5ca0630bbb58abc878223fe1b3c4ccbf95a67",
+  "original_outcomes_sha256": "70569ca722d53996faf062d378f5cef0fc545986fd0494c707b35fd01ed6f58f",
+  "files": {
+    "selection.json": "6592882f0b068d2696b02aff48a5ca0630bbb58abc878223fe1b3c4ccbf95a67",
+    "outcomes.json": "8df400793f605df7e008b6485e5ac36293881347d99146c218b1a21e0d52f180",
+    "source_actions.json": "69b0def993c6e30a7c08e491c56295aef6093638900dc1044a31c291c392fb47",
+    "audit.json": "228c871c985e1cdcf764a92c97033dcf62b07019a0ad0cf7f5cef2fb77be149d"
+  },
+  "scope": "Target states 10-49 were excluded from action selection but had been used in earlier evaluations. The ten selected float32 action arrays are losslessly exported from the original NPZ. Full replay NPZ evidence remains local; its completed audit is recorded in audit.json."
+}

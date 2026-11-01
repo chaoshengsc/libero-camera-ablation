@@ -1,0 +1,31 @@
+{
+  "status": "PASS",
+  "episodes": 410,
+  "formal": 400,
+  "self": 10,
+  "invalid": 0,
+  "steps": 42442,
+  "selection_sha256": "6592882f0b068d2696b02aff48a5ca0630bbb58abc878223fe1b3c4ccbf95a67",
+  "runner_sha256": "f9f33ee39ddfa8912e95378c2ef0ef560e37d1b58fec5b48cb8b2315805832ee",
+  "exact_prefixes_verified": 410,
+  "formal_target_range": [
+    10,
+    49
+  ],
+  "runtime": {
+    "started_utc": "2026-11-01T07:49:33.748790+00:00",
+    "pid": 1993360,
+    "python": "3.12.14 (main, Sep  2 2026, 23:27:36) [GCC 15.3.0]",
+    "selection_sha256": "6592882f0b068d2696b02aff48a5ca0630bbb58abc878223fe1b3c4ccbf95a67",
+    "runner_sha256": "f9f33ee39ddfa8912e95378c2ef0ef560e37d1b58fec5b48cb8b2315805832ee",
+    "libero_env_sha256": "97c984f12331527626812ec19967ef399e545535b3571becf044db2417ae9d71",
+    "versions": {
+      "numpy": "2.2.6",
+      "mujoco": "3.3.2",
+      "torch": "2.11.0+cu128",
+      "robosuite": "1.4.0",
+      "lerobot": "0.6.1",
+      "hf-libero": "0.1.4"
+    }
+  }
+}
