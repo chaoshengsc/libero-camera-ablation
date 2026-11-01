@@ -165,6 +165,53 @@ PY
 
 LeRobot π0/π0.5仍按上一节配置本地分词器；OpenPI原版按独立指南准备GCS缓存。LIBERO的BDDL、初始状态与assets目录也须在本地，并与固定的`hf-libero`/LIBERO源码配置一致。**单纯评测无需下载`lerobot/libero`训练数据。** 完成这些准备后，再选择[最小相机入口](../scripts/README_CN.md#最小相机评测)或[P1启动步骤](../scripts/README_CN.md#p1启动步骤仅供获准的独立重复)。
 
+### 4.2 准备 LIBERO 仿真素材
+
+[hf-libero 0.1.4 源码](https://github.com/huggingface/LIBERO/blob/8561c60eea2fb93096146f240194649df73d8b1e/libero/libero/utils/download_utils.py)从**数据集**仓库[lerobot/libero-assets](https://huggingface.co/datasets/lerobot/libero-assets/tree/0b3ea86be5fe169d0fd036ae63d1070ec09e90f6)获取网格和纹理；这与策略权重、训练示范数据分开。默认位置为`$HOME/.cache/libero/assets`，加载本项目`env.sh`后即`$EMB_ROOT/home/.cache/libero/assets`，不在`HF_HOME`内。
+
+**仅用于尚不存在的新素材缓存，会下载约422 MB。** 在Linux工作站任意目录、完成第0–3节并设置`REPO`和`EMB_ROOT`后执行。这里固定一个已发布素材快照供后续安装使用，不追认为历史实验使用的素材revision。命令独占创建目标；已有目录、文件或链接会停止，下载失败保留部分目录供检查，不通过删除或覆盖强行重试。`HF_HUB_OFFLINE=0`仅作用于这次明确的准备命令，后续评测继续离线。
+
+```bash
+source "$EMB_ROOT/env.sh"
+conda activate smolvla
+(
+  set -e
+  HF_HUB_OFFLINE=0 python - <<'ASSETS'
+from importlib import metadata
+from pathlib import Path
+
+from huggingface_hub import snapshot_download
+
+dist = metadata.distribution("hf-libero")
+if dist.version != "0.1.4":
+    raise SystemExit("Stop: expected hf-libero 0.1.4")
+package = Path(dist.locate_file("libero/libero"))
+if (package / "assets").exists():
+    raise SystemExit("Packaged assets take priority; inspect them before preparing a cache")
+target = Path.home() / ".cache/libero/assets"
+target.mkdir(parents=True, exist_ok=False)
+snapshot_download(
+    repo_id="lerobot/libero-assets", repo_type="dataset",
+    revision="0b3ea86be5fe169d0fd036ae63d1070ec09e90f6",
+    local_dir=str(target),
+)
+ASSETS
+  python "$REPO/scripts/checks/libero_assets_check.py"
+)
+```
+
+预期最后出现`LIBERO Spatial files and required asset directories present`。已有素材的环境跳过下载块，只执行：
+
+```bash
+source "$EMB_ROOT/env.sh"
+conda activate smolvla
+python "$REPO/scripts/checks/libero_assets_check.py"
+```
+
+这个只读检查要求已安装包内各有10份非空Spatial BDDL和初始状态文件，以及非空的`articulated_objects`、`stable_scanned_objects`、`turbosquid_objects`、`stable_hope_objects`、`scenes`素材目录；不导入LIBERO或仿真器。包缺失、版本不同、目录缺失或为空均返回非零。包内`libero/libero/assets`优先于HOME缓存，所以即使缓存完整，也须先检查不完整的包内素材目录。它不验证每份网格/内容哈希、自定义LIBERO配置、渲染或新机器实际运行。
+
+LIBERO首次导入可能询问是否自定义**训练数据集**路径；仅评测时回答`n`保留包默认值。BDDL/init路径须与已安装版本一致；已有自定义配置先检查，不直接替换。OpenVLA使用第0节单独固定的原始LIBERO克隆，其包内素材和配置与hf-libero缓存分开；原生OpenPI客户端使用上面的`smolvla`/hf-libero环境。本次只补文档，没有实际下载素材或仿真。
+
 ## 5. 跑评测
 
 ```bash

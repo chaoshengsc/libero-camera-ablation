@@ -128,3 +128,39 @@ def test_deadline_boundary_is_inclusive_and_failures_stay_in_denominator(tmp_pat
 
 def test_managed_csv_matches_validated_export():
     assert (AUDIT.parents[2] / "results/budget_sensitivity.csv").read_text() == serialize(audit_rows())
+
+
+@pytest.mark.parametrize("failure", ["missing", "difference", "nonfinite", "unchecked", "duplicate", "source_key", "shape", "dtype", "input_hash",
+                                      "script_hash", "report_hash", "entry_count", "source_count", "scope", "time", "alias"])
+def test_inconsistent_a0_cannot_pass_unchanged_protocol_and_budget(tmp_path, failure):
+    directory = tmp_path / "audit"
+    shutil.copytree(AUDIT, directory)
+    path = directory / "checkpoint_loading.json"
+    if failure == "missing":
+        path.unlink()
+    else:
+        data = json.loads(path.read_text())
+        report, execution = data["report"], data["execution"]
+        first = report["parameters"][0]
+        if failure == "difference": first["different_elements_after_target_cast"] = 1
+        elif failure == "nonfinite": first["nonfinite_actual_elements"] = 1
+        elif failure == "unchecked": report["unchecked_entries"] = ["missing parameter"]
+        elif failure == "duplicate": report["parameters"][-1] = first.copy()
+        elif failure == "source_key": first["source_key"] = "other source"
+        elif failure == "shape": first["shape"][0] += 1
+        elif failure == "dtype": first["actual_dtype"] = "torch.float16"
+        elif failure == "input_hash":
+            key = next(iter(report["input_sha256"]))
+            report["input_sha256"][key] = report["expected_input_sha256"][key] = "0" * 64
+        elif failure == "script_hash": execution.pop("script_sha256")
+        elif failure == "report_hash": data.pop("source_report_sha256")
+        elif failure == "entry_count": report["checked_entries"] -= 1
+        elif failure == "source_count": execution["source_keys_used"] = 778
+        elif failure == "scope": execution["policy_forwards"] = 1
+        elif failure == "time": execution["elapsed_seconds"] = float("nan")
+        else:
+            alias = next(r for r in report["parameters"] if "embed_tokens" in r["parameter"])
+            alias["source_key"] = alias["parameter"]
+        path.write_text(json.dumps(data))
+    with pytest.raises((OSError, ValueError)):
+        audit_rows(directory)

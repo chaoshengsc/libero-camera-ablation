@@ -36,7 +36,10 @@ python scripts/analysis/summarize_protocol_audit.py
 It checks required source-association metadata, public-result/duration hashes,
 episode coverage, length agreement and the managed
 [budget CSV](../../../results/budget_sensitivity.csv), using only the standard
-library. Mismatch/missing evidence exits nonzero. `--write` regenerates only that
+library. It also validates the frozen A0 report's execution scope, fingerprints,
+entry/source-key counts, declared alias, dtypes/shapes and zero-difference/error
+claims against its per-entry records and the existing identity export. It does
+not reload weights or rehash the local instrumentation/raw report. Mismatch/missing evidence exits nonzero. `--write` regenerates only that
 repository-managed CSV after source review; it does not run a model. CI cannot
 rehash raw artifacts outside Git; their recorded hashes remain audit references.
 
@@ -92,7 +95,9 @@ acceptance; they cannot restore missing fields or identify online correction.
 13150条控制步记录保留实际可用的动作/末端/录像长度，缺失证据写null。三组早期
 500回合正常评测只重计每任务前10回合，标为matched100，不外推缺少录像的400回合。
 OpenVLA原本就是220步；ACT/PushT不参与本次截止比较。重复不合并成独立状态。
-首条命令只读核查来源关联字段、公开结果/长度哈希、覆盖和CSV，失败返回非零；
+首条命令只读核查来源关联字段、公开结果/长度哈希、覆盖和CSV，并检查A0报告的执行范围、
+指纹、状态项/源键计数、共享别名、dtype/形状以及逐项与总体的零差异/错误声明是否一致；
+它不会重新加载权重或重算本地取证脚本/原报告哈希。失败返回非零；
 CI不能重新核验Git外工件内容，其原始哈希是审计指针。`--write`仅重建仓库管理的补充CSV。
 
 原始权重核验需按OpenPI指南先配置上述四个变量，再设置已有输入路径与未用JSON路径。

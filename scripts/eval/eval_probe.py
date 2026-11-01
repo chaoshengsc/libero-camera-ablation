@@ -14,10 +14,10 @@ POLICY_SERVER=<端口>:不用 LeRobot 的策略,改向本机 OpenPI 原版服务
            drop_* 由服务端把对应槽位的 image_mask 置 0。--policy.path 仍要给一个 π0 权重目录,只用来解析配置,不加载权重。
 TRAJ_OUT=<npz 路径>:每回合一条轨迹,字段 eef[T,3]、grip[T,2]、act[T,7](实际送进环境 step 的动作,开环回放用);
          按 rollout 调用顺序(batch_size=1 时即 任务0回合0..9, 任务1…)。"""
-import atexit
 import hashlib
 import os
 import sys
+from pathlib import Path
 
 import lerobot.scripts.lerobot_eval as E
 import numpy as np
@@ -250,21 +250,33 @@ def _save():
         for nm in ("agent", "wrist"):
             n = [len(e.get(nm + "_sent", ())) for e in episodes]
             print(f"[probe] distinct {nm} images sent per episode: min {min(n)}, max {max(n)}", flush=True)
-    if TRAJ_OUT and episodes:
-        np.savez_compressed(TRAJ_OUT, n=len(episodes),
-                            **{f"eef_{i}": np.array(e["eef"]) for i, e in enumerate(episodes)},
-                            **{f"grip_{i}": np.array(e["grip"]) for i, e in enumerate(episodes)},
-                            **{f"act_{i}": np.array(e["act"]) for i, e in enumerate(episodes)},
-                            h0=np.array([e.get("h0", "") for e in episodes]))
+    if TRAJ_OUT:
+        if not episodes:
+            raise ValueError("No episodes recorded; requested trajectory was not saved")
+        # Never replace existing evidence; a failed partial write stays for diagnosis.
+        with Path(TRAJ_OUT).open("xb") as output:
+            np.savez_compressed(output, n=len(episodes),
+                                **{f"eef_{i}": np.array(e["eef"]) for i, e in enumerate(episodes)},
+                                **{f"grip_{i}": np.array(e["grip"]) for i, e in enumerate(episodes)},
+                                **{f"act_{i}": np.array(e["act"]) for i, e in enumerate(episodes)},
+                                h0=np.array([e.get("h0", "") for e in episodes]))
         print(f"[probe] saved {len(episodes)} episodes -> {TRAJ_OUT}", flush=True)
 
 
 # 入口保护:多进程以 spawn 方式启动时子进程会重新导入本文件,没有保护会重复执行主流程
+def main():
+    try:
+        E.preprocess_observation, E.rollout = pre, roll
+        _log_masks()
+        _delta_ref()
+        if POLICY_SERVER:
+            _remote()
+        return E.main()
+    finally:
+        # atexit callbacks cannot turn a successful evaluator exit into a failure.
+        # Finalize here so archive errors propagate through run_logged/pipelines.
+        _save()
+
+
 if __name__ == "__main__":
-    atexit.register(_save)
-    E.preprocess_observation, E.rollout = pre, roll
-    _log_masks()
-    _delta_ref()
-    if POLICY_SERVER:
-        _remote()
-    sys.exit(E.main())
+    sys.exit(main())

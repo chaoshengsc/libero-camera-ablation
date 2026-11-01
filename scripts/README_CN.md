@@ -67,6 +67,8 @@ python scripts/analysis/summarize_eval.py --file \
 
 指南逐项对应历史阶段的运行名、回合数与渲染设置。入口不会启动服务，也不自动执行≥92%的成功率门槛，需核对工件后验收。早期HF试用检查点失败且未验证与原生权重同源，不能把它作为同权重的管线对照，见[证据核验](../dashboard/data/protocol_audit/)。
 
+`summarize_blackout.py`只汇总原有固定运行：每任务50回合正常、10回合全黑，正常取前10回合。它检查唯一输入、十任务及完整回合覆盖，复用严格OpenVLA日志解析；空日志、异常、截断和歧义输入返回1，不输出成功汇总。默认写入新的`$EMB_ROOT/logs/eval/B_summary.json`；已有输出会被拒绝，可用`--output`选择未用JSON路径。参数/环境错误返回2。它不替代种子、初始状态哈希和原评测退出码的验收。
+
 ## 最小相机评测
 
 在已完成安装与权重准备的环境中，从隔离仓库副本根目录运行。`EMB_ROOT`必须已设置：
@@ -184,9 +186,11 @@ python3 scripts/analysis/summarize_followup.py
 ## 自检、诊断与历史实验
 
 - **既有协议补证：** [summarize_protocol_audit.py](analysis/summarize_protocol_audit.py)只读核查95条来源关联元数据、公开结果/长度文件哈希与220步截止计分，CI不重新读取Git外原始工件；`--write`仅重建补充CSV。[check_checkpoint_identity.py](analysis/check_checkpoint_identity.py)在已有OpenPI环境中用CPU核对原生/HF参数，不导入模型、不写权重；返回1表示已确认参数不同，返回2表示不完整或输入错误。输入、内存保护和命令见[证据说明](../dashboard/data/protocol_audit/)。
+- **A0元数据检查：** 上述协议检查同时核对载入报告的逐项差异、覆盖、别名、dtype/形状、输入指纹及CPU执行范围；不重新加载模型或核验Git外原报告。[语义检查实现](analysis/validate_loading_audit.py)。
 - **公开仓库检查：** [repository_check.py](checks/repository_check.py)离线检查Git跟踪的相对链接/锚点、JavaScript语法（需Node.js）和引用/项目版本；现有CI会执行，不导入模型或仿真。
 - **旧ACT演示导出：** [export_act.py](../viewer/export_act.py)使用已配置`lerobot`环境及未被使用的`--output`目录；顺序尝试seed1000–1009，取首个成功演示或最后一次失败，不属于评测结果。已有输出和失败工件均保留。另获准导出后，将`done.json`指向的`.mjb`及选中`.npz`一起复制到本地查看器；[replay.py](../viewer/replay.py)头部有macOS的`mjpython`命令。本轮维护未在GPU上运行该导出器。
 
+- **LIBERO离线素材：** [libero_assets_check.py](checks/libero_assets_check.py)只读检查hf-libero 0.1.4的Spatial文件及素材目录，不导入仿真器；[首次准备步骤](../docs/INSTALL_CN.md#42-准备-libero-仿真素材)。
 - **环境自检：** [torch_check.py](checks/torch_check.py)、[egl_smoke.py](checks/egl_smoke.py)、[codec_check.py](checks/codec_check.py)，分别检查 GPU/torch、EGL 与视频解码。
 - **π0 诊断：** [run_pi0_full.sh](eval/run_pi0_full.sh) 与 [run_pi0_action_steps.sh](eval/run_pi0_action_steps.sh)，对应历史冒烟、完整评测和动作块长度检查。
 - **历史微调：** [run_statedrop_pipeline.sh](train/run_statedrop_pipeline.sh) 调用 [run_train.sh](train/run_train.sh)，由 [summarize_statedrop.py](analysis/summarize_statedrop.py) 汇总。结果与后续更正保留在[实验日志](../docs/NOTES_CN.md)，不作为 README 的主要发现。

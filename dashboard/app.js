@@ -1,4 +1,4 @@
-const R = window.RESULTS || [];
+const R = Array.isArray(window.RESULTS) ? window.RESULTS : [];
 const $ = (id) => document.getElementById(id);
 const fmt = (x) => x == null ? "—" : x.toFixed(1) + "%";
 const sum = (a) => a.reduce((p, q) => p + q, 0);
@@ -145,9 +145,12 @@ const reproduced = (r) => { const b = r.baseline_pm ?? r.baseline_ci ?? 0; retur
 const BO = window.BLACKOUT || { summary: [], runs: [] };
 const FU = window.FOLLOWUP || {};
 const MNAME = { pi0: "π0", "pi0.5": "π0.5" };
+const HAS_CORE_DATA = R.length > 0 && Array.isArray(window.BLACKOUT?.summary) && Array.isArray(window.BLACKOUT?.runs)
+  && Array.isArray(FU.pi0_black_runs) && FU.pi0_black_runs.length > 0
+  && Array.isArray(FU.perturb) && FU.perturb.some(r => r.model === "pi0.5");
 
 // ---- 三条结论（数字全部取自数据）
-{
+if (HAS_CORE_DATA) {
   const ok = done.filter(reproduced), p0 = BO.summary.find(r => r.model === "pi0"), p5 = (FU.perturb || []).find(r => r.model === "pi0.5");
   const zero = BO.summary.filter(r => sum(r.black) === 0).map(r => MNAME[r.model] || r.model);
   $("keys").innerHTML = [
@@ -155,6 +158,10 @@ const MNAME = { pi0: "π0", "pi0.5": "π0.5" };
     [`${p5.normal} → ${p5.freeze}`, "π0.5 画面冻结后的成功率", "整个回合只给第一帧画面（%），各 100 回合"],
     [`${ok.length} / ${done.length}`, "达到本项目参考对照判据的公开权重", done.map(r => r.model).join(" · ")],
   ].map(([v, k, d], i) => `<a class="key" href="${["#blackout", "#perturbations", "#repro"][i]}"><span class="v">${v}</span><span class="key-copy"><span class="k">${k}</span><span class="d">${d}</span></span><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="m9 5 7 7-7 7"/></svg></a>`).join("");
+} else {
+  $("keys").innerHTML = LANG === "en"
+    ? '<p class="pending" role="status">Results data could not be loaded. Reload the page or use the <a href="#resources">docs and data links</a>.</p>'
+    : '<p class="pending" role="status">结果数据未加载。请刷新页面，或查看<a href="#resources">文档与数据</a>。</p>';
 }
 
 // ---- dot plot
@@ -180,6 +187,7 @@ function selectModel(index, focus = false) {
   if (focus) document.querySelector(`.chart-row[data-model-index="${index}"]`).focus({ preventScroll: true });
 }
 function drawChart() {
+  if (!HAS_CORE_DATA) return;
   const svg = $("chart"), wrap = $("chartWrap");
   const W = wrap.clientWidth; if (!W) return;  // 表格视图下图表被隐藏，宽度为 0
   const labelW = Math.min(190, W * 0.34), padR = 24, rowH = 64, top = 8, axisH = 28;
@@ -349,8 +357,8 @@ if (probe && location.protocol !== "file:")
 else if (probe) drawVideos();
 else noVideos();
 
-drawChart(); selectModel(selectedModel); drawMatrix(); drawBlackout(); drawFollowup();
-addEventListener("resize", () => { drawChart(); drawBlackout(); });
+if (HAS_CORE_DATA) { drawChart(); selectModel(selectedModel); drawMatrix(); drawBlackout(); drawFollowup(); }
+addEventListener("resize", () => { if (HAS_CORE_DATA) { drawChart(); drawBlackout(); } });
 
 // Theme and wayfinding share the existing light/dark palette.
 let savedTheme;

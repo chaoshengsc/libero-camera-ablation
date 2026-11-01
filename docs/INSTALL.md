@@ -165,6 +165,53 @@ Expect `Pinned base-model files resolve offline; no model loaded`. This checks f
 
 LeRobot π0/π0.5 still need the local tokenizer setup above; native OpenPI needs its separate GCS cache. LIBERO's BDDL, initial-state and asset directories must also be local and match the pinned `hf-libero`/LIBERO source configuration. **Evaluation alone does not require the `lerobot/libero` training dataset.** Then choose the [minimal camera entry](../scripts/README.md#minimal-camera-evaluation) or [P1 launch steps](../scripts/README.md#p1-launch-steps-for-an-authorized-independent-repeat).
 
+### 4.2 Prepare LIBERO simulation assets
+
+The [hf-libero 0.1.4 source](https://github.com/huggingface/LIBERO/blob/8561c60eea2fb93096146f240194649df73d8b1e/libero/libero/utils/download_utils.py) gets meshes/textures from the **dataset** repository [lerobot/libero-assets](https://huggingface.co/datasets/lerobot/libero-assets/tree/0b3ea86be5fe169d0fd036ae63d1070ec09e90f6). This is separate from policy weights and training demonstrations. Its default destination is `$HOME/.cache/libero/assets`; after loading this project's `env.sh`, that is `$EMB_ROOT/home/.cache/libero/assets`, outside `HF_HOME`.
+
+**Only for a new, empty asset cache; downloads about 422 MB.** Run on the Linux workstation from any directory after sections 0–3, with `REPO` and `EMB_ROOT` set. The block pins a published asset snapshot for future setup; it does not establish which asset revision was present in historical experiments. It exclusively creates the destination and stops on existing directories/files/links. A failed download leaves its partial directory for inspection; do not delete or overwrite it to force a retry. `HF_HUB_OFFLINE=0` applies only to the explicit preparation command, not later evaluation.
+
+```bash
+source "$EMB_ROOT/env.sh"
+conda activate smolvla
+(
+  set -e
+  HF_HUB_OFFLINE=0 python - <<'ASSETS'
+from importlib import metadata
+from pathlib import Path
+
+from huggingface_hub import snapshot_download
+
+dist = metadata.distribution("hf-libero")
+if dist.version != "0.1.4":
+    raise SystemExit("Stop: expected hf-libero 0.1.4")
+package = Path(dist.locate_file("libero/libero"))
+if (package / "assets").exists():
+    raise SystemExit("Packaged assets take priority; inspect them before preparing a cache")
+target = Path.home() / ".cache/libero/assets"
+target.mkdir(parents=True, exist_ok=False)
+snapshot_download(
+    repo_id="lerobot/libero-assets", repo_type="dataset",
+    revision="0b3ea86be5fe169d0fd036ae63d1070ec09e90f6",
+    local_dir=str(target),
+)
+ASSETS
+  python "$REPO/scripts/checks/libero_assets_check.py"
+)
+```
+
+Expected output ends with `LIBERO Spatial files and required asset directories present`. For an already prepared installation, skip the download block and run only:
+
+```bash
+source "$EMB_ROOT/env.sh"
+conda activate smolvla
+python "$REPO/scripts/checks/libero_assets_check.py"
+```
+
+This read-only check requires ten nonempty Spatial BDDL and initial-state files in the installed package, plus nonempty `articulated_objects`, `stable_scanned_objects`, `turbosquid_objects`, `stable_hope_objects` and `scenes` asset directories. It imports neither LIBERO nor a simulator. Missing packages, wrong versions or missing/empty directories return nonzero. Packaged `libero/libero/assets` takes priority over the home cache, so an incomplete packaged directory must be inspected even if the cache is complete. The check does not verify every mesh/hash, custom LIBERO configuration, rendering or clean-machine execution.
+
+On LIBERO's first import, its configuration may ask for a custom **training dataset** path; answer `n` to retain package defaults when only evaluating. Keep BDDL/init paths consistent with the installed version; inspect an existing custom configuration rather than replacing it. OpenVLA uses the separately pinned original LIBERO clone from section 0; its bundled assets/configuration are separate from this hf-libero cache. Native OpenPI's client uses the `smolvla`/hf-libero environment above. This documentation update performs no asset download or simulation.
+
 ## 5. Running evaluations
 
 ```bash

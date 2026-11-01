@@ -2,6 +2,7 @@
 
 Default: check the managed CSV. --write regenerates that CSV after validation.
 Raw NPZ/video evidence remains outside Git; this checks the published audit export.
+Also checks the frozen A0 loading report; never imports a policy or tensor backend.
 """
 
 import argparse
@@ -11,6 +12,8 @@ import io
 import json
 import sys
 from pathlib import Path
+
+from validate_loading_audit import check_loading
 
 ROOT = Path(__file__).resolve().parents[2]
 DATA = ROOT / "dashboard/data"
@@ -69,6 +72,7 @@ def summary(run, keys, label, outcomes, steps, budget):
 
 
 def audit_rows(directory=AUDIT, data=DATA):
+    check_loading(directory)
     provenance = json.loads((directory / "provenance.json").read_text())
     lengths = json.loads((directory / "episode_lengths.json").read_text())
     require(provenance["schema"] == lengths["schema"] == 1, "Unsupported evidence schema")
@@ -162,7 +166,7 @@ def main(argv=None):
     except (OSError, ValueError, KeyError, TypeError) as error:
         print(f"Protocol audit: {error}", file=sys.stderr)
         return 1
-    print("Checked frozen run identities and recorded-trajectory deadline counts; no model or simulation was run")
+    print("Checked frozen provenance, deadline counts and A0 loading metadata; no model or simulation was run")
     return 0
 
 
