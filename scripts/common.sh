@@ -21,3 +21,57 @@ CK_PI0_OPENPI_EMB=$CK/pi0_libero_base@98ac51b8_embedded
 CK_OPENPI_PI0=$CK/openpi_pi0_libero
 OPENPI_PORT=${OPENPI_PORT:-18765}
 OPENPI_KEYFILE=${EMB_ROOT}/tmp/openpi_authkey
+
+# Extra CLI arguments must not redirect a run outside its reserved output.
+reject_output_override() {
+  local arg
+  for arg in "$@"; do
+    case "$arg" in --output_dir|--output_dir=*) echo "output_dir is managed by the run name" >&2; return 2 ;; esac
+  done
+}
+
+# Atomically reserve an unused output directory; never remove an old run.
+new_run_dir() {
+  local kind=$1 name=$2
+  case "$kind" in eval|train) ;; *) echo "unknown run kind: $kind" >&2; return 2 ;; esac
+  case "$name" in ""|.|..|*[!a-zA-Z0-9_.-]*) echo "invalid run name: $name" >&2; return 2 ;; esac
+  W=$EMB_ROOT/logs/$kind/$name
+  mkdir -p -- "$EMB_ROOT/logs/$kind" || return
+  mkdir -- "$W" || { echo "Cannot reserve output; choose an unused run name: $W" >&2; return 1; }
+}
+
+# Reserve the whole pipeline before launching either lane or writing shared logs.
+reserve_pipeline() {
+  local lock=$1 path
+  shift
+  for path in "$@"; do
+    if [ -e "$path" ] || [ -L "$path" ]; then
+      echo "Refusing to overwrite pipeline output: $path" >&2; return 1
+    fi
+  done
+  mkdir -p -- "$(dirname "$lock")" || return
+  mkdir -- "$lock" || { echo "Pipeline already reserved or unavailable: $lock" >&2; return 1; }
+}
+
+# Capture the command status before logging; a successful echo is not a run result.
+run_logged() {
+  local logfile=$1 status=0
+  shift
+  "$@" >> "$logfile" 2>&1 || status=$?
+  if ! printf 'exit=%s\n' "$status" >> "$logfile"; then
+    if [ "$status" -eq 0 ]; then status=1; fi
+  fi
+  return "$status"
+}
+
+# Bare wait ignores individual failures. Reap every owned child and report failure.
+wait_for_jobs() {
+  local pid status=0 child_status
+  for pid in "$@"; do
+    if wait "$pid"; then :; else
+      child_status=$?
+      if [ "$status" -eq 0 ]; then status=$child_status; fi
+    fi
+  done
+  return "$status"
+}

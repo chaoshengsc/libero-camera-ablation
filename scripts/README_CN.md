@@ -12,6 +12,12 @@
 
 评测包装器通过运行时替换函数实现干预，不修改 LeRobot / OpenVLA 源码。需要 GPU 或模型前向的入口与只处理已有数据的分析脚本分开列在下面。
 
+运行入口以原子方式创建新目录；同名目录、文件或链接（含失效链接）均拒绝使用，失败后的目录也保留。运行名只接受字母、数字、下划线、连字符和点，不能是`.`、`..`或路径。`run_libero.sh`和`run_train.sh`的额外参数不能覆盖`--output_dir`。
+
+执行命令的退出码会保留并写入`stdout.log`的`exit=<code>`；批量入口遇到必需子任务失败会返回非零，不写成功完成标记。历史训练流程仍保留原有batch16失败后尝试batch8的测速回退。并行/训练流水线会保留`.*.started`目录作为启动记录，并拒绝覆盖已有结果、共享日志和完成标记，不能原地重复启动。
+
+ACT的新输出统一为`logs/eval/act_cube_500/stdout.log`与`out/`；旧`logs/act_500.log`保持不动。需要重复LIBERO、OpenVLA评测或训练时，使用相应带运行名的入口选择新名字。ACT、DP及批量入口使用固定名字，会拒绝在原位置重跑；不要删除旧工件来绕过保护。
+
 ## 公开权重复现
 
 | 模型 / 任务 | 入口 | 汇总 |
@@ -47,18 +53,14 @@
 ```bash
 CK="$EMB_ROOT/ckpt/pi0_libero_finetuned_v044@45dcc8fc"
 RUN=pi0_camera_black_smoke
-if [ -e "$EMB_ROOT/logs/eval/$RUN" ]; then
-  echo "Choose an unused run name"
-else
-  WRAP=probe BLACKOUT=all bash scripts/eval/run_libero.sh \
-    "$RUN" 1 "$CK" 1 --policy.n_action_steps=5 \
-    --env.observation_height=360 --env.observation_width=360
-fi
+WRAP=probe BLACKOUT=all bash scripts/eval/run_libero.sh \
+  "$RUN" 1 "$CK" 1 --policy.n_action_steps=5 \
+  --env.observation_height=360 --env.observation_width=360
 ```
 
-`CK`定位权重；`RUN`指定本次独立输出，必须未被使用。条件分支保护旧目录，因为底层历史入口会清空同名目录。
+`CK`定位权重；`RUN`指定本次独立输出，必须未被使用；入口本身会原子拒绝重复启动。
 评测每任务1回合、十任务共10回合，batch1、每次执行5步动作，模型接收全黑图；它只检查入口，不是新的成功率基准。
-输出在`$EMB_ROOT/logs/eval/$RUN/`，检查`stdout.log`里的`exit=0`和`out/eval_info.json`的10回合覆盖，不能只看外层shell退出码。
+输出在`$EMB_ROOT/logs/eval/$RUN/`，外层退出码必须为0，同时检查`stdout.log`里的`exit=0`和`out/eval_info.json`的10回合覆盖；命令成功不等于结果已验收。
 缺环境、权重或EGL时按[排错](../docs/TROUBLESHOOTING_CN.md)处理；不要覆盖旧结果或盲目重跑。
 
 ## 状态与回放补充实验

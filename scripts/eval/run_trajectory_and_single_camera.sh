@@ -1,21 +1,28 @@
 #!/bin/bash
+set -e
 # 记录末端轨迹 + 只涂黑一路相机,两条线并行
 source "$(dirname "$0")/../common.sh"; R=$SCRIPTS/eval/run_libero.sh
+E=$EMB_ROOT/logs/eval
+reserve_pipeline "$E/.trajectory.started" "$E/trajectory_done.flag" \
+  "$E/traj_pi0_normal" "$E/traj_pi0_normal2" "$E/traj_pi0_black" "$E/traj_pi0_agent" "$E/traj_pi0_wrist" \
+  "$E/traj_pi05_normal" "$E/traj_pi05_agent" "$E/traj_pi05_wrist" "$E/traj_smol2_agent" "$E/traj_smol2_wrist"
 export WRAP=probe
 lane1() {
-  BLACKOUT=none  bash $R traj_pi0_normal  10 $CK_PI0 1 --policy.n_action_steps=5
-  BLACKOUT=none  bash $R traj_pi0_normal2 10 $CK_PI0 1 --policy.n_action_steps=5
-  BLACKOUT=all   bash $R traj_pi0_black   10 $CK_PI0 1 --policy.n_action_steps=5
-  BLACKOUT=agent bash $R traj_pi0_agent   10 $CK_PI0 1 --policy.n_action_steps=5
-  BLACKOUT=wrist bash $R traj_pi0_wrist   10 $CK_PI0 1 --policy.n_action_steps=5
-  BLACKOUT=wrist bash $R traj_smol2_wrist 10 $CK_SMOL2 1 "${SMOL2_ARGS[@]}"
+  BLACKOUT=none  bash "$R" traj_pi0_normal  10 "$CK_PI0" 1 --policy.n_action_steps=5
+  BLACKOUT=none  bash "$R" traj_pi0_normal2 10 "$CK_PI0" 1 --policy.n_action_steps=5
+  BLACKOUT=all   bash "$R" traj_pi0_black   10 "$CK_PI0" 1 --policy.n_action_steps=5
+  BLACKOUT=agent bash "$R" traj_pi0_agent   10 "$CK_PI0" 1 --policy.n_action_steps=5
+  BLACKOUT=wrist bash "$R" traj_pi0_wrist   10 "$CK_PI0" 1 --policy.n_action_steps=5
+  BLACKOUT=wrist bash "$R" traj_smol2_wrist 10 "$CK_SMOL2" 1 "${SMOL2_ARGS[@]}"
 }
 lane2() {
   sleep 240
-  BLACKOUT=none  bash $R traj_pi05_normal 10 $CK_PI05 1 --policy.n_action_steps=10
-  BLACKOUT=agent bash $R traj_pi05_agent  10 $CK_PI05 1 --policy.n_action_steps=10
-  BLACKOUT=wrist bash $R traj_pi05_wrist  10 $CK_PI05 1 --policy.n_action_steps=10
-  BLACKOUT=agent bash $R traj_smol2_agent 10 $CK_SMOL2 1 "${SMOL2_ARGS[@]}"
+  BLACKOUT=none  bash "$R" traj_pi05_normal 10 "$CK_PI05" 1 --policy.n_action_steps=10
+  BLACKOUT=agent bash "$R" traj_pi05_agent  10 "$CK_PI05" 1 --policy.n_action_steps=10
+  BLACKOUT=wrist bash "$R" traj_pi05_wrist  10 "$CK_PI05" 1 --policy.n_action_steps=10
+  BLACKOUT=agent bash "$R" traj_smol2_agent 10 "$CK_SMOL2" 1 "${SMOL2_ARGS[@]}"
 }
-lane1 & lane2 & wait
-echo DONE > ${EMB_ROOT}/logs/eval/trajectory_done.flag
+lane1 & JOB1=$!
+lane2 & JOB2=$!
+wait_for_jobs "$JOB1" "$JOB2"
+echo DONE > "$E/trajectory_done.flag"

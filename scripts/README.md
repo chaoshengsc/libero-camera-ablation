@@ -12,6 +12,12 @@ Complete [installation](../docs/INSTALL.md) and [environment configuration](../e
 
 Wrappers replace functions at run time without changing LeRobot / OpenVLA sources. Model-evaluation entries and analysis of existing data are listed separately below.
 
+Run directories are created atomically. Existing directories, files and symlinks (including dangling links) are rejected; failed runs are retained. Names accept only letters, digits, underscores, hyphens and dots, excluding `.` and `..`. Extra arguments to `run_libero.sh` and `run_train.sh` cannot override `--output_dir`.
+
+Command exit codes are preserved and logged as `exit=<code>` in `stdout.log`. Pipelines propagate child failures and do not write a success marker after a failed required stage. The historical training pipeline retains its intended batch16-to-batch8 timing fallback. Parallel/training pipelines retain `.*.started` directories as launch records and reject reuse of their fixed outputs, shared logs and completion markers.
+
+New ACT outputs use `logs/eval/act_cube_500/stdout.log` and `out/`; the old `logs/act_500.log` is untouched. Choose unused names through the named LIBERO, OpenVLA or training entries for another run. ACT, DP and batch entries use fixed names and reject reruns in place; do not delete old artifacts to bypass protection.
+
 ## Public-checkpoint reproduction
 
 | Model / task | Entry point | Summary |
@@ -49,18 +55,14 @@ From the isolated checkout root, after configuring the environment, checkpoint a
 ```bash
 CK="$EMB_ROOT/ckpt/pi0_libero_finetuned_v044@45dcc8fc"
 RUN=pi0_camera_black_smoke
-if [ -e "$EMB_ROOT/logs/eval/$RUN" ]; then
-  echo "Choose an unused run name"
-else
-  WRAP=probe BLACKOUT=all bash scripts/eval/run_libero.sh \
-    "$RUN" 1 "$CK" 1 --policy.n_action_steps=5 \
-    --env.observation_height=360 --env.observation_width=360
-fi
+WRAP=probe BLACKOUT=all bash scripts/eval/run_libero.sh \
+  "$RUN" 1 "$CK" 1 --policy.n_action_steps=5 \
+  --env.observation_height=360 --env.observation_width=360
 ```
 
-`CK` selects the checkpoint; `RUN` selects a new output name. The guard protects old output because the historical lower-level entry clears a same-named directory. This runs one episode per task, ten in total, batch1, five executed actions per chunk and all-black model images. It checks the entry point, not a new success-rate benchmark.
+`CK` selects the checkpoint; `RUN` selects an unused output name. The entry point itself atomically rejects duplicate starts. This runs one episode per task, ten in total, batch1, five executed actions per chunk and all-black model images. It checks the entry point, not a new success-rate benchmark.
 
-Inspect `stdout.log` for `exit=0` and `out/eval_info.json` for ten episodes under `$EMB_ROOT/logs/eval/$RUN/`. The outer shell status alone is insufficient. Resolve environment/checkpoint/EGL failures using [troubleshooting](../docs/TROUBLESHOOTING.md); do not overwrite old runs or blindly retry.
+Require a zero shell exit code, then inspect `stdout.log` for `exit=0` and `out/eval_info.json` for ten episodes under `$EMB_ROOT/logs/eval/$RUN/`. Command success alone is not result acceptance. Resolve environment/checkpoint/EGL failures using [troubleshooting](../docs/TROUBLESHOOTING.md); do not overwrite old runs or blindly retry.
 
 ## State-input and replay follow-ups
 
