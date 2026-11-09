@@ -60,6 +60,7 @@ python scripts/analysis/summarize_eval.py --file \
 
 | 实验 | 入口 | 结果与解释 |
 |---|---|---|
+| 腕部500回合主实验与主视角附加条件 | [逐组命令生成器](eval/camera_study_commands.py)（只打印，不执行） | [十一组配置](../configs/camera_study_runs.json) · [换设备准备](../docs/CONTINUE_CN.md) |
 | 四种模型全涂黑 | [run_blackout_all.sh](eval/run_blackout_all.sh) | [summarize_blackout.py](analysis/summarize_blackout.py) · [实验 1.1](../docs/EXPERIMENTS_CN.md#11-所有相机涂黑) |
 | 加噪声、冻结首帧 | [run_perturbation.sh](eval/run_perturbation.sh) | [实验 1.2](../docs/EXPERIMENTS_CN.md#12-单路相机噪声冻结画面) |
 | 末端轨迹、单路相机涂黑 | [run_trajectory_and_single_camera.sh](eval/run_trajectory_and_single_camera.sh) | [轨迹分析](analysis/analyze_trajectories.py) · [单路汇总](analysis/summarize_single_camera.py) |

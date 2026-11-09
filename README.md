@@ -22,7 +22,7 @@ In the wrist study, masking the wrist input reduces π0.5 success from **98.4% t
 |---|---|---|
 | Camera-ablation evaluation | Four-policy all-black comparison; π0/π0.5 wrist-camera study; matched-state analysis | Results below · [Study structure](docs/STUDY_MAP.md) |
 | Camera-slot diagnosis and fix PR | Fix PR covers **six policies**; pre-submission regression **old 21 failed/6 passed → fixed 27/27 passed** | [Issue #5118](https://github.com/huggingface/lerobot/issues/5118) · [PR #5129](https://github.com/huggingface/lerobot/pull/5129) |
-| Data preparation and result regeneration | Episode records, statistical tables, figures and CI consistency checks | [Public data](dashboard/data/) · [Execution and analysis entries](scripts/README.md) |
+| Result organization and regeneration | Episode records, statistical tables, figures and CI consistency checks | [Public data](dashboard/data/) · [Execution and analysis entries](scripts/README.md) |
 
 **My work on the fix:** I found the slot issue in camera-ablation work, set the fix scope, reviewed the changes and submitted the issue and PR.
 
@@ -97,7 +97,7 @@ This supplementary control changes only the agent-view treatment; the wrist and 
 
 Agent-only blackout also has earlier 100-episode results. Agent-only freezing remains unrun and is included in the follow-up plan below.
 
-## 3. The camera-slot fix preserves input positions
+## 3. The fix preserves each camera image’s configured slot
 
 While building the ablations, this project identified a LeRobot behavior: missing an earlier camera packs subsequent images into earlier slots. **A wrist image can silently enter the agent-view slot.** The resulting intervention changes image layout as well as camera availability.
 
@@ -197,7 +197,7 @@ Each checkpoint has 500 episodes. The project uses overlap between its 95% inter
 
 ## Version and evidence
 
-**v1.5.4 · 2026-11-09**: the wrist main study, supplementary agent mask and public-evidence checks are complete. The follow-up experiments above have not started. Evaluation evidence remains fixed at v1.5.3; earlier tags are unchanged.
+**v1.5.5 · 2026-11-09**: the wrist main study, supplementary agent mask and public-evidence checks are complete. The follow-up experiments above have not started. Evaluation evidence remains fixed at v1.5.3. Device-preparation instructions and per-run recipes are available; target-device runtime acceptance remains pending. Earlier tags are unchanged.
 
 [Study structure and coverage](docs/STUDY_MAP.md) · [Freeze scope](docs/FREEZE.md) · [Public evidence SHA-256](results/freeze_20261109_v1.5.3.sha256)
 
@@ -205,6 +205,8 @@ Each checkpoint has 500 episodes. The project uses overlap between its 95% inter
 <summary>Reproduction, installation, repository layout and full limitations</summary>
 
 ## Quick start
+
+**Continue on another device:** [Preparation and eleven-run settings](docs/CONTINUE.md) separate repository materials, external assets and target-device acceptance.
 
 **Recompute included results first: no GPU or model weights required.** From the repository root, with Python 3.10+:
 
@@ -229,6 +231,7 @@ For a missing NumPy import, check the active environment. Missing raw files requ
 libero-camera-ablation/
 ├── README.md / README_CN.md   Project overview and key findings
 ├── docs/                     Full experiments, setup, troubleshooting, history
+├── configs/                  Recorded runs and future evaluation settings
 ├── scripts/                  Evaluation, interventions, summaries, figures
 ├── env/                      Configuration, constraints, package inventories
 ├── results/                  Recomputable result tables and trajectory data
@@ -287,7 +290,7 @@ If you use these results or scripts, please cite:
   author  = {ShengChao},
   title   = {libero-camera-ablation: Camera-input ablations of four robot policies on LIBERO-Spatial},
   year    = {2026},
-  version = {1.5.4},
+  version = {1.5.5},
   url     = {https://github.com/chaoshengsc/libero-camera-ablation}
 }
 ```

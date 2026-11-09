@@ -13,7 +13,7 @@
 | 比较主题 | 已观察到的结果 | 核查入口 |
 |---|---|---|
 | 全黑输入下的任务完成表现 | 所测 π0.5、OpenVLA、SmolVLA 全黑均为 0%；LeRobot π0 v044 五次为 53–56%，每次 100 回合 | [逐任务计数](../results/blackout_per_task.csv) · [原始评测](../dashboard/data/) |
-| 官方π0与LeRobot检查点的全黑对照 | 匹配100初态：官方π0/OpenPI正常93/100、全黑0/100；LeRobot π0 v044正常65/100、全黑五次53–56/100 | [官方对照](../results/official_pi0_summary.csv) · [原始记录](../dashboard/data/official_pi0/) |
+| 官方π0与LeRobot检查点的全黑对照 | 匹配100初态：官方π0/OpenPI正常93/100、全黑0/100；LeRobot π0 v044正常65/100、全黑五次53–56/100 | [匹配100初态](../results/official_pi0_matched100.csv) · [完整汇总](../results/official_pi0_summary.csv) · [原始记录](../dashboard/data/official_pi0/) |
 | π0.5的腕部输入敏感性 | 正常 492/500；屏蔽原槽位腕部相机 23/500；冻结腕部首帧 0/500 | [配对统计](../results/single_camera_summary.csv) · [500 回合记录](../dashboard/data/s500/) |
 | π0 v044的状态更新敏感性 | P1 三轮均值：正常画面/全黑为 73.3%/55.3%；冻结模型首状态后均为 0% | [逐轮结果](../results/state_feedback_runs.csv) · [配对差值与区间](../results/state_feedback_comparisons.csv) |
 | 固定动作在选择外状态上的表现 | P2 选择外回放 262/400＝65.5%，95% 分层 bootstrap 区间 61.0–69.75%；自回放 10/10 | [总体与逐任务结果](../results/replay_holdout_summary.csv) · [选择与全部结果](../dashboard/data/replay_holdout/) |

@@ -58,6 +58,7 @@ Exit codes: **0** means all selected inputs were processed; **1** means missing,
 
 | Experiment | Entry point | Results and interpretation |
 |---|---|---|
+| 500-state wrist study and supplementary agent masking | [Per-run command helper](eval/camera_study_commands.py) (prints only) | [Eleven-run settings](../configs/camera_study_runs.json) · [Device preparation](../docs/CONTINUE.md) |
 | All cameras black, four policies | [run_blackout_all.sh](eval/run_blackout_all.sh) | [summarize_blackout.py](analysis/summarize_blackout.py) · [Experiment 1.1](../docs/EXPERIMENTS.md#11-all-cameras-black) |
 | Noise and frozen first frames | [run_perturbation.sh](eval/run_perturbation.sh) | [Experiment 1.2](../docs/EXPERIMENTS.md#12-one-camera-noise-frozen-image) |
 | End-effector trajectories, one-camera blackout | [run_trajectory_and_single_camera.sh](eval/run_trajectory_and_single_camera.sh) | [Trajectory analysis](analysis/analyze_trajectories.py) · [Single-camera summary](analysis/summarize_single_camera.py) |

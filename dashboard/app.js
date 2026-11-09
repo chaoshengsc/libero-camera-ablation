@@ -26,7 +26,7 @@ const DICT = [
   ["π0与π0.5的观测与动作形成闭环", "π0 and π0.5 observations and actions form a closed loop"],
   ["黑图保留视觉掩码；屏蔽在原槽位将掩码置0；冻结持续使用真实腕部首帧。主视角与状态正常更新。正常、腕部mask和腕部冻结的新运行条件各10任务×50初态；π0.5腕部黑图仍为历史5×100。", "Black images retain their visual mask; masking disables the original slot; freezing repeats the real first wrist frame. Agent view and state update live. New normal/wrist-mask/wrist-freeze conditions use 10 tasks × 50 starts each; π0.5 wrist black remains historical 5 × 100."],
   ["配对差数据正在读取。", "Paired differences are loading."],
-  ["相机槽位修复保持输入位置不变", "The camera-slot fix preserves input positions"],
+  ["修复后，各路图像保留原相机槽位", "The fix preserves each camera image’s configured slot"],
   ["相机缺失会使腕部图像进入主视角槽位；已提交修复PR覆盖6个策略。", "A missing camera can shift wrist images into the agent-view slot; the submitted fix PR covers six policies."],
   ["π0.5 v044缺失主视角时修复前后的槽位布局", "π0.5 v044 slot layout before and after the fix when the agent view is missing"],
   ["提交前回归验证为旧实现21失败／6通过，修复后27/27通过。本人在相机消融中发现问题、确定修复范围、审阅改动并提交；PR提交不代表合并。", "Pre-submission regression: old 21 failed/6 passed; fixed 27/27 passed. My role was to find the issue, set scope, review changes and submit; submission does not establish a merge."],

@@ -11,6 +11,7 @@ The README presents the key findings. This guide connects the full study, reprod
 | Understand the study | [Experiments & results](EXPERIMENTS.md) | Interventions, full tables, repeated runs, and interpretation limits |
 | Audit the protocol | [Steps & audit scope](EXPERIMENTS.md#3-evaluation-protocols-and-audit-scope) | Control budgets, replanning, stopping rules and record gaps |
 | Inspect recovered evidence | [Original records & checkpoint identity](../dashboard/data/protocol_audit/) | 95-run provenance, 13150 recorded lengths and identity checks, without model execution |
+| Continue on another device | [Preparation and run settings](CONTINUE.md) | Runtime assets, eleven-run index, new outputs and target-device acceptance |
 | Set up | [Installation](INSTALL.md) | Environments, checkpoints, tokenizer, and a first evaluation |
 | Reproduce official π0 | [OpenPI setup & acceptance](OPENPI.md) | Pinned JAX environment, native assets, local server/client and historical protocol |
 | Choose an entry point | [Script index](../scripts/README.md) | Reproduction, camera ablations, official π0, and analysis |

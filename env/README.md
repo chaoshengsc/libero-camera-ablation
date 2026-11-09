@@ -16,3 +16,5 @@ Configuration examples, dependency constraints, and historical package inventori
 ACT / Diffusion Policy, OpenVLA, and SmolVLA / π0 / π0.5 use separate environments. Official OpenPI π0 adds a separate JAX environment; its [setup guide](../docs/OPENPI.md) records the upstream revision/lock fingerprints, Python/uv versions and verified package metadata. The three historical exports above do not include OpenPI. Constraints and historical exports do not prove the current runtime state of a machine.
 
 After setup, choose an evaluation in the [script index](../scripts/README.md). For dependency, rendering, or decoding failures, consult [troubleshooting](../docs/TROUBLESHOOTING.md).
+
+See [device preparation](../docs/CONTINUE.md) for runtime assets and acceptance stages. Constraints pin `hf-libero==0.1.4`, matching the historical inventory and asset checks; target-device acceptance remains pending.

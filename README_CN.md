@@ -97,7 +97,7 @@
 
 主视角单独涂黑另有早期100回合结果；主视角单独冻结尚未完成，已列入下方补做计划。
 
-## 3. 相机槽位修复保持输入位置不变
+## 3. 修复后，各路图像保留原相机槽位
 
 在搭建消融时发现：LeRobot缺失排在前面的相机键后，会将仍在场的图像向前排列。**腕部图像可能进入主视角槽位，而程序不报错。** 这会让相机消融测到错误的输入布局。
 
@@ -197,7 +197,7 @@ OpenVLA没有腕部输入，腕部条件不适用，不作为缺失实验或待�
 
 ## 版本与证据
 
-**v1.5.4 · 2026-11-09**：已完成腕部主实验、主视角mask附加对照与公开证据验收；上述补做实验尚未启动。评测证据沿用v1.5.3，旧冻结标签保持不动。
+**v1.5.5 · 2026-11-09**：已完成腕部主实验、主视角mask附加对照与公开证据验收；上述补做实验尚未启动。评测证据沿用v1.5.3。迁移准备与逐组运行配方已整理，新设备运行尚未验收；旧冻结标签保持不动。
 
 [研究结构与覆盖范围](docs/STUDY_MAP_CN.md) · [冻结说明](docs/FREEZE_CN.md) · [公开证据SHA-256](results/freeze_20261109_v1.5.3.sha256)
 
@@ -205,6 +205,8 @@ OpenVLA没有腕部输入，腕部条件不适用，不作为缺失实验或待�
 <summary>复现、安装、仓库结构与完整局限（无需阅读这些也可理解上方结果）</summary>
 
 ## 快速开始
+
+**换设备继续实验：** [准备清单与十一组运行配置](docs/CONTINUE_CN.md)区分仓库材料、外部运行资产和目标设备验收。
 
 **先从已有数据重算结果，无需 GPU 或模型权重。** 在仓库根目录，使用 Python 3.10+：
 
@@ -231,6 +233,7 @@ python scripts/analysis/summarize_followup.py
 libero-camera-ablation/
 ├── README.md / README_CN.md   项目概览与主要结论
 ├── docs/                     完整实验、安装、排错与历史记录
+├── configs/                  历史运行索引与未来执行配置
 ├── scripts/                  评测、干预、汇总与出图
 ├── env/                      环境配置、版本约束与导出清单
 ├── results/                  可重算的结果表与轨迹数据
@@ -289,7 +292,7 @@ OpenPI原版π0使用`gs://openpi-assets/checkpoints/pi0_libero`；[OpenPI指南
   author  = {ShengChao},
   title   = {libero-camera-ablation: Camera-input ablations of four robot policies on LIBERO-Spatial},
   year    = {2026},
-  version = {1.5.4},
+  version = {1.5.5},
   url     = {https://github.com/chaoshengsc/libero-camera-ablation}
 }
 ```

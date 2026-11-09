@@ -16,3 +16,5 @@
 ACT / Diffusion Policy、OpenVLA、SmolVLA / π0 / π0.5 使用不同环境；官方OpenPI π0另用独立JAX环境，[安装指南](../docs/OPENPI_CN.md)记录固定源码/锁文件指纹、Python/uv版本与已核对包元数据。上面三份历史环境导出不包含OpenPI，不将约束文件或旧清单当成当前机器的运行证明。
 
 装好后到[脚本索引](../scripts/README_CN.md)选择评测入口；遇到依赖、渲染或解码问题，查[排错文档](../docs/TROUBLESHOOTING_CN.md)。
+
+换设备继续实验的材料与验收顺序见[迁移准备](../docs/CONTINUE_CN.md)。约束现已固定`hf-libero==0.1.4`，与历史清单和素材准备检查一致；这不等于新设备已验收。

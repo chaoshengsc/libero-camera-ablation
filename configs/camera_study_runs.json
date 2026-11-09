@@ -1,0 +1,240 @@
+{
+  "schema": 1,
+  "source_commit": "8b99b4d306f0cd146971d3cea5b16f279f404ee2",
+  "scope": "Historical public records and proposed settings for new independent evaluations; no run is started by this file.",
+  "normal_run_semantics": "Public analysis reference only; repeat suffixes do not establish contemporaneous pairing or identical policy noise.",
+  "historical_common": {
+    "suite": "libero_spatial",
+    "task_ids": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "episodes_per_task": 50,
+    "total_episodes": 500,
+    "batch_size": 1,
+    "observation_height": 360,
+    "observation_width": null,
+    "entry_seed": 1000,
+    "chunk_size": 50,
+    "num_inference_steps": 10,
+    "control_budget": 280,
+    "control_hz": 20,
+    "per_episode_policy_noise_sequence": null,
+    "full_simulator_state_bitwise_match": null,
+    "initial_index_range_per_task": [
+      0,
+      49
+    ]
+  },
+  "models": {
+    "pi0": {
+      "checkpoint_repo": "lerobot/pi0_libero_finetuned_v044",
+      "revision_prefix": "45dcc8fc",
+      "local_checkpoint_dir": "pi0_libero_finetuned_v044@45dcc8fc",
+      "n_action_steps": 5
+    },
+    "pi05": {
+      "checkpoint_repo": "lerobot/pi05_libero_finetuned_v044",
+      "revision_prefix": "8e174154",
+      "local_checkpoint_dir": "pi05_libero_finetuned_v044@8e174154",
+      "n_action_steps": 10
+    }
+  },
+  "evidence": {
+    "settings": "dashboard/data/protocol_audit/provenance.json",
+    "condition_mapping": "scripts/analysis/make_figures.py:SC_RUNS",
+    "protocol": "docs/EXPERIMENTS_CN.md:3.1",
+    "analysis_reference": "scripts/analysis/make_figures.py:single_camera_summary"
+  },
+  "runs": [
+    {
+      "run_id": "s500/pi05_none",
+      "model": "pi05",
+      "blackout": "none",
+      "role": "main_normal",
+      "analysis_normal_run": "s500/pi05_none",
+      "eval_file": "dashboard/data/s500/pi05_none/eval_info.json",
+      "first_frame_hash_file": "dashboard/data/s500/pi05_none/first_frame_hash.json",
+      "provenance_id": "s500/pi05_none"
+    },
+    {
+      "run_id": "s500/pi05_drop_wrist",
+      "model": "pi05",
+      "blackout": "drop_wrist",
+      "role": "wrist_main",
+      "analysis_normal_run": "s500/pi05_none",
+      "eval_file": "dashboard/data/s500/pi05_drop_wrist/eval_info.json",
+      "first_frame_hash_file": "dashboard/data/s500/pi05_drop_wrist/first_frame_hash.json",
+      "provenance_id": "s500/pi05_drop_wrist"
+    },
+    {
+      "run_id": "s500/pi05_freeze_wrist",
+      "model": "pi05",
+      "blackout": "freeze_wrist",
+      "role": "wrist_main",
+      "analysis_normal_run": "s500/pi05_none",
+      "eval_file": "dashboard/data/s500/pi05_freeze_wrist/eval_info.json",
+      "first_frame_hash_file": "dashboard/data/s500/pi05_freeze_wrist/first_frame_hash.json",
+      "provenance_id": "s500/pi05_freeze_wrist"
+    },
+    {
+      "run_id": "s500/pi05_drop_agent",
+      "model": "pi05",
+      "blackout": "drop_agent",
+      "role": "agent_supplementary",
+      "analysis_normal_run": "s500/pi05_none",
+      "eval_file": "dashboard/data/s500/pi05_drop_agent/eval_info.json",
+      "first_frame_hash_file": "dashboard/data/s500/pi05_drop_agent/first_frame_hash.json",
+      "provenance_id": "s500/pi05_drop_agent"
+    },
+    {
+      "run_id": "s500/pi0_none",
+      "model": "pi0",
+      "blackout": "none",
+      "role": "main_normal",
+      "analysis_normal_run": "s500/pi0_none",
+      "eval_file": "dashboard/data/s500/pi0_none/eval_info.json",
+      "first_frame_hash_file": "dashboard/data/s500/pi0_none/first_frame_hash.json",
+      "provenance_id": "s500/pi0_none"
+    },
+    {
+      "run_id": "s500/pi0_none_r2",
+      "model": "pi0",
+      "blackout": "none",
+      "role": "normal_repeat",
+      "analysis_normal_run": "s500/pi0_none",
+      "eval_file": "dashboard/data/s500/pi0_none_r2/eval_info.json",
+      "first_frame_hash_file": "dashboard/data/s500/pi0_none_r2/first_frame_hash.json",
+      "provenance_id": "s500/pi0_none_r2"
+    },
+    {
+      "run_id": "s500/pi0_wrist",
+      "model": "pi0",
+      "blackout": "wrist",
+      "role": "wrist_main",
+      "analysis_normal_run": "s500/pi0_none",
+      "eval_file": "dashboard/data/s500/pi0_wrist/eval_info.json",
+      "first_frame_hash_file": "dashboard/data/s500/pi0_wrist/first_frame_hash.json",
+      "provenance_id": "s500/pi0_wrist"
+    },
+    {
+      "run_id": "s500/pi0_drop_wrist",
+      "model": "pi0",
+      "blackout": "drop_wrist",
+      "role": "wrist_main",
+      "analysis_normal_run": "s500/pi0_none",
+      "eval_file": "dashboard/data/s500/pi0_drop_wrist/eval_info.json",
+      "first_frame_hash_file": "dashboard/data/s500/pi0_drop_wrist/first_frame_hash.json",
+      "provenance_id": "s500/pi0_drop_wrist"
+    },
+    {
+      "run_id": "s500/pi0_drop_wrist_r2",
+      "model": "pi0",
+      "blackout": "drop_wrist",
+      "role": "wrist_repeat",
+      "analysis_normal_run": "s500/pi0_none",
+      "eval_file": "dashboard/data/s500/pi0_drop_wrist_r2/eval_info.json",
+      "first_frame_hash_file": "dashboard/data/s500/pi0_drop_wrist_r2/first_frame_hash.json",
+      "provenance_id": "s500/pi0_drop_wrist_r2"
+    },
+    {
+      "run_id": "s500/pi0_freeze_wrist",
+      "model": "pi0",
+      "blackout": "freeze_wrist",
+      "role": "wrist_main",
+      "analysis_normal_run": "s500/pi0_none",
+      "eval_file": "dashboard/data/s500/pi0_freeze_wrist/eval_info.json",
+      "first_frame_hash_file": "dashboard/data/s500/pi0_freeze_wrist/first_frame_hash.json",
+      "provenance_id": "s500/pi0_freeze_wrist"
+    },
+    {
+      "run_id": "s500/pi0_drop_agent",
+      "model": "pi0",
+      "blackout": "drop_agent",
+      "role": "agent_supplementary",
+      "analysis_normal_run": "s500/pi0_none",
+      "eval_file": "dashboard/data/s500/pi0_drop_agent/eval_info.json",
+      "first_frame_hash_file": "dashboard/data/s500/pi0_drop_agent/first_frame_hash.json",
+      "provenance_id": "s500/pi0_drop_agent"
+    }
+  ],
+  "historical_references": [
+    {
+      "model": "pi05",
+      "blackout": "wrist",
+      "raw_runs": [
+        "traj_pi05_wrist",
+        "run2/traj_pi05_wrist",
+        "run3/traj_pi05_wrist",
+        "run4/traj_pi05_wrist",
+        "run5/traj_pi05_wrist"
+      ],
+      "episodes_per_task": 10,
+      "episodes_per_run": 100,
+      "repeats": 5,
+      "independent_task_initial_combinations": 100,
+      "is_s500_paired_arm": false,
+      "repeated_initial_index_range_per_task": [
+        0,
+        9
+      ]
+    }
+  ],
+  "continuation_recipe": {
+    "status": "prepared_not_executed",
+    "supported_reference_platform": "Existing Ubuntu 24.04 / NVIDIA setup; no new-device acceptance yet.",
+    "entry": "scripts/eval/run_libero.sh",
+    "wrap": "probe",
+    "episodes_per_task": 50,
+    "batch_size": 1,
+    "seed": 1000,
+    "chunk_size": 50,
+    "num_inference_steps": 10,
+    "observation_height": 360,
+    "observation_width": 360,
+    "control_budget": 280,
+    "max_parallel_tasks": 1,
+    "normal_reference": "Collect a new normal run on the selected target device; do not silently use historical normal results.",
+    "historical_width_note": "The historical provenance export has no width field. Width=360 is explicit for the future recipe, not a recovered historical CLI value."
+  },
+  "planned_followups": [
+    {
+      "model": "pi0",
+      "blackout": "freeze_agent",
+      "status": "not_started",
+      "target_device_normal_run": null
+    },
+    {
+      "model": "pi0",
+      "blackout": "agent",
+      "status": "not_started",
+      "target_device_normal_run": null
+    },
+    {
+      "model": "pi05",
+      "blackout": "freeze_agent",
+      "status": "not_started",
+      "target_device_normal_run": null
+    },
+    {
+      "model": "pi05",
+      "blackout": "agent",
+      "status": "not_started",
+      "target_device_normal_run": null
+    },
+    {
+      "model": "pi05",
+      "blackout": "drop_all",
+      "status": "not_started",
+      "target_device_normal_run": null
+    }
+  ]
+}
