@@ -1,8 +1,8 @@
 <div align="center">
 
-# Robot policies respond differently to camera interventions
+# Camera ablations on LIBERO-Spatial
 
-**Visual dependence in robot policies · LIBERO-Spatial simulation**
+**Public robot policies evaluated under camera-input interventions**
 
 **English** · [中文](README_CN.md) · [Open interactive results](https://chaoshengsc.github.io/libero-camera-ablation/dashboard/?lang=en)
 
@@ -12,19 +12,19 @@
 
 </div>
 
-**This project combines camera-input interventions with preprocessing checks to examine visual dependence in public robot policies.** In the wrist study, π0.5 falls from **98.4% to 4.6%** with wrist masking. In the separate blackout exploration, LeRobot π0 v044 retains **53–56%** success. The observations belong to different controls below.
+This project evaluates public checkpoints of π0, π0.5, OpenVLA and SmolVLA under camera-input interventions in LIBERO-Spatial. It includes all-black comparisons across four policies, perturbation tests on three dual-view policies, and a wrist-camera study of π0/π0.5.
 
-## Project outputs cover evaluation, analysis and debugging
+In the wrist study, masking the wrist input reduces π0.5 success from **98.4% to 4.6%**. In a separate all-black comparison, LeRobot π0 v044 scores **53–56%** across five runs. Conditions and results for each experiment are reported below.
 
-| Work | Direct output | Evidence |
+## The project includes evaluation, debugging and analysis
+
+| Work | Results and materials | Records |
 |---|---|---|
-| Multi-policy evaluation and controlled visual interventions | Four-policy blackout overview; two-policy wrist study; matched-state analysis | Results below · [Study structure](docs/STUDY_MAP.md) |
-| Preprocessing diagnosis and upstream contribution | Fix PR covers **six policies**; pre-submission regression **old 21 failed/6 passed → fixed 27/27 passed** | [Issue #5118](https://github.com/huggingface/lerobot/issues/5118) · [PR #5129](https://github.com/huggingface/lerobot/pull/5129) |
-| Public evidence and offline regeneration | Episode records, statistical tables, figures and CI consistency checks | [Public data](dashboard/data/) · [Execution and analysis entries](scripts/README.md) |
+| Camera-ablation evaluation | Four-policy all-black comparison; π0/π0.5 wrist-camera study; matched-state analysis | Results below · [Study structure](docs/STUDY_MAP.md) |
+| Camera-slot diagnosis and fix PR | Fix PR covers **six policies**; pre-submission regression **old 21 failed/6 passed → fixed 27/27 passed** | [Issue #5118](https://github.com/huggingface/lerobot/issues/5118) · [PR #5129](https://github.com/huggingface/lerobot/pull/5129) |
+| Data preparation and result regeneration | Episode records, statistical tables, figures and CI consistency checks | [Public data](dashboard/data/) · [Execution and analysis entries](scripts/README.md) |
 
-**My role in the upstream contribution:** I found the slot issue in camera-ablation work, set the fix scope, reviewed the changes and submitted the issue and PR.
-
-**Coverage:** four-policy blackout exploration → three dual-view policies in early perturbations → π0/π0.5 wrist follow-up. The study uses public checkpoints, with different coverage by stage.
+**My work on the fix:** I found the slot issue in camera-ablation work, set the fix scope, reviewed the changes and submitted the issue and PR.
 
 <a id="1-camera-ablations"></a>
 
@@ -48,11 +48,11 @@
 
 </details>
 
-## 2. Focused study: change the wrist treatment, keep the agent view live
+## 2. Wrist-camera tests keep the agent view live
 
 This later study covers **LeRobot π0/π0.5 v044 only**. π0.5 previously approached zero success with wrist-black input. The follow-up tests this observation with original-slot masking and first-frame freezing, while recording π0 v044’s contrasting response.
 
-### A concrete task and closed-loop flow define the experiment
+### The policies predict actions from images, state and instructions
 
 One recorded task is “pick up the black bowl between the plate and the ramekin and place it on the plate.” The agent view shows the scene, the wrist view shows the workspace near the hand; π0/π0.5 also receive robot state and instruction, and output control actions.
 
@@ -66,7 +66,7 @@ The new normal, wrist-mask and wrist-freeze conditions each have **10 tasks × 5
 | Input masking | Empty placeholder in the original slot, mask false | Disable that view’s visual mask without shifting other cameras |
 | First-frame freezing | Repeat the first real wrist frame, mask true | Stop wrist-image updates while agent images and state continue updating |
 
-### Matched initial states define the main wrist comparison
+### Wrist interventions are compared on matched initial states
 
 The shared conditions below use 500 episodes each; historical wrist-black evidence and supplementary agent masking are labelled separately in the figure.
 
@@ -97,7 +97,7 @@ This supplementary control changes only the agent-view treatment; the wrist and 
 
 Agent-only blackout also has earlier 100-episode results. Agent-only freezing remains unrun and is included in the follow-up plan below.
 
-## 3. Engineering contribution: prevent camera shifts from confounding ablations
+## 3. The camera-slot fix preserves input positions
 
 While building the ablations, this project identified a LeRobot behavior: missing an earlier camera packs subsequent images into earlier slots. **A wrist image can silently enter the agent-view slot.** The resulting intervention changes image layout as well as camera availability.
 
@@ -107,7 +107,7 @@ The study masks cameras in their original slots. The upstream fix PR covers **si
 
 [Issue and reproduction](https://github.com/huggingface/lerobot/issues/5118) · [Fix and test evidence](https://github.com/huggingface/lerobot/pull/5129)
 
-## 4. Additional controls bound the interpretation of π0 all-black success
+## 4. Additional controls examine π0 all-black results
 
 | Additional check | Key observation | Interpretation limit |
 |---|---|---|
@@ -132,7 +132,7 @@ All points use 100 episodes; 500-episode runs contribute only their first ten in
 
 </details>
 
-## Experiment coverage at a glance
+## Policy and intervention coverage differs by stage
 
 | Policy / workstream | Completed | Untested / inapplicable |
 |---|---|---|
@@ -148,14 +148,14 @@ All points use 100 episodes; 500-episode runs contribute only their first ten in
 
 Agent-only masking already has 500-episode results; agent-only blackout has earlier 100-episode repeats. The wrist main study and supplementary agent mask are complete. The following unstarted follow-ups extend controls and policy coverage; they are not current results.
 
-### Core follow-ups extend the main-study controls
+### The main study will add these controls
 
 | Incomplete condition | Current boundary | Planned follow-up |
 |---|---|---|
 | Full agent-view single-factor study for π0/π0.5 | Only masking entered the later 500-state study; agent-only freezing is absent and black uses earlier 100-state runs | Add agent-only freezing and blackout matched to the main-study scale, keeping the wrist live |
 | π0.5 both-camera masking | Normal, wrist mask and agent mask exist; both-mask is absent | Add both-mask to complete the four camera-availability conditions |
 
-### Policy and perturbation extensions expand applicable coverage
+### Further work will extend policy and intervention coverage
 
 | Incomplete condition | Current boundary | Planned follow-up |
 |---|---|---|
@@ -249,7 +249,6 @@ libero-camera-ablation/
 - The π0 results concern the tested checkpoint/pipeline combinations. The official control uses native GCS assets and the accepted OpenPI path. A separate HF candidate scores 0/50 and fails checkpoint-identity verification, so it is not a same-weight pipeline control. Official π0 scores 0/100 with black input at 256 and 360 rendering; weights and other inference differences remain unseparated. Each ablation condition was run once, 100 episodes.
 - [Replay](docs/EXPERIMENTS.md#16-fixed-action-replay) concerns the selected sequences and states. P2 targets were excluded from action selection but had appeared in earlier evaluations; they are not a hidden test set. P1/P2 use different checkpoint/state protocols and cannot be subtracted to assign mechanism contributions. P1 lacks stepwise terminal flags and full images; state freezing does not identify a unique mechanism. Full NPZ audit artifacts remain outside Git; published records reproduce rates and intervals.
 - Diffusion Policy was evaluated on PushT (2-D physics), not in MuJoCo.
-
 
 </details>
 

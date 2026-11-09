@@ -6,18 +6,18 @@ const sum = (a) => a.reduce((p, q) => p + q, 0);
 // ---- 语言：默认跟随浏览器，？lang=zh|en 或右上角按钮切换。英文版在渲染后按词典替换文本（整句在前，短词在后）。
 const LANG = new URLSearchParams(location.search).get("lang") || ((navigator.language || "").toLowerCase().startsWith("zh") ? "zh" : "en");
 const DICT = [
-  ["总体探索：LeRobot π0 v044全黑成功率", "Overview: LeRobot π0 v044 all-black success"],
+  ["全黑对照：LeRobot π0 v044全黑成功率", "All-black comparison: LeRobot π0 v044 success"],
   ["其他所测检查点为0%：", "Other tested checkpoints score 0%: "],
-  ["腕部深入：π0.5屏蔽腕部后的成功率", "Wrist follow-up: π0.5 success with wrist masking"],
+  ["腕部单因素实验：π0.5屏蔽腕部后的成功率", "Wrist-camera study: π0.5 success with wrist masking"],
   ["只冻结腕部为", "Wrist-only freezing scores"],
   ["%；每条件", "%; per condition: "],
   ["回合", " episodes"],
-  ["腕部深入数据尚未加载", "Wrist-study data could not be loaded"],
+  ["腕部单因素实验数据尚未加载", "Wrist-study data could not be loaded"],
   ["可直接核对下方结果与CSV", "Results and CSVs remain available below"],
-  ["工程贡献：6策略修复PR与27项回归用例", "Engineering: six-policy fix PR with 27 regression cases"],
+  ["相机槽位修复：6个策略、27项回归用例", "Camera-slot fix: six policies, 27 regression cases"],
   ["提交前：旧21失败／6通过 → 修后27/27通过", "Before submission: old 21 failed/6 passed → fixed 27/27 passed"],
 
-  ["腕部主实验中π0.5从98.4%降至4.6%；四模型探索中，所测LeRobot π0 v044在全黑下保留53–56%成功。项目另提交了覆盖六策略的相机槽位修复PR。", "In the wrist study π0.5 drops from 98.4% to 4.6%; in the separate four-policy exploration LeRobot π0 v044 retains 53–56% all-black success. The project also submitted a six-policy camera-slot fix PR."],
+  ["本项目使用公开检查点，在LIBERO-Spatial中评测π0、π0.5、OpenVLA和SmolVLA在相机干预下的任务表现。实验包括四模型全黑对照、三个双视角模型的扰动对照，以及π0／π0.5的腕部单因素实验。", "This project evaluates public checkpoints of π0, π0.5, OpenVLA and SmolVLA under camera interventions in LIBERO-Spatial. It includes four-policy all-black comparisons, perturbation tests on three dual-view policies, and wrist-camera tests on π0/π0.5."],
   ["固定动作在选择外状态上保留成功表现", "Fixed actions retain successes on selection-excluded states"],
   ["腕部图显示各条件Wilson区间，配对差使用正态近似；官方π0图逐次展示匹配100初态结果；P1/P2的bootstrap方法分别注明。", "Wrist bars show per-condition Wilson intervals; paired differences use a normal approximation. The official π0 figure shows matched 100 runs separately. P1/P2 document their respective bootstrap methods."],
   ["评测协议与输入结构保留完整说明", "Evaluation protocols and input structure remain fully documented"],
@@ -26,14 +26,14 @@ const DICT = [
   ["π0与π0.5的观测与动作形成闭环", "π0 and π0.5 observations and actions form a closed loop"],
   ["黑图保留视觉掩码；屏蔽在原槽位将掩码置0；冻结持续使用真实腕部首帧。主视角与状态正常更新。正常、腕部mask和腕部冻结的新运行条件各10任务×50初态；π0.5腕部黑图仍为历史5×100。", "Black images retain their visual mask; masking disables the original slot; freezing repeats the real first wrist frame. Agent view and state update live. New normal/wrist-mask/wrist-freeze conditions use 10 tasks × 50 starts each; π0.5 wrist black remains historical 5 × 100."],
   ["配对差数据正在读取。", "Paired differences are loading."],
-  ["上游修复具有可复现的槽位与回归证据", "The upstream fix has reproducible slot and regression evidence"],
+  ["相机槽位修复保持输入位置不变", "The camera-slot fix preserves input positions"],
   ["相机缺失会使腕部图像进入主视角槽位；已提交修复PR覆盖6个策略。", "A missing camera can shift wrist images into the agent-view slot; the submitted fix PR covers six policies."],
   ["π0.5 v044缺失主视角时修复前后的槽位布局", "π0.5 v044 slot layout before and after the fix when the agent view is missing"],
   ["提交前回归验证为旧实现21失败／6通过，修复后27/27通过。本人在相机消融中发现问题、确定修复范围、审阅改动并提交；PR提交不代表合并。", "Pre-submission regression: old 21 failed/6 passed; fixed 27/27 passed. My role was to find the issue, set scope, review changes and submit; submission does not establish a merge."],
   ["原始问题与复现", "Original issue and reproduction"],
   ["修复PR与测试证据", "Fix PR and test evidence"],
-  ["腕部深入", "Wrist follow-up"],
-  ["工程贡献", "Engineering contribution"],
+  ["腕部单因素实验", "Wrist-camera study"],
+  ["相机槽位修复", "Camera-slot fix"],
 
   ["后续将补齐主视角单独冻结、与主实验匹配规模的主视角黑图、单路噪声及π0.5双路mask。SmolVLA和OpenVLA的扩展先核接口；OpenVLA腕部不适用。上述内容是待执行计划，不计入当前结果。", "Follow-up work will add agent-only freezing, agent blackout matched to the main-study scale, single-camera noise and π0.5 both-mask. SmolVLA/OpenVLA extensions first require interface checks; OpenVLA wrist conditions are inapplicable. These are unstarted plans, not current results."],
   ["有录像时，每个任务至多展示一段成功和一段失败选例。录像缺失不代表没做实验；全黑录像展示真实环境，策略收到的是黑图。", "When available, each task shows at most one success and one failure example. Missing video does not mean a missing experiment. All-black videos show the real environment; the policy received black images."],
@@ -54,7 +54,7 @@ const DICT = [
   ["已完成的实验", "Completed experiments"],
   ["没有覆盖的部分", "Outside coverage"],
   ["四模型", "Four policies"],
-  ["全黑探索", "All-black exploration"],
+  ["全黑对照", "All-black comparison"],
   ["不是四模型都完成全部干预", "Not every intervention for every policy"],
   ["三个双视角模型", "Three dual-view policies"],
   ["单路黑图、双路噪声和双路冻结", "Single-camera black, both-camera noise/freezing"],
@@ -85,7 +85,7 @@ const DICT = [
   ["完整实验与P1/P2", "Full experiments and P1/P2"],
   ["选择外固定动作回放、状态更新与解释边界", "Selection-external replay, state updates and interpretation limits"],
   ["此图保留早期选择集上的交叉回放；已完成的选择外回放和状态更新检查见下方完整实验入口。", "This figure retains earlier selection-set cross-replay; completed selection-external replay and state-update checks are in the full experiment report below."],
-  ["机器人策略对相机干预呈现不同响应", "Robot policies respond differently to camera interventions"],
+  ["LIBERO-Spatial 相机消融实验", "Camera ablations on LIBERO-Spatial"],
   ["LIBERO-Spatial 上四种机器人策略的相机消融实验", "Camera ablations of four robot policies on LIBERO-Spatial"],
   ["同一任务：π0.5 正常成功、涂黑失败，LeRobot π0 涂黑仍成功", "Same task: π0.5 succeeds with vision and fails with black input; LeRobot π0 still succeeds with black input"],
   ["同一任务、同一初始状态。右侧两次运行中，策略收到的是黑图。", "Same task and initial state. In the two right-hand runs, the policy receives black images."],
@@ -214,10 +214,10 @@ if (HAS_CORE_DATA) {
   const zero = BO.summary.filter(r => sum(r.black) === 0).map(r => MNAME[r.model] || r.model);
   const wrist = wristPi05?.conditions;
   const cards = [
-    [`${Math.min(...FU.pi0_black_runs)}–${Math.max(...FU.pi0_black_runs)}%`, "总体探索：LeRobot π0 v044全黑成功率", "其他所测检查点为0%：" + zero.join(" · "), "#blackout"],
-    wrist ? [`${wrist.normal.pc} → ${wrist.mask.pc}%`, "腕部深入：π0.5屏蔽腕部后的成功率", `只冻结腕部为${wrist.freeze.pc}%；每条件${wrist.normal.episodes}回合`, "#single-camera"]
-      : ["—", "腕部深入数据尚未加载", "可直接核对下方结果与CSV", "#single-camera"],
-    [LANG === "en" ? "6 policies" : "6个策略", "工程贡献：6策略修复PR与27项回归用例", "提交前：旧21失败／6通过 → 修后27/27通过", "#engineering"],
+    [`${Math.min(...FU.pi0_black_runs)}–${Math.max(...FU.pi0_black_runs)}%`, "全黑对照：LeRobot π0 v044全黑成功率", "其他所测检查点为0%：" + zero.join(" · "), "#blackout"],
+    wrist ? [`${wrist.normal.pc} → ${wrist.mask.pc}%`, "腕部单因素实验：π0.5屏蔽腕部后的成功率", `只冻结腕部为${wrist.freeze.pc}%；每条件${wrist.normal.episodes}回合`, "#single-camera"]
+      : ["—", "腕部单因素实验数据尚未加载", "可直接核对下方结果与CSV", "#single-camera"],
+    [LANG === "en" ? "6 policies" : "6个策略", "相机槽位修复：6个策略、27项回归用例", "提交前：旧21失败／6通过 → 修后27/27通过", "#engineering"],
   ];
   const markup = cards.map(([v, k, d, href]) => `<a class="key" href="${href}"><span class="v">${v}</span><span class="key-copy"><span class="k">${k}</span><span class="d">${d}</span></span><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="m9 5 7 7-7 7"/></svg></a>`).join("");
   $("keys").innerHTML = LANG === "en" ? trStr(markup) : markup;

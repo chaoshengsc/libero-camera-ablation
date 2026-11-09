@@ -71,14 +71,14 @@ This audits consistency between public sources, pre-run records, intervention co
 
 Agent-only masking already has 500-episode results; agent-only blackout has earlier 100-episode repeats. The wrist main study and supplementary agent mask are complete. The following unstarted follow-ups extend controls and policy coverage; they are not current results.
 
-### Core follow-ups extend the main-study controls
+### The main study will add these controls
 
 | Incomplete condition | Current boundary | Planned follow-up |
 |---|---|---|
 | Full agent-view single-factor study for π0/π0.5 | Only masking entered the later 500-state study; agent-only freezing is absent and black uses earlier 100-state runs | Add agent-only freezing and blackout matched to the main-study scale, keeping the wrist live |
 | π0.5 both-camera masking | Normal, wrist mask and agent mask exist; both-mask is absent | Add both-mask to complete the four camera-availability conditions |
 
-### Policy and perturbation extensions expand applicable coverage
+### Further work will extend policy and intervention coverage
 
 | Incomplete condition | Current boundary | Planned follow-up |
 |---|---|---|

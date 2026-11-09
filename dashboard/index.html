@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>机器人策略对相机干预呈现不同响应</title>
+<title>LIBERO-Spatial 相机消融实验</title>
 <meta name="description" content="Camera ablations of four robot policies on LIBERO-Spatial, with public checkpoints, repeated runs, and traceable evaluation data.">
 <link rel="stylesheet" href="styles.css?v=followup-1">
 </head>
@@ -23,8 +23,8 @@
   <a href="#overview">概览</a>
   <a href="#vision">相机消融</a>
   <a class="sub" href="#blackout">所有相机涂黑</a>
-  <a class="sub" href="#single-camera">腕部深入</a>
-  <a class="sub" href="#engineering">工程贡献</a>
+  <a class="sub" href="#single-camera">腕部单因素实验</a>
+  <a class="sub" href="#engineering">相机槽位修复</a>
   <a class="sub" href="#perturbations">噪声与冻结</a>
   <a class="sub" href="#trajectories">轨迹比较</a>
   <a class="sub" href="#official">额外检查点对照：官方 π0 / OpenPI</a>
@@ -38,9 +38,9 @@
   <header id="overview">
     <div class="hero-layout">
       <div class="hero-copy">
-        <h1>机器人策略对相机干预呈现不同响应</h1>
+        <h1>LIBERO-Spatial 相机消融实验</h1>
         <p class="subtitle">Camera ablations of four robot policies on LIBERO-Spatial</p>
-        <p class="lede">腕部主实验中π0.5从98.4%降至4.6%；四模型探索中，所测LeRobot π0 v044在全黑下保留53–56%成功。项目另提交了覆盖六策略的相机槽位修复PR。</p>
+        <p class="lede">本项目使用公开检查点，在LIBERO-Spatial中评测π0、π0.5、OpenVLA和SmolVLA在相机干预下的任务表现。实验包括四模型全黑对照、三个双视角模型的扰动对照，以及π0／π0.5的腕部单因素实验。</p>
         <div class="hero-actions"><a class="action-primary" href="#blackout">查看实验结果</a><a class="action-link" href="#resources">复现与数据入口</a></div>
       </div>
       <figure class="hero-demo">
@@ -58,7 +58,7 @@
       <div class="mx-wrap"><table class="followup-table">
         <thead><tr><th>范围</th><th>已完成的实验</th><th>没有覆盖的部分</th></tr></thead>
         <tbody>
-          <tr><th>四模型</th><td>全黑探索</td><td>不是四模型都完成全部干预</td></tr>
+          <tr><th>四模型</th><td>全黑对照</td><td>不是四模型都完成全部干预</td></tr>
           <tr><th>三个双视角模型</th><td>单路黑图、双路噪声和双路冻结</td><td>OpenVLA仅主视角，不在此组</td></tr>
           <tr><th>π0／π0.5</th><td>腕部单因素主实验；主视角mask附加条件</td><td>主视角单独冻结、单路噪声未测</td></tr>
         </tbody>
@@ -110,7 +110,7 @@
     </div>
 
     <div class="block" id="engineering">
-      <h3>上游修复具有可复现的槽位与回归证据</h3>
+      <h3>相机槽位修复保持输入位置不变</h3>
       <p class="take">相机缺失会使腕部图像进入主视角槽位；已提交修复PR覆盖6个策略。</p>
       <div class="fig"><img id="figSlots" src="../media/zh/camera_slot_fix.svg" width="900" height="304" alt="π0.5 v044缺失主视角时修复前后的槽位布局"></div>
       <p class="note">提交前回归验证为旧实现21失败／6通过，修复后27/27通过。本人在相机消融中发现问题、确定修复范围、审阅改动并提交；PR提交不代表合并。</p>
@@ -248,7 +248,7 @@
 </div>
 <script src="results.js?v=interview-4"></script>
 <script src="followup.js?v=p1p2-1"></script>
-<script src="app.js?v=interview-4"></script>
+<script src="app.js?v=copy-5"></script>
 <noscript><p class="no-script">交互图表需要 JavaScript。<a href="https://github.com/chaoshengsc/libero-camera-ablation">Read the results on GitHub</a>.</p></noscript>
 </body>
 </html>
