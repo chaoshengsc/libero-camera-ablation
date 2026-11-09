@@ -1,6 +1,6 @@
 [project]
 name = "libero-camera-ablation"
-version = "1.5.3"
+version = "1.5.4"
 description = "Camera-input ablations of four robot policies on LIBERO-Spatial, plus reproduction of five public checkpoints"
 requires-python = ">=3.10"
 license = { text = "MIT" }

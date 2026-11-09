@@ -23,9 +23,10 @@
   <a href="#overview">概览</a>
   <a href="#vision">相机消融</a>
   <a class="sub" href="#blackout">所有相机涂黑</a>
+  <a class="sub" href="#single-camera">腕部深入</a>
+  <a class="sub" href="#engineering">工程贡献</a>
   <a class="sub" href="#perturbations">噪声与冻结</a>
   <a class="sub" href="#trajectories">轨迹比较</a>
-  <a class="sub" href="#single-camera">单路相机</a>
   <a class="sub" href="#official">额外检查点对照：官方 π0 / OpenPI</a>
   <a class="sub" href="#open-loop">开环回放</a>
   <a class="sub" href="#state-feedback">状态输入更新（P1）</a>
@@ -39,7 +40,7 @@
       <div class="hero-copy">
         <h1>机器人策略对相机干预呈现不同响应</h1>
         <p class="subtitle">Camera ablations of four robot policies on LIBERO-Spatial</p>
-        <p class="lede">在所测全黑回合中，三个检查点均未成功；LeRobot π0 v044及其管线五次成功率为53–56%。另对五个公开权重做了参考对照。</p>
+        <p class="lede">腕部主实验中π0.5从98.4%降至4.6%；四模型探索中，所测LeRobot π0 v044在全黑下保留53–56%成功。项目另提交了覆盖六策略的相机槽位修复PR。</p>
         <div class="hero-actions"><a class="action-primary" href="#blackout">查看实验结果</a><a class="action-link" href="#resources">复现与数据入口</a></div>
       </div>
       <figure class="hero-demo">
@@ -68,6 +69,7 @@
 
     <p class="note">后续将补齐主视角单独冻结、与主实验匹配规模的主视角黑图、单路噪声及π0.5双路mask。SmolVLA和OpenVLA的扩展先核接口；OpenVLA腕部不适用。上述内容是待执行计划，不计入当前结果。</p>
     <p class="intro"><a href="#state-feedback">状态输入更新（P1）</a> · <a href="#open-loop">选择外固定动作回放（P2）</a></p>
+    <details class="evidence"><summary>评测协议与输入结构保留完整说明</summary>
     <p class="intro">相机消融只改变画面输入；OpenVLA只接收主视角和指令，其余三个检查点还接收腕部画面与状态。</p>
     <p class="intro">早期相机消融每次100回合，按相同初始状态比较。区间取决于配对与重复结构，不设统一的13点阈值；π0早期同条件重复最多相差18点。</p>
     <p class="intro"><span>OpenVLA为220控制步，其他LIBERO模型客户端为280步，均另有10步等待。对已有回合统一220步截止计分后，首页全黑对照数字不变；这仍不是完整同协议排名。</span> <a data-doc="docs/EXPERIMENTS" data-anchor-zh="3-评测协议与验收范围" data-anchor-en="3-evaluation-protocols-and-audit-scope" href="https://github.com/chaoshengsc/libero-camera-ablation/blob/main/docs/EXPERIMENTS_CN.md#3-评测协议与验收范围">协议与验收范围</a></p>
@@ -76,8 +78,10 @@
 
     <p class="note">输入与操作示意不代表每个模型都完成了所有干预；实际范围见上方覆盖表。</p>
 
+    </details>
+
     <div class="block" id="blackout">
-      <h3><span class="n">1.1</span>所有相机涂黑</h3>
+      <h3>所有相机涂黑</h3>
       <p class="take">三个检查点在所测全黑回合中均未成功完成任务；LeRobot π0 v044仍有一半以上成功。</p>
       <div class="panel">
         <div class="legend" style="margin-bottom:6px">
@@ -93,8 +97,28 @@
       </details>
     </div>
 
+    <div class="block" id="single-camera">
+      <h3>两模型腕部主实验；主视角mask为附加条件</h3>
+      <p class="take">π0.5屏蔽腕部后从98.4%降到4.6%；同样的腕部干预没有使π0 v044出现相同降幅。</p>
+      <p class="intro">实际任务示例是拿起盘子与小烤碗之间的黑碗并放到盘子上。主视角看场景，腕部相机看手边；π0／π0.5还接收机械臂状态与任务指令。</p>
+      <div class="fig"><img id="figLoop" src="../media/zh/evaluation_loop.svg" width="900" height="294" alt="π0与π0.5的观测与动作形成闭环"></div>
+      <p class="note">黑图保留视觉掩码；屏蔽在原槽位将掩码置0；冻结持续使用真实腕部首帧。主视角与状态正常更新。正常、腕部mask和腕部冻结的新运行条件各10任务×50初态；π0.5腕部黑图仍为历史5×100。</p>
+      <div class="fig"><img loading="lazy" id="figSingle" width="760" height="508" src="../media/zh/single_camera.svg?v=structure-2" alt="π0与π0.5腕部主实验及分区的主视角附加条件"></div>
+      <div class="figure-tools"><a data-figure="single_camera" href="../media/zh/single_camera.svg" target="_blank" rel="noopener">查看原图 SVG</a><a href="../results/single_camera_summary.csv">结果 CSV</a><a href="../results/single_camera.csv">逐回合数据</a></div>
+      <p class="note" id="wristPaired">配对差数据正在读取。</p>
+      <p class="note">腕部主实验只覆盖π0／π0.5，主视角保持正常。正常、腕部mask和腕部冻结各500初态；π0.5腕部黑图借用同100初态的5次重复。主视角mask为附加条件，不是完整主视角实验；主视角单独冻结与单路噪声未测。</p>
+    </div>
+
+    <div class="block" id="engineering">
+      <h3>上游修复具有可复现的槽位与回归证据</h3>
+      <p class="take">相机缺失会使腕部图像进入主视角槽位；已提交修复PR覆盖6个策略。</p>
+      <div class="fig"><img id="figSlots" src="../media/zh/camera_slot_fix.svg" width="900" height="304" alt="π0.5 v044缺失主视角时修复前后的槽位布局"></div>
+      <p class="note">提交前回归验证为旧实现21失败／6通过，修复后27/27通过。本人在相机消融中发现问题、确定修复范围、审阅改动并提交；PR提交不代表合并。</p>
+      <div class="figure-tools"><a href="https://github.com/huggingface/lerobot/issues/5118">原始问题与复现</a><a href="https://github.com/huggingface/lerobot/pull/5129">修复PR与测试证据</a></div>
+    </div>
+
     <div class="block" id="perturbations">
-      <h3><span class="n">1.2</span>三模型探索：单路黑图与双路噪声／冻结</h3>
+      <h3>三模型探索：单路黑图与双路噪声／冻结</h3>
       <p class="take">所测π0.5和SmolVLA检查点对首帧冻结敏感；π0本组全黑运行的成功率低于正常运行。</p>
       <div class="panel"><div class="mx-wrap"><table class="mx" id="cammatrix" style="min-width:520px"></table></div></div>
       <div class="figure-tools"><a href="../results/perturbations.csv">结果 CSV</a></div>
@@ -102,7 +126,7 @@
     </div>
 
     <div class="block" id="trajectories">
-      <h3><span class="n">1.3</span>末端轨迹的描述性比较</h3>
+      <h3>末端轨迹的描述性比较</h3>
       <p class="take">按全黑成功率事后筛选的任务组中，正常与全黑的平均轨迹差与正常重跑参考接近；任务7的差异较大。这是描述性比较，未证明轨迹等效。</p>
       <div class="fig"><img loading="lazy" id="figTraj" width="760" height="820" src="../media/zh/trajectory.svg?v=claims-1" alt="π0 有无相机输入时的末端路线"></div>
       <div class="figure-tools"><a data-figure="trajectory" href="../media/zh/trajectory.svg" target="_blank" rel="noopener">查看原图 SVG</a><a href="../results/trajectory.csv">结果 CSV</a></div>
@@ -113,16 +137,8 @@
       <p class="note">正常重跑参考剔除了近乎重合的任务（第1次0–3，第2次0），其余任务平均差为3.4和3.3 cm；全黑成功至少一半的事后任务组为2.8和3.2 cm。两组任务构成不同，未做轨迹等效检验。任务9两次差为7.8和4.9 cm，结果没有任务7清楚。这不能识别跟随物体或固定动作机制；固定动作回放见完整实验1.6节。</p>
     </div>
 
-    <div class="block" id="single-camera">
-      <h3><span class="n">1.4</span>两模型腕部主实验；主视角mask为附加条件</h3>
-      <p class="take">π0.5对所测腕部干预高度敏感；LeRobot π0 v044配对差的95%区间落在事前±8点范围内。</p>
-      <div class="fig"><img loading="lazy" id="figSingle" width="760" height="508" src="../media/zh/single_camera.svg?v=structure-2" alt="π0与π0.5腕部主实验及分区的主视角附加条件"></div>
-      <div class="figure-tools"><a data-figure="single_camera" href="../media/zh/single_camera.svg" target="_blank" rel="noopener">查看原图 SVG</a><a href="../results/single_camera_summary.csv">结果 CSV</a><a href="../results/single_camera.csv">逐回合数据</a></div>
-      <p class="note">腕部主实验只覆盖π0／π0.5，主视角保持正常。正常、腕部mask和腕部冻结各500初态；π0.5腕部黑图借用同100初态的5次重复。主视角mask为附加条件，不是完整主视角实验；主视角单独冻结与单路噪声未测。</p>
-    </div>
-
     <div class="block" id="official">
-      <h3><span class="n">1.5</span>额外检查点对照：官方 π0 / OpenPI</h3>
+      <h3>额外检查点对照：官方 π0 / OpenPI</h3>
       <p class="take">官方π0/OpenPI在所测全黑与腕部屏蔽条件下均为0/100，主视角屏蔽为77/100。LeRobot v044全黑仍有成功，但两边权重与管线不同。</p>
       <div class="fig"><img loading="lazy" id="figOfficial" width="900" height="580" src="../media/zh/official_pi0.svg?v=claims-1" alt="官方π0与LeRobotπ0：每点同100初态，重复逐次展示"></div>
       <div class="figure-tools"><a data-figure="official_pi0" href="../media/zh/official_pi0.svg" target="_blank" rel="noopener">查看原图 SVG</a><a href="../results/official_pi0_summary.csv">结果 CSV</a></div>
@@ -130,7 +146,7 @@
     </div>
 
     <div class="block" id="open-loop">
-      <h3><span class="n">1.6</span>开环回放：固定动作能完成多少任务</h3>
+      <h3>固定动作在选择外状态上保留成功表现</h3>
       <p class="take" id="p2Finding">补充结果数据加载中；可直接查看下方CSV和原始记录。</p>
       <p class="intro">P2将每任务预先选定的一套官方π0动作，在未参与动作选择的状态上原样回放。目标曾用于旧评测，并非隐藏测试集。</p>
       <p class="note" id="p2Scope"></p>
@@ -149,7 +165,7 @@
     </div>
 
     <div class="block" id="state-feedback">
-      <h3><span class="n">1.7</span>状态输入更新（P1）</h3>
+      <h3>状态输入更新（P1）</h3>
       <p class="take">LeRobot π0 v044在所测冻结状态条件下均未成功；仿真环境、底层控制和动作后处理仍继续运行。</p>
       <div class="panel">
         <table class="followup-table">
@@ -227,12 +243,12 @@
     </div>
   </section>
 
-  <footer><span>公开权重对照中的本仓库区间使用正态近似；官方π0对照使用Wilson区间。参考范围定义、配对与重复限制见实验说明。</span> <a href="https://github.com/chaoshengsc/libero-camera-ablation">chaoshengsc/libero-camera-ablation</a></footer>
+  <footer><span>腕部图显示各条件Wilson区间，配对差使用正态近似；官方π0图逐次展示匹配100初态结果；P1/P2的bootstrap方法分别注明。</span> <a href="https://github.com/chaoshengsc/libero-camera-ablation">chaoshengsc/libero-camera-ablation</a></footer>
 </main>
 </div>
-<script src="results.js?v=replay-1"></script>
+<script src="results.js?v=interview-4"></script>
 <script src="followup.js?v=p1p2-1"></script>
-<script src="app.js?v=statements-3"></script>
+<script src="app.js?v=interview-4"></script>
 <noscript><p class="no-script">交互图表需要 JavaScript。<a href="https://github.com/chaoshengsc/libero-camera-ablation">Read the results on GitHub</a>.</p></noscript>
 </body>
 </html>

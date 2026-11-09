@@ -12,17 +12,19 @@
 
 </div>
 
-**Task success alone does not establish a policy’s dependence on visual inputs.** This project intervenes on visual inputs to public policy checkpoints and tracks success, trajectories and preprocessing. Four-policy exploration leads to a focused two-policy wrist-treatment study, with separate controls bounding the interpretation.
+**This project combines camera-input interventions with preprocessing checks to examine visual dependence in public robot policies.** In the wrist study, π0.5 falls from **98.4% to 4.6%** with wrist masking. In the separate blackout exploration, LeRobot π0 v044 retains **53–56%** success. The observations belong to different controls below.
 
-## Project contributions
+## Project outputs cover evaluation, analysis and debugging
 
-| Work | Concrete output | Evidence |
+| Work | Direct output | Evidence |
 |---|---|---|
-| **Multi-policy evaluation and interventions** | π0, π0.5, OpenVLA and SmolVLA; blackout, original-slot masks, frozen first frames | [Execution entries](scripts/README.md) · [Pinned environments](env/README.md) |
-| **Controlled follow-up to anomalous results** | Two-policy wrist study; supplementary agent masking; official π0, state-update and fixed-action checks | Figures below · [Full study structure](docs/STUDY_MAP.md) |
-| **Upstream camera-slot bug report and fix PR** | Identified silent image shifting when an earlier camera is missing; fix covers six policies | [Issue #5118](https://github.com/huggingface/lerobot/issues/5118) · [PR #5129](https://github.com/huggingface/lerobot/pull/5129) |
+| Multi-policy evaluation and controlled visual interventions | Four-policy blackout overview; two-policy wrist study; matched-state analysis | Results below · [Study structure](docs/STUDY_MAP.md) |
+| Preprocessing diagnosis and upstream contribution | Fix PR covers **six policies**; pre-submission regression **old 21 failed/6 passed → fixed 27/27 passed** | [Issue #5118](https://github.com/huggingface/lerobot/issues/5118) · [PR #5129](https://github.com/huggingface/lerobot/pull/5129) |
+| Public evidence and offline regeneration | Episode records, statistical tables, figures and CI consistency checks | [Public data](dashboard/data/) · [Execution and analysis entries](scripts/README.md) |
 
-**Scope: four checkpoints in all-black exploration, three dual-view checkpoints in early perturbations, π0/π0.5 in the wrist follow-up.** Coverage differs by stage; this is not a full intervention suite for every model. The study evaluates public checkpoints.
+**My role in the upstream contribution:** I found the slot issue in camera-ablation work, set the fix scope, reviewed the changes and submitted the issue and PR.
+
+**Coverage:** four-policy blackout exploration → three dual-view policies in early perturbations → π0/π0.5 wrist follow-up. The study uses public checkpoints, with different coverage by stage.
 
 <a id="1-camera-ablations"></a>
 
@@ -50,23 +52,41 @@
 
 This later study covers **LeRobot π0/π0.5 v044 only**. π0.5 previously approached zero success with wrist-black input. The follow-up tests this observation with original-slot masking and first-frame freezing, while recording π0 v044’s contrasting response.
 
-The table first shows the two policies’ common new500-state conditions; the figure separately labels historical wrist-black evidence and the supplementary condition.
+### A concrete task and closed-loop flow define the experiment
+
+One recorded task is “pick up the black bowl between the plate and the ramekin and place it on the plate.” The agent view shows the scene, the wrist view shows the workspace near the hand; π0/π0.5 also receive robot state and instruction, and output control actions.
+
+![π0 and π0.5 observation, targeted image intervention, action prediction and closed-loop execution](media/evaluation_loop.svg)
+
+The new normal, wrist-mask and wrist-freeze conditions each have **10 tasks × 50 starts = 500 episodes**. π0.5 wrist black reuses five historical runs of the same 100 states. Episodes are scored by the environment’s task-success signal. Checkpoints retain their own control budgets and replanning intervals; this is not a common-protocol ranking.
+
+| Wrist intervention | Input actually received | Experimental role |
+|---|---|---|
+| Black image | Zero pixels, visual mask true | Retain the slot while replacing its image content |
+| Input masking | Empty placeholder in the original slot, mask false | Disable that view’s visual mask without shifting other cameras |
+| First-frame freezing | Repeat the first real wrist frame, mask true | Stop wrist-image updates while agent images and state continue updating |
+
+### Matched initial states define the main wrist comparison
+
+The shared conditions below use 500 episodes each; historical wrist-black evidence and supplementary agent masking are labelled separately in the figure.
 
 | Wrist condition (agent view always live) | π0.5 v044 | π0 v044 |
 |---|---|---|
 | Live | **492/500 · 98.4%** | 360/500 · 72.0% |
-| Original-slot mask false | **23/500 · 4.6%** | 356/500 · 71.2% |
+| Wrist input masked in its original slot | **23/500 · 4.6%** | 356/500 · 71.2% |
 | First wrist frame frozen | **0/500 · 0.0%** | 364/500 · 72.8% |
 
 ![Two-policy wrist study with supplementary agent masking in a separate group](media/single_camera.svg)
 
 **π0.5 is highly sensitive to the tested wrist interventions; π0 v044 does not show the same decrease.** These observations concern the tested checkpoints and protocols. Freezing also changes image–state synchronization; it does not uniquely identify an internal mechanism.
 
-**Keep two evidence types separate:** π0.5 wrist black borrows five historical 100-state repeats, all 0/100, not a paired arm over the same 500 states. Agent masking is supplementary: π0.5 277/500 = 55.4%, π0 371/500 = 74.2%. Agent-only freezing and single-camera noise were not run; π0.5 both-camera masking is also untested.
+**Paired by task/start index, wrist mask minus normal:** π0.5 **−93.8 percentage points, 95% interval [−96.0, −91.6]**; π0 **−0.8 points, [−6.1, 4.5]**. These are normal-approximation intervals: mean paired success difference ±1.96 standard errors, not new-task generalization intervals.
+
+π0.5 wrist black reuses five historical runs on the same 100 states, all 0/100; it is not part of this 500-state paired arm. Missing conditions and follow-ups are listed together below.
 
 [Design and missing conditions](docs/STUDY_MAP.md#2-main-experiment-change-the-wrist-treatment-keep-the-agent-view-live) · [Paired differences and 95% intervals](results/single_camera_summary.csv)
 
-### Agent-view-only masking already has500-episode results
+### Agent-view-only masking already has 500-episode results
 
 This supplementary control changes only the agent-view treatment; the wrist and proprioceptive state remain live. Agent view and global camera refer to the same input here.
 
@@ -75,13 +95,23 @@ This supplementary control changes only the agent-view treatment; the wrist and 
 | Live | 492/500 · 98.4% | 360/500 · 72.0% |
 | Original-slot mask false | **277/500 · 55.4%** | **371/500 · 74.2%** |
 
-Agent-only blackout also has earlier100-episode results. Agent-only freezing remains unrun and is included in the follow-up plan below.
+Agent-only blackout also has earlier 100-episode results. Agent-only freezing remains unrun and is included in the follow-up plan below.
 
-## 3. Additional controls bound the interpretation of π0 all-black success
+## 3. Engineering contribution: prevent camera shifts from confounding ablations
+
+While building the ablations, this project identified a LeRobot behavior: missing an earlier camera packs subsequent images into earlier slots. **A wrist image can silently enter the agent-view slot.** The resulting intervention changes image layout as well as camera availability.
+
+![Camera-slot layout before and after the missing-agent fix](media/camera_slot_fix.svg)
+
+The study masks cameras in their original slots. The upstream fix PR covers **six policies**. Before submission, new regression cases scored **21 failed / 6 passed on the old implementation → 27/27 passed with the fix**. These establish reproduction and regression coverage. A submitted PR is not a claim of merge or adoption.
+
+[Issue and reproduction](https://github.com/huggingface/lerobot/issues/5118) · [Fix and test evidence](https://github.com/huggingface/lerobot/pull/5129)
+
+## 4. Additional controls bound the interpretation of π0 all-black success
 
 | Additional check | Key observation | Interpretation limit |
 |---|---|---|
-| **Official π0/OpenPI** | Matched100 states: official normal 93/100, black 0/100; LeRobot normal 65/100, black 53–56/100 across five runs | Weights and pipelines both change; conversion or training cannot be uniquely blamed |
+| **Official π0/OpenPI** | Matched 100 states: official normal 93/100, black 0/100; LeRobot normal 65/100, black 53–56/100 across five runs | Weights and pipelines both change; conversion or training cannot be uniquely blamed |
 | **P1: state-input updates** | LeRobot π0 three-run means: normal 73.3%, black 55.3%; frozen first model state gives 0% in both | State-update sensitivity, without separating online correction, phase cues and input mismatch |
 | **P2: fixed-action replay** | Preselected official π0 actions succeed on 262/400 selection-excluded states = 65.5%; 95% interval 61.0–69.8% | Fixed actions can succeed; this does not establish internal replay or permit subtraction from P1 |
 
@@ -90,25 +120,17 @@ These **bound the anomalous π0 result**; they do not causally validate the wris
 <details>
 <summary>Expand technical control figures and complete statistics</summary>
 
-![Official and LeRobot π0: matched100 points, with repeats shown separately](media/official_pi0.svg)
+![Official and LeRobot π0: matched 100 points, with repeats shown separately](media/official_pi0.svg)
 
-All points use 100 episodes; 500-episode runs contribute only their first ten initial states per task. Separate full500 references: official 482/500 = 96.4%, LeRobot 360/500 = 72.0%. Repeated states receive no pooled Wilson interval. Matching task/init indices does not establish bitwise-matched policy noise or complete states.
+All points use 100 episodes; 500-episode runs contribute only their first ten initial states per task. Separate full 500 references: official 482/500 = 96.4%, LeRobot 360/500 = 72.0%. Repeated states receive no pooled Wilson interval. Matching task/init indices does not establish bitwise-matched policy noise or complete states.
 
 ![P1 state-update sensitivity](media/state_feedback.svg)
 
 ![P2 selection-excluded fixed-action replay](media/replay_holdout.svg)
 
-[Matched100 records](results/official_pi0_matched100.csv) · [Full official-control table](results/official_pi0_summary.csv) · [P1 paired statistics](results/state_feedback_comparisons.csv) · [P2 task statistics](results/replay_holdout_summary.csv)
+[Matched 100 records](results/official_pi0_matched100.csv) · [Full official-control table](results/official_pi0_summary.csv) · [P1 paired statistics](results/state_feedback_comparisons.csv) · [P2 task statistics](results/replay_holdout_summary.csv)
 
 </details>
-
-## 4. Engineering contribution: prevent camera shifts from confounding ablations
-
-While building the ablations, this project identified a LeRobot behavior: missing an earlier camera packs subsequent images into earlier slots. **A wrist image can silently enter the agent-view slot.** The resulting intervention changes image layout as well as camera availability.
-
-The study masks cameras in their original slots. The upstream fix PR covers **six policies**. Before submission, new regression cases scored **21 failed / 6 passed on the old implementation → 27/27 passed with the fix**. These establish reproduction and regression coverage. A submitted PR is not a claim of merge or adoption.
-
-[Issue and reproduction](https://github.com/huggingface/lerobot/issues/5118) · [Fix and test evidence](https://github.com/huggingface/lerobot/pull/5129)
 
 ## Experiment coverage at a glance
 
@@ -124,13 +146,20 @@ The study masks cameras in their original slots. The upstream fix PR covers **si
 
 ## Follow-up work will complete the remaining applicable controls
 
-Agent-only masking already has500-episode results; agent-only blackout has earlier100-episode repeats. The following conditions remain incomplete and are planned follow-ups, not current results.
+Agent-only masking already has 500-episode results; agent-only blackout has earlier 100-episode repeats. The wrist main study and supplementary agent mask are complete. The following unstarted follow-ups extend controls and policy coverage; they are not current results.
+
+### Core follow-ups extend the main-study controls
 
 | Incomplete condition | Current boundary | Planned follow-up |
 |---|---|---|
-| Full agent-view single-factor study for π0/π0.5 | Only masking entered the later500-state study; agent-only freezing is absent and black uses earlier100-state runs | Add agent-only freezing and blackout matched to the main-study scale, keeping the wrist live |
-| Single-camera noise | Existing noise affects both cameras together | Add separate agent-only and wrist-only noise for applicable dual-view policies |
+| Full agent-view single-factor study for π0/π0.5 | Only masking entered the later 500-state study; agent-only freezing is absent and black uses earlier 100-state runs | Add agent-only freezing and blackout matched to the main-study scale, keeping the wrist live |
 | π0.5 both-camera masking | Normal, wrist mask and agent mask exist; both-mask is absent | Add both-mask to complete the four camera-availability conditions |
+
+### Policy and perturbation extensions expand applicable coverage
+
+| Incomplete condition | Current boundary | Planned follow-up |
+|---|---|---|
+| Single-camera noise | Existing noise affects both cameras together | Add separate agent-only and wrist-only noise for applicable dual-view policies |
 | SmolVLA masking and wrist-only freezing | Current evidence is early blackout and both-camera noise/freezing | Verify interface and slot semantics, then add applicable single-camera masks and wrist-only freezing |
 | Other OpenVLA single-view interventions | Only blackout of its sole agent view is tested; freezing/noise are absent | Add first-frame freezing and noise for the sole view, and verify mask-interface applicability |
 
@@ -168,9 +197,9 @@ Each checkpoint has 500 episodes. The project uses overlap between its 95% inter
 
 ## Version and evidence
 
-**v1.5.3 · 2026-11-09**: public copy uses declarative wording; existing agent-only masking results are shown separately; remaining applicable controls are explicitly planned follow-ups. Original results are unchanged and no follow-up run has started. The v1.5.1 and v1.5.2 tags remain fixed. The separate fine-tuning project is excluded.
+**v1.5.4 · 2026-11-09**: the wrist main study, supplementary agent mask and public-evidence checks are complete. The follow-up experiments above have not started. Evaluation evidence remains fixed at v1.5.3; earlier tags are unchanged.
 
-[Study structure and audit findings](docs/STUDY_MAP.md) · [Freeze scope](docs/FREEZE.md) · [Public evidence SHA-256](results/freeze_20261109_v1.5.3.sha256)
+[Study structure and coverage](docs/STUDY_MAP.md) · [Freeze scope](docs/FREEZE.md) · [Public evidence SHA-256](results/freeze_20261109_v1.5.3.sha256)
 
 <details>
 <summary>Reproduction, installation, repository layout and full limitations</summary>
@@ -259,7 +288,7 @@ If you use these results or scripts, please cite:
   author  = {ShengChao},
   title   = {libero-camera-ablation: Camera-input ablations of four robot policies on LIBERO-Spatial},
   year    = {2026},
-  version = {1.5.3},
+  version = {1.5.4},
   url     = {https://github.com/chaoshengsc/libero-camera-ablation}
 }
 ```

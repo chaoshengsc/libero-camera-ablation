@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="304" viewBox="0 0 900 304" role="img">
+<title>保留原槽位可避免把腕部图像误放进主视角槽</title>
+<rect width="100%" height="100%" fill="white"/>
+<style>text{font-family:-apple-system,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;font-size:14px;fill:#253244}.muted{fill:#667085;font-size:12px}</style>
+<text x="22" y="30" style="font-size:19px;font-weight:650">保留原槽位可避免把腕部图像误放进主视角槽</text>
+<text x="300" y="68" text-anchor="middle" class="muted">槽位0 · 主视角</text>
+<text x="515" y="68" text-anchor="middle" class="muted">槽位1 · 腕部</text>
+<text x="730" y="68" text-anchor="middle" class="muted">槽位2 · 原空槽</text>
+<text x="22" y="113">正常输入</text>
+<rect x="202" y="86" width="196" height="40" rx="4" fill="#f6f7f9" stroke="#d5dce5"/>
+<text x="300" y="112" text-anchor="middle">主视角</text>
+<rect x="417" y="86" width="196" height="40" rx="4" fill="#f6f7f9" stroke="#d5dce5"/>
+<text x="515" y="112" text-anchor="middle">腕部</text>
+<rect x="632" y="86" width="196" height="40" rx="4" fill="#f6f7f9" stroke="#d5dce5"/>
+<text x="730" y="112" text-anchor="middle">空</text>
+<text x="22" y="171">主视角缺失 · 旧实现</text>
+<rect x="202" y="144" width="196" height="40" rx="4" fill="#fff0eb" stroke="#c86a4b"/>
+<text x="300" y="170" text-anchor="middle">腕部（错位）</text>
+<rect x="417" y="144" width="196" height="40" rx="4" fill="#f6f7f9" stroke="#d5dce5"/>
+<text x="515" y="170" text-anchor="middle">空</text>
+<rect x="632" y="144" width="196" height="40" rx="4" fill="#f6f7f9" stroke="#d5dce5"/>
+<text x="730" y="170" text-anchor="middle">空</text>
+<text x="22" y="229">主视角缺失 · 修复后</text>
+<rect x="202" y="202" width="196" height="40" rx="4" fill="#f6f7f9" stroke="#d5dce5"/>
+<text x="300" y="228" text-anchor="middle">空</text>
+<rect x="417" y="202" width="196" height="40" rx="4" fill="#edf4fb" stroke="#547da6"/>
+<text x="515" y="228" text-anchor="middle">腕部（原位）</text>
+<rect x="632" y="202" width="196" height="40" rx="4" fill="#f6f7f9" stroke="#d5dce5"/>
+<text x="730" y="228" text-anchor="middle">空</text>
+<text x="22" y="280" class="muted">示例采用π0.5 v044三槽配置；六策略修复分别保留各自原有占位和空相机预算规则。</text>
+</svg>

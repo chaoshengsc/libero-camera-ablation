@@ -9,6 +9,8 @@ import math
 import re
 from pathlib import Path
 
+from presentation_figures import build_presentation_figures
+
 ROOT = Path(__file__).resolve().parents[2]
 RES, MEDIA = ROOT / "results", ROOT / "media"
 FONT = "-apple-system,'Segoe UI','PingFang SC','Microsoft YaHei','Noto Sans CJK SC',sans-serif"
@@ -626,4 +628,5 @@ if __name__ == "__main__":
         (out / "single_camera.svg").write_text(fig_single_camera(sc_sum, t))
         (out / "official_pi0.svg").write_text(fig_official_pi0(op_sum, t))
         (out / "open_loop_replay.svg").write_text(fig_replay(rp_sum, t))
-    print(f"wrote {len(list(RES.glob('*.csv')))} csv -> results/, 9 svg -> media/ and media/zh/")
+    build_presentation_figures(ROOT)
+    print(f"wrote {len(list(RES.glob('*.csv')))} csv -> results/, 11 svg per language -> media/ and media/zh/")

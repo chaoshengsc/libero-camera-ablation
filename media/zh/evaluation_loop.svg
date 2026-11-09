@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="294" viewBox="0 0 900 294" role="img">
+<title>π0／π0.5的评测形成观测—动作闭环</title>
+<rect width="100%" height="100%" fill="white"/>
+<style>text{font-family:-apple-system,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;font-size:14px;fill:#253244}.muted{fill:#667085;font-size:12px}</style>
+<text x="22" y="30" style="font-size:19px;font-weight:650">π0／π0.5的评测形成观测—动作闭环</text>
+<rect x="22" y="62" width="188" height="112" rx="5" fill="#f5f7fa" stroke="#d5dce5"/>
+<text x="116.0" y="91" text-anchor="middle" style="font-weight:650">当前观测</text>
+<text x="116.0" y="118" text-anchor="middle" class="muted">主视角＋腕部图像</text>
+<text x="116.0" y="145" text-anchor="middle" class="muted">机械臂状态＋任务指令</text>
+<rect x="236" y="62" width="190" height="112" rx="5" fill="#f5f7fa" stroke="#d5dce5"/>
+<text x="331.0" y="91" text-anchor="middle" style="font-weight:650">指定相机干预</text>
+<text x="331.0" y="118" text-anchor="middle" class="muted">仅改目标图像／掩码</text>
+<text x="331.0" y="145" text-anchor="middle" class="muted">其余输入正常传入</text>
+<rect x="452" y="62" width="166" height="112" rx="5" fill="#f5f7fa" stroke="#d5dce5"/>
+<text x="535.0" y="91" text-anchor="middle" style="font-weight:650">公开策略检查点</text>
+<text x="535.0" y="118" text-anchor="middle" class="muted">预测一个动作块</text>
+<text x="535.0" y="145" text-anchor="middle" class="muted">模型未重新训练</text>
+<rect x="644" y="62" width="234" height="112" rx="5" fill="#f5f7fa" stroke="#d5dce5"/>
+<text x="761.0" y="91" text-anchor="middle" style="font-weight:650">执行部分预测动作</text>
+<text x="761.0" y="118" text-anchor="middle" class="muted">环境产生下一次观测</text>
+<text x="761.0" y="145" text-anchor="middle" class="muted">再次查询策略</text>
+<path d="M214 117H230m-6 -5 6 5-6 5" fill="none" stroke="#526f91" stroke-width="1.6"/>
+<path d="M430 117H446m-6 -5 6 5-6 5" fill="none" stroke="#526f91" stroke-width="1.6"/>
+<path d="M622 117H638m-6 -5 6 5-6 5" fill="none" stroke="#526f91" stroke-width="1.6"/>
+<path d="M762 180V213H116V180m-5 7 5-7 5 7" fill="none" stroke="#526f91" stroke-width="1.6"/>
+<text x="440" y="204" text-anchor="middle" class="muted">新一轮图像与状态随环境正常更新；同初态不代表后续输入逐位相同</text>
+<text x="22" y="247" class="muted">π0：预测50步，执行5步后重观察；π0.5：预测50步，执行10步后重观察。</text>
+<text x="22" y="271" class="muted">OpenVLA另用主视角＋指令与单步动作，不套用图中的双视角／状态输入配置。</text>
+</svg>

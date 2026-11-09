@@ -117,11 +117,32 @@ def _n(run, first=None):
     return sum(sum(t["metrics"]["successes"][:first]) for t in _json(f"{run}/eval_info.json")["per_task"])
 
 
+def _successes(run):
+    tasks = sorted(_json(f"{run}/eval_info.json")["per_task"], key=lambda task: task["task_id"])
+    return [int(value) for task in tasks for value in task["metrics"]["successes"]]
+
+
+def _wrist_study(model, prefix):
+    runs = {"normal": f"s500/{prefix}_none", "mask": f"s500/{prefix}_drop_wrist", "freeze": f"s500/{prefix}_freeze_wrist"}
+    arrays = {key: _successes(run) for key, run in runs.items()}
+    if any(len(values) != 500 for values in arrays.values()):
+        raise ValueError("wrist-study sources must retain all 500 matched initial states")
+    conditions = {key: {"run": runs[key], "episodes": len(values), "successes": sum(values), "pc": round(100*sum(values)/len(values), 1)}
+                  for key, values in arrays.items()}
+    differences = [b-a for a,b in zip(arrays["normal"], arrays["mask"], strict=True)]
+    mean = sum(differences)/len(differences)
+    se = math.sqrt(sum((value-mean)**2 for value in differences)/(len(differences)-1)/len(differences))
+    return {"model": model, "conditions": conditions,
+            "paired_mask": {"difference_pp": round(100*mean, 1), "ci95_lo": round(100*(mean-1.96*se), 1),
+                            "ci95_hi": round(100*(mean+1.96*se), 1), "method": "paired_success_difference_normal_approximation"}}
+
+
 # 温和扰动：加噪声 / 冻结画面（每组 100 回合，与正常、全涂黑同种子同初始状态）
 PERTURB = [("pi0", "pi0_spatial_500", "pi0", "pi0_black_all"), ("pi0.5", "pi05_spatial_500", "pi05", "pi05_black_all"),
            ("SmolVLA", "smolvla2_spatial_500", "smol2", "smol2_black_all")]
 
 followup = {
+    "wrist_study": [_wrist_study("pi0.5", "pi05"), _wrist_study("pi0", "pi0")],
     "perturb": [{"model": m, "normal": _n(base, 10), "noise": _n(f"pert_{k}_noise"), "freeze": _n(f"pert_{k}_freeze"), "all_black": _n(black)}
                 for m, base, k, black in PERTURB],
     # 第二次独立运行（2026-10-07 按仓库脚本整条重跑，数据在 data/run2/）；SmolVLA 没有重跑正常条件

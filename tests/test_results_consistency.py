@@ -291,3 +291,22 @@ def test_reused_states_are_not_given_a_pooled_independent_sample_interval():
         assert aggregate["lerobot", condition]["wilson_hi"] == ""
         actual = [int(entry["successes"]) for entry in matched if entry["side"] == "lerobot" and entry["condition"] == condition]
         assert actual == expected
+
+
+def test_dashboard_wrist_summary_matches_published_paired_evidence():
+    source = (ROOT / "dashboard/results.js").read_text()
+    payload = json.loads(re.search(r"window\.FOLLOWUP = (.*);\nwindow\.REPLAY_BASELINE", source, re.S)[1])
+    actual = {row["model"]: row for row in payload["wrist_study"]}
+    published = {(row["model"], row["condition"]): row for row in rows("single_camera_summary.csv")}
+    for key, name in [("pi0.5", "π0.5"), ("pi0", "π0")]:
+        for condition, canonical in [("normal", "both"), ("mask", "wrist_dropped"), ("freeze", "wrist_frozen")]:
+            row, expected = actual[key]["conditions"][condition], published[name, canonical]
+            assert row["episodes"] == int(expected["episodes"]) == 500
+            assert row["successes"] == int(expected["successes"])
+            assert row["pc"] == float(expected["success_pc"])
+        point = actual[key]["paired_mask"]
+        expected = published[name, "wrist_dropped"]
+        assert point["difference_pp"] == float(expected["paired_diff_pp"])
+        assert point["ci95_lo"] == pytest.approx(float(expected["paired_diff_pp"])-float(expected["diff_ci95_pp"]), abs=0.051)
+        assert point["ci95_hi"] == pytest.approx(float(expected["paired_diff_pp"])+float(expected["diff_ci95_pp"]), abs=0.051)
+        assert point["method"] == "paired_success_difference_normal_approximation"
