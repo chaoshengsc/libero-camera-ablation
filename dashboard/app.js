@@ -6,6 +6,7 @@ const sum = (a) => a.reduce((p, q) => p + q, 0);
 // ---- 语言：默认跟随浏览器，？lang=zh|en 或右上角按钮切换。英文版在渲染后按词典替换文本（整句在前，短词在后）。
 const LANG = new URLSearchParams(location.search).get("lang") || ((navigator.language || "").toLowerCase().startsWith("zh") ? "zh" : "en");
 const DICT = [
+  ["后续将补齐主视角单独冻结、与主实验匹配规模的主视角黑图、单路噪声及π0.5双路mask。SmolVLA和OpenVLA的扩展先核接口；OpenVLA腕部不适用。上述内容是待执行计划，不计入当前结果。", "Follow-up work will add agent-only freezing, agent blackout matched to the main-study scale, single-camera noise and π0.5 both-mask. SmolVLA/OpenVLA extensions first require interface checks; OpenVLA wrist conditions are inapplicable. These are unstarted plans, not current results."],
   ["有录像时，每个任务至多展示一段成功和一段失败选例。录像缺失不代表没做实验；全黑录像展示真实环境，策略收到的是黑图。", "When available, each task shows at most one success and one failure example. Missing video does not mean a missing experiment. All-black videos show the real environment; the policy received black images."],
   ["输入与操作示意不代表每个模型都完成了所有干预；实际范围见上方覆盖表。", "The input/operation diagram does not establish that every policy received every intervention. See the coverage table above."],
 
@@ -55,7 +56,7 @@ const DICT = [
   ["完整实验与P1/P2", "Full experiments and P1/P2"],
   ["选择外固定动作回放、状态更新与解释边界", "Selection-external replay, state updates and interpretation limits"],
   ["此图保留早期选择集上的交叉回放；已完成的选择外回放和状态更新检查见下方完整实验入口。", "This figure retains earlier selection-set cross-replay; completed selection-external replay and state-update checks are in the full experiment report below."],
-  ["机器人策略真的在看画面吗？", "Do robot policies actually use their cameras?"],
+  ["机器人策略对相机干预呈现不同响应", "Robot policies respond differently to camera interventions"],
   ["LIBERO-Spatial 上四种机器人策略的相机消融实验", "Camera ablations of four robot policies on LIBERO-Spatial"],
   ["同一任务：π0.5 正常成功、涂黑失败，LeRobot π0 涂黑仍成功", "Same task: π0.5 succeeds with vision and fails with black input; LeRobot π0 still succeeds with black input"],
   ["同一任务、同一初始状态。右侧两次运行中，策略收到的是黑图。", "Same task and initial state. In the two right-hand runs, the policy receives black images."],
@@ -125,7 +126,7 @@ const DICT = [
   ["官方 π0 对照", "Official π0 control"],
   ["去掉腕部相机：每个条件 500 回合", "Wrist camera removed: 500 episodes per condition"],
   ["测试时去掉一路相机后的成功率", "Success rate with one camera removed at test time"],
-  ["策略的输入，以及各实验改了哪一项", "What the policy receives and what each experiment changes"],
+  ["策略输入与各实验的干预对象", "Policy inputs and intervention targets"],
   ["π0 有无相机输入时的末端路线", "End-effector paths of π0 with and without camera input"],
   ["正常与全涂黑成功率对比", "Normal vs. all-black success rate"], ["各模型成功率对比", "Success rate by model"],
   ["四个机器人策略在 LIBERO-Spatial 上的相机输入消融", "Camera-input ablations of four robot policies on LIBERO-Spatial"],
@@ -159,9 +160,9 @@ $("langBtn").onclick = () => { location.search = "?lang=" + (LANG === "en" ? "zh
 // README 用的两张图：线上在仓库的 media/ 下；本地没有这些文件时整块隐藏
 for (const [id, name] of [["figInputs", "inputs"], ["figTraj", "trajectory"], ["figSingle", "single_camera"], ["figOfficial", "official_pi0"], ["figReplay", "open_loop_replay"]]) {
   $(id).onerror = () => $(id).closest(".fig").classList.add("hidden");
-  $(id).src = `../media/${LANG === "en" ? "" : "zh/"}${name}.svg?v=structure-2`;
+  $(id).src = `../media/${LANG === "en" ? "" : "zh/"}${name}.svg?v=statements-3`;
 }
-$("figInputsMobile").srcset = `../media/${LANG === "en" ? "" : "zh/"}inputs-mobile.svg?v=claims-1`;
+$("figInputsMobile").srcset = `../media/${LANG === "en" ? "" : "zh/"}inputs-mobile.svg?v=statements-3`;
 if (LANG === "en") {
   document.documentElement.lang = "en"; document.title = trStr(document.title);
   new MutationObserver(ms => ms.forEach(m => m.type === "characterData" ? trNode(m.target) : m.addedNodes.forEach(trNode)))

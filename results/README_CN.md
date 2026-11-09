@@ -4,7 +4,7 @@
 
 这里保存可重算的结果表；方法、比较范围与判读见[实验说明](../docs/EXPERIMENTS_CN.md)，原始评测在 [dashboard/data/](../dashboard/data/)。
 
-[2026-11-09 冻结说明](../docs/FREEZE_CN.md) · [证据 SHA-256 清单](freeze_20261109_v1.5.2.sha256)。在仓库根目录运行 `python scripts/checks/freeze_check.py`，只读核对公开证据文件。
+[2026-11-09 冻结说明](../docs/FREEZE_CN.md) · [证据 SHA-256 清单](freeze_20261109_v1.5.3.sha256)。在仓库根目录运行 `python scripts/checks/freeze_check.py`，只读核对公开证据文件。
 
 ## 按实验找结果
 
@@ -27,7 +27,9 @@
 | [replay_holdout_summary.csv](replay_holdout_summary.csv) | P2逐任务Wilson与总体分层bootstrap区间 |
 | [budget_sensitivity.csv](budget_sensitivity.csv) | 既有LIBERO回合的220步截止计分，保留原分母和matched100范围，不覆盖原结果 |
 
-## 数字怎样追溯
+<a id="数字怎样追溯"></a>
+
+## 结果数字可追溯到公开记录
 
 从 CSV 中的模型、条件和运行编号，找到[实验说明](../docs/EXPERIMENTS_CN.md)与[实验日志](../docs/NOTES_CN.md)中的对应运行，再核对原始 JSON。公开权重的 revision 同时记录在 `reproduction.csv` 与 [dashboard/build.py](../dashboard/build.py) 的 `RUNS` 中。
 

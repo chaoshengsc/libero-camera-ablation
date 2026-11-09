@@ -1,6 +1,6 @@
 <div align="center">
 
-# Do robot policies actually use their cameras?
+# Robot policies respond differently to camera interventions
 
 **Visual dependence in robot policies · LIBERO-Spatial simulation**
 
@@ -12,7 +12,7 @@
 
 </div>
 
-**Does completing a simulated task establish that a robot uses its cameras?** This project intervenes on visual inputs to public policy checkpoints and tracks success, trajectories and preprocessing. Four-policy exploration leads to a focused two-policy wrist-treatment study, with separate controls bounding the interpretation.
+**Task success alone does not establish a policy’s dependence on visual inputs.** This project intervenes on visual inputs to public policy checkpoints and tracks success, trajectories and preprocessing. Four-policy exploration leads to a focused two-policy wrist-treatment study, with separate controls bounding the interpretation.
 
 ## Project contributions
 
@@ -26,7 +26,7 @@
 
 <a id="1-camera-ablations"></a>
 
-## 1. Four-policy overview: what happens with all-black visual inputs?
+## 1. Four policies show different responses to all-black visual inputs
 
 ![Four-policy normal-versus-black overview, representative 100-episode runs](media/blackout_overview.svg)
 
@@ -48,7 +48,7 @@
 
 ## 2. Focused study: change the wrist treatment, keep the agent view live
 
-This later study covers **LeRobot π0/π0.5 v044 only**. π0.5 previously approached zero success with wrist-black input: does this persist with original-slot masking or first-frame freezing? π0 v044 provides a contrasting response.
+This later study covers **LeRobot π0/π0.5 v044 only**. π0.5 previously approached zero success with wrist-black input. The follow-up tests this observation with original-slot masking and first-frame freezing, while recording π0 v044’s contrasting response.
 
 The table first shows the two policies’ common new500-state conditions; the figure separately labels historical wrist-black evidence and the supplementary condition.
 
@@ -66,7 +66,18 @@ The table first shows the two policies’ common new500-state conditions; the fi
 
 [Design and missing conditions](docs/STUDY_MAP.md#2-main-experiment-change-the-wrist-treatment-keep-the-agent-view-live) · [Paired differences and 95% intervals](results/single_camera_summary.csv)
 
-## 3. Why does π0 retain all-black successes? Bound the interpretation
+### Agent-view-only masking already has500-episode results
+
+This supplementary control changes only the agent-view treatment; the wrist and proprioceptive state remain live. Agent view and global camera refer to the same input here.
+
+| Agent-view treatment (wrist live) | π0.5 v044 | π0 v044 |
+|---|---|---|
+| Live | 492/500 · 98.4% | 360/500 · 72.0% |
+| Original-slot mask false | **277/500 · 55.4%** | **371/500 · 74.2%** |
+
+Agent-only blackout also has earlier100-episode results. Agent-only freezing remains unrun and is included in the follow-up plan below.
+
+## 3. Additional controls bound the interpretation of π0 all-black success
 
 | Additional check | Key observation | Interpretation limit |
 |---|---|---|
@@ -111,6 +122,20 @@ The study masks cameras in their original slots. The upstream fix PR covers **si
 
 [Full coverage map](docs/STUDY_MAP.md) · [All experiments and limits](docs/EXPERIMENTS.md) · [Public source records](dashboard/data/) · [Interactive results](https://chaoshengsc.github.io/libero-camera-ablation/dashboard/?lang=en)
 
+## Follow-up work will complete the remaining applicable controls
+
+Agent-only masking already has500-episode results; agent-only blackout has earlier100-episode repeats. The following conditions remain incomplete and are planned follow-ups, not current results.
+
+| Incomplete condition | Current boundary | Planned follow-up |
+|---|---|---|
+| Full agent-view single-factor study for π0/π0.5 | Only masking entered the later500-state study; agent-only freezing is absent and black uses earlier100-state runs | Add agent-only freezing and blackout matched to the main-study scale, keeping the wrist live |
+| Single-camera noise | Existing noise affects both cameras together | Add separate agent-only and wrist-only noise for applicable dual-view policies |
+| π0.5 both-camera masking | Normal, wrist mask and agent mask exist; both-mask is absent | Add both-mask to complete the four camera-availability conditions |
+| SmolVLA masking and wrist-only freezing | Current evidence is early blackout and both-camera noise/freezing | Verify interface and slot semantics, then add applicable single-camera masks and wrist-only freezing |
+| Other OpenVLA single-view interventions | Only blackout of its sole agent view is tested; freezing/noise are absent | Add first-frame freezing and noise for the sole view, and verify mask-interface applicability |
+
+OpenVLA has no wrist input; wrist conditions are inapplicable rather than missing or pending results. Each follow-up will first fix its checkpoint, matched normal group, tasks/states, intervention and episode count. Results will be added after execution and acceptance. These plans do not establish a started run.
+
 <details>
 <summary>Expand task demos (selected two-policy examples, not a four-policy overview)</summary>
 
@@ -143,9 +168,9 @@ Each checkpoint has 500 episodes. The project uses overlap between its 95% inter
 
 ## Version and evidence
 
-**v1.5.2 · 2026-11-09:** the overview, figures and data navigation now distinguish four-policy exploration from two-policy follow-up. Matched100 normal controls are explicit; repeated states receive no pooled independent-sample interval. Original records are unchanged, and no missing condition was rerun. The v1.5.1 tag stays fixed. The separate fine-tuning project is excluded.
+**v1.5.3 · 2026-11-09**: public copy uses declarative wording; existing agent-only masking results are shown separately; remaining applicable controls are explicitly planned follow-ups. Original results are unchanged and no follow-up run has started. The v1.5.1 and v1.5.2 tags remain fixed. The separate fine-tuning project is excluded.
 
-[Study structure and audit findings](docs/STUDY_MAP.md) · [Freeze scope](docs/FREEZE.md) · [Public evidence SHA-256](results/freeze_20261109_v1.5.2.sha256)
+[Study structure and audit findings](docs/STUDY_MAP.md) · [Freeze scope](docs/FREEZE.md) · [Public evidence SHA-256](results/freeze_20261109_v1.5.3.sha256)
 
 <details>
 <summary>Reproduction, installation, repository layout and full limitations</summary>
@@ -234,11 +259,11 @@ If you use these results or scripts, please cite:
   author  = {ShengChao},
   title   = {libero-camera-ablation: Camera-input ablations of four robot policies on LIBERO-Spatial},
   year    = {2026},
-  version = {1.5.2},
+  version = {1.5.3},
   url     = {https://github.com/chaoshengsc/libero-camera-ablation}
 }
 ```
 
 The same entry is in [`CITATION.cff`](CITATION.cff), which GitHub's "Cite this repository" button reads.
 
-The v1.5.2 tag freezes the camera-ablation evidence; see the [freeze scope and verification](docs/FREEZE.md). The v1.5 tag includes P1/P2 results, their public data and reproduction guides. The earlier v1.4 tag records the single-camera snapshot. For changes after v1.5, also record the commit used.
+The v1.5.3 tag freezes the camera-ablation evidence; see the [freeze scope and verification](docs/FREEZE.md). The v1.5 tag includes P1/P2 results, their public data and reproduction guides. The earlier v1.4 tag records the single-camera snapshot. For changes after v1.5, also record the commit used.

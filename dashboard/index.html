@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Do robot policies actually use their cameras?</title>
+<title>机器人策略对相机干预呈现不同响应</title>
 <meta name="description" content="Camera ablations of four robot policies on LIBERO-Spatial, with public checkpoints, repeated runs, and traceable evaluation data.">
 <link rel="stylesheet" href="styles.css?v=followup-1">
 </head>
@@ -37,7 +37,7 @@
   <header id="overview">
     <div class="hero-layout">
       <div class="hero-copy">
-        <h1>Do robot policies actually use their cameras?</h1>
+        <h1>机器人策略对相机干预呈现不同响应</h1>
         <p class="subtitle">Camera ablations of four robot policies on LIBERO-Spatial</p>
         <p class="lede">在所测全黑回合中，三个检查点均未成功；LeRobot π0 v044及其管线五次成功率为53–56%。另对五个公开权重做了参考对照。</p>
         <div class="hero-actions"><a class="action-primary" href="#blackout">查看实验结果</a><a class="action-link" href="#resources">复现与数据入口</a></div>
@@ -66,12 +66,13 @@
       <p class="note">官方π0为额外检查点与管线对照；P1/P2界定π0异常结果的解释，不是腕部因果验证。五项工程参考对照是另一组模型。</p>
     </div>
 
+    <p class="note">后续将补齐主视角单独冻结、与主实验匹配规模的主视角黑图、单路噪声及π0.5双路mask。SmolVLA和OpenVLA的扩展先核接口；OpenVLA腕部不适用。上述内容是待执行计划，不计入当前结果。</p>
     <p class="intro"><a href="#state-feedback">状态输入更新（P1）</a> · <a href="#open-loop">选择外固定动作回放（P2）</a></p>
     <p class="intro">相机消融只改变画面输入；OpenVLA只接收主视角和指令，其余三个检查点还接收腕部画面与状态。</p>
     <p class="intro">早期相机消融每次100回合，按相同初始状态比较。区间取决于配对与重复结构，不设统一的13点阈值；π0早期同条件重复最多相差18点。</p>
     <p class="intro"><span>OpenVLA为220控制步，其他LIBERO模型客户端为280步，均另有10步等待。对已有回合统一220步截止计分后，首页全黑对照数字不变；这仍不是完整同协议排名。</span> <a data-doc="docs/EXPERIMENTS" data-anchor-zh="3-评测协议与验收范围" data-anchor-en="3-evaluation-protocols-and-audit-scope" href="https://github.com/chaoshengsc/libero-camera-ablation/blob/main/docs/EXPERIMENTS_CN.md#3-评测协议与验收范围">协议与验收范围</a></p>
     <p class="intro">早期π0相机实验使用LeRobot v044，一组500回合正常评测为73%。官方π0/OpenPI的全黑对照为0/100（1.5节）；结果限于各自所测检查点、管线和干预，不能推广到所有π0。</p>
-    <div class="block"><div class="fig"><picture><source id="figInputsMobile" width="420" height="500" srcset="../media/zh/inputs-mobile.svg?v=claims-1" media="(max-width: 600px)"><img id="figInputs" width="880" height="350" src="../media/zh/inputs.svg?v=claims-1" alt="策略的输入，以及各实验改了哪一项"></picture></div></div>
+    <div class="block"><div class="fig"><picture><source id="figInputsMobile" width="420" height="500" srcset="../media/zh/inputs-mobile.svg?v=claims-1" media="(max-width: 600px)"><img id="figInputs" width="880" height="350" src="../media/zh/inputs.svg?v=claims-1" alt="策略输入与各实验的干预对象"></picture></div></div>
 
     <p class="note">输入与操作示意不代表每个模型都完成了所有干预；实际范围见上方覆盖表。</p>
 
@@ -231,7 +232,7 @@
 </div>
 <script src="results.js?v=replay-1"></script>
 <script src="followup.js?v=p1p2-1"></script>
-<script src="app.js?v=structure-2"></script>
+<script src="app.js?v=statements-3"></script>
 <noscript><p class="no-script">交互图表需要 JavaScript。<a href="https://github.com/chaoshengsc/libero-camera-ablation">Read the results on GitHub</a>.</p></noscript>
 </body>
 </html>

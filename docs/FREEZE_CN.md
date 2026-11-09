@@ -1,6 +1,6 @@
 # 相机消融 · 证据冻结版
 
-**v1.5.2 · 2026-11-09**
+**v1.5.3 · 2026-11-09**
 
 [English](FREEZE.md) · [项目首页](../README_CN.md) · [完整实验](EXPERIMENTS_CN.md) · [交互结果页](https://chaoshengsc.github.io/libero-camera-ablation/dashboard/?lang=zh)
 
@@ -10,17 +10,17 @@
 
 ## 结论与证据，一一对应
 
-| 问题 | 已观察到的结果 | 核查入口 |
+| 比较主题 | 已观察到的结果 | 核查入口 |
 |---|---|---|
-| 完全没有画面，还能完成任务吗？ | 所测 π0.5、OpenVLA、SmolVLA 全黑均为 0%；LeRobot π0 v044 五次为 53–56%，每次 100 回合 | [逐任务计数](../results/blackout_per_task.csv) · [原始评测](../dashboard/data/) |
-| 官方 π0 是否同样如此？ | 匹配100初态：官方π0/OpenPI正常93/100、全黑0/100；LeRobot π0 v044正常65/100、全黑五次53–56/100 | [官方对照](../results/official_pi0_summary.csv) · [原始记录](../dashboard/data/official_pi0/) |
-| π0.5 对腕部相机有多敏感？ | 正常 492/500；屏蔽原槽位腕部相机 23/500；冻结腕部首帧 0/500 | [配对统计](../results/single_camera_summary.csv) · [500 回合记录](../dashboard/data/s500/) |
-| 状态更新影响 π0 v044 吗？ | P1 三轮均值：正常画面/全黑为 73.3%/55.3%；冻结模型首状态后均为 0% | [逐轮结果](../results/state_feedback_runs.csv) · [配对差值与区间](../results/state_feedback_comparisons.csv) |
-| 固定动作也能成功吗？ | P2 选择外回放 262/400＝65.5%，95% 分层 bootstrap 区间 61.0–69.75%；自回放 10/10 | [总体与逐任务结果](../results/replay_holdout_summary.csv) · [选择与全部结果](../dashboard/data/replay_holdout/) |
+| 全黑输入下的任务完成表现 | 所测 π0.5、OpenVLA、SmolVLA 全黑均为 0%；LeRobot π0 v044 五次为 53–56%，每次 100 回合 | [逐任务计数](../results/blackout_per_task.csv) · [原始评测](../dashboard/data/) |
+| 官方π0与LeRobot检查点的全黑对照 | 匹配100初态：官方π0/OpenPI正常93/100、全黑0/100；LeRobot π0 v044正常65/100、全黑五次53–56/100 | [官方对照](../results/official_pi0_summary.csv) · [原始记录](../dashboard/data/official_pi0/) |
+| π0.5的腕部输入敏感性 | 正常 492/500；屏蔽原槽位腕部相机 23/500；冻结腕部首帧 0/500 | [配对统计](../results/single_camera_summary.csv) · [500 回合记录](../dashboard/data/s500/) |
+| π0 v044的状态更新敏感性 | P1 三轮均值：正常画面/全黑为 73.3%/55.3%；冻结模型首状态后均为 0% | [逐轮结果](../results/state_feedback_runs.csv) · [配对差值与区间](../results/state_feedback_comparisons.csv) |
+| 固定动作在选择外状态上的表现 | P2 选择外回放 262/400＝65.5%，95% 分层 bootstrap 区间 61.0–69.75%；自回放 10/10 | [总体与逐任务结果](../results/replay_holdout_summary.csv) · [选择与全部结果](../dashboard/data/replay_holdout/) |
 
 全黑、屏蔽槽位、删键和冻结是不同干预，不能互换名称。上表汇总跨实验的观察，不构成统一协议下的模型排名。五个公开检查点的参考对照仍保留在[复现表](../results/reproduction.csv)，ACT/PushT 不属于四策略 LIBERO 相机消融。
 
-## 本次冻结补齐了什么
+## 本次冻结整合了结果与协议补证
 
 从 v1.5 的 P1/P2 公开结果出发，本快照纳入后续已在仓库中的工程与协议补证，并整理为统一入口：
 
@@ -30,7 +30,7 @@
 | [统一 220 步截止重计](../results/budget_sensitivity.csv) | 在已有可核工件上检查截止敏感性；保留 matched100 范围 | 完整同协议重新评测；缺失回合不能补推 |
 | [权重身份](../dashboard/data/protocol_audit/checkpoint_identity.json)与[加载审计](../dashboard/data/protocol_audit/checkpoint_loading.json) | 同源性未获确认；HF 加载后 778/778 状态项与目标精度源张量一致（777 个来源键，含共享别名） | 同权重的管线因果对照、模型推理或行为等价性 |
 | 执行入口与离线检查 | 归档当前失败传播、工件保护、安装检查和 CI | 新机器/学校/真机运行验收 |
-| [证据 SHA-256 清单](../results/freeze_20261109_v1.5.2.sha256) | 验证本版公开原始记录与结果表是否改变 | 证明 Git 外工件、不可见权重或研究结论为真 |
+| [证据 SHA-256 清单](../results/freeze_20261109_v1.5.3.sha256) | 验证本版公开原始记录与结果表是否改变 | 证明 Git 外工件、不可见权重或研究结论为真 |
 
 ## 解释上限与暂停项
 
@@ -50,6 +50,6 @@ python scripts/analysis/summarize_protocol_audit.py
 python scripts/checks/repository_check.py
 ```
 
-第一条检查清单中每个公开证据文件字节的 SHA-256；第二条核对协议导出和结果表；第三条检查公开链接、JavaScript 语法与版本一致性。重算 CSV/SVG 的入口见[结果目录](../results/README_CN.md#重新生成)。完整代码、文档与环境配置由 **v1.5.2 标签对应的 Git 提交**固定，证据清单只覆盖其列明的公开数据与结果文件。
+第一条检查清单中每个公开证据文件字节的 SHA-256；第二条核对协议导出和结果表；第三条检查公开链接、JavaScript 语法与版本一致性。重算 CSV/SVG 的入口见[结果目录](../results/README_CN.md#重新生成)。完整代码、文档与环境配置由 **v1.5.3 标签对应的 Git 提交**固定，证据清单只覆盖其列明的公开数据与结果文件。
 
-引用本版请记录 `v1.5.2`、实际提交 SHA 和使用的数据路径；较早标签保持原样。以后若出现更正，应另发提交/版本并明确说明，不回写本冻结标签。
+引用本版请记录 `v1.5.3`、实际提交 SHA 和使用的数据路径；较早标签保持原样。以后若出现更正，应另发提交/版本并明确说明，不回写本冻结标签。

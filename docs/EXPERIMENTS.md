@@ -112,7 +112,7 @@ Per-episode results and first-frame hashes are in `results/single_camera.csv`; t
 
 Installation, server/client commands and historical stage acceptance are in the [OpenPI reproduction guide](OPENPI.md).
 
-LeRobot's π0 still scores 53–56% with every camera black. Is that π0 in general or this checkpoint? This section repeats the vision removal with Physical Intelligence's own `pi0_libero` checkpoint, in the same environment and on the same initial states. The design, the gate (normal ≥ 92%) and the reading rule were written before the runs and pushed to the repository (commit `6c54c5d`); the single-camera and 360-rendering conditions added later were also written down before their runs, but only locally, without a public timestamp; they are advance records rather than pre-registrations, and their results are exploratory.
+LeRobot's π0 still scores 53–56% with every camera black. This control examines the observation in another checkpoint and inference pipeline. This section repeats the vision removal with Physical Intelligence's own `pi0_libero` checkpoint, in the same environment and on the same initial states. The design, the gate (normal ≥ 92%) and the reading rule were written before the runs and pushed to the repository (commit `6c54c5d`); the single-camera and 360-rendering conditions added later were also written down before their runs, but only locally, without a public timestamp; they are advance records rather than pre-registrations, and their results are exploratory.
 
 - **The early HF candidate failed acceptance.** `lerobot/pi0_libero_base@98ac51b8` scored 0/50 in LeRobot v0.6.1 and 0/20 in three diagnostics. A CPU audit on 2026-11-02 finds that all 775 comparable tensors differ under the pinned official mapping and declared precision. It is not a verified conversion of the native GCS checkpoint, so its 0/50 does not show that changing only the pipeline causes failure ([identity evidence](../dashboard/data/protocol_audit/checkpoint_identity.json)). Following the original fallback, OpenPI serves actions to the LeRobot LIBERO client (`scripts/openpi/`); the native server loads GCS assets, not this HF model's weights.
 - **A loading warning does not imply an entirely unloaded model.** An authorized CPU readback matches all 778 loaded model-state entries to that HF file after target-dtype conversion, while reproducing the warning for six obsolete normalization buffers. This is a current CPU loading check, not historical GPU-state recovery or an inference test; it does not repair the failed native/HF identity premise or isolate the cause of 0/50 ([loading evidence and scope](../dashboard/data/protocol_audit/checkpoint_loading.json)).
@@ -251,7 +251,9 @@ LeRobot LIBERO evaluation ends on environment termination/truncation or success,
 
 P2 stops on success, termination/truncation, 280 steps or source-sequence exhaustion; see its [replay loop](../scripts/analysis/replay_holdout.py). The ten sources are 80–133 steps long. Of 400 formal episodes, 262 succeed and 138 exhaust the source, with zero technical invalids. Those failures are not environment timeouts and did not execute 280 steps. Ten self-replays are excluded from the formal 400, as P1's 40 engineering checks are excluded from its 1200 formal executions.
 
-### 3.3 What the evidence supports
+<a id="33-what-the-evidence-supports"></a>
+
+### 3.3 The evidence supports bounded conclusions
 
 The 2026-11-02 review distinguishes public-data consistency, historical execution logs and full-artifact acceptance. All 117 public `eval_info.json` records have consistent episode counts, success rates and task keys; that does not certify complete stepwise evidence for all 117 runs.
 

@@ -38,7 +38,9 @@ README 给出主要结论；这里按阅读、复现与核查组织完整材料�
 | [选择外固定动作回放](EXPERIMENTS_CN.md#16-固定动作回放) | [replay_holdout_summary.csv](../results/replay_holdout_summary.csv) | [冻结动作与全部结果](../dashboard/data/replay_holdout/) |
 | [公开权重复现](EXPERIMENTS_CN.md#2-公开权重的复现) | [reproduction.csv](../results/reproduction.csv) | [原始记录](../dashboard/build.py) |
 
-## 怎样更新结果
+<a id="怎样更新结果"></a>
+
+## 结果更新使用统一生成入口
 
 在仓库根目录依次运行 `python3 dashboard/build.py`、`python3 scripts/analysis/make_figures.py`、`python3 scripts/analysis/summarize_followup.py`。前两步使用标准库生成原有结果；第三步用NumPy从逐回合记录重算P1/P2配对统计、6个CSV、中英文SVG与[网页摘要数据](../dashboard/followup.js)，不执行模型或仿真。环境准备见[快速开始](../README_CN.md#快速开始)。
 

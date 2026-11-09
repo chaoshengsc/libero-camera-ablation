@@ -4,7 +4,7 @@
 
 **Four-policy exploration, two-policy wrist-treatment follow-up; official π0 and P1/P2 provide separate interpretation controls.** The four policies did not receive the same full intervention suite. This is not a complete factorial design. “Untested” is distinct from failure or 0% success.
 
-## 1. Which policies entered each stage?
+## 1. Policy coverage narrows across experimental stages
 
 | Public checkpoint | Visual inputs | Early exploration | Later wrist-treatment study | Supplementary agent-view condition |
 |---|---|---|---|---|
@@ -47,10 +47,10 @@ Blackout and masking are different operations. Freezing changes both image updat
 
 | Control | Question | Matching and limits |
 |---|---|---|
-| Official π0/OpenPI | Does all-black success also occur for another π0 checkpoint and pipeline? | Matched100 normal: 93/100 official, 65/100 LeRobot. Full500 normal 482/500 and 360/500 are separate references. Weights and pipelines both change |
-| π0 P1: live/frozen state × normal/black images | Is LeRobot π0 v044 sensitive to state updates? | Its own three-repeat paired baselines; not the wrist-study normal condition, and not unique evidence of online correction |
-| P2 fixed-action replay | How often do preselected actions succeed on selection-excluded states? | Official π0 source; 262/400 targets; no policy calls. Cannot be subtracted from P1 to assign mechanism contributions |
-| Checkpoint identity, CPU loading, 220-step recount | What identity/protocol evidence survives for the existing results? | Engineering/provenance checks, not new behavioral interventions |
+| Official π0/OpenPI | Check all-black behavior in another π0 checkpoint and pipeline | Matched100 normal: 93/100 official, 65/100 LeRobot. Full500 normal 482/500 and 360/500 are separate references. Weights and pipelines both change |
+| π0 P1: live/frozen state × normal/black images | Measure state-update sensitivity in LeRobot π0 v044 | Its own three-repeat paired baselines; not the wrist-study normal condition, and not unique evidence of online correction |
+| P2 fixed-action replay | Measure the success of preselected actions on selection-excluded states | Official π0 source; 262/400 targets; no policy calls. Cannot be subtracted from P1 to assign mechanism contributions |
+| Checkpoint identity, CPU loading, 220-step recount | Verify the identity and protocol evidence for existing results | Engineering/provenance checks, not new behavioral interventions |
 
 Every point in the official-control figure uses the first ten states per task, 100 episodes per point. Repeats appear individually; no pooled Wilson interval treats five executions of the same 100 states as 500 independent states. Full500 results remain in the original summary. The new [matched100 table](../results/official_pi0_matched100.csv) records the subset explicitly.
 
@@ -66,3 +66,17 @@ Every point in the official-control figure uses the first ten states per task, 1
 This audits consistency between public sources, pre-run records, intervention code and presentation. It does not revalidate every private image/tensor, and no missing condition was rerun. Historical logs and frozen tags remain unchanged. The separate fine-tuning project is outside scope.
 
 “Matched100” means the same task/init indices; it does not establish bitwise-matched policy noise or complete simulator states.
+
+## Follow-up work will complete the remaining applicable controls
+
+Agent-only masking already has500-episode results; agent-only blackout has earlier100-episode repeats. The following conditions remain incomplete and are planned follow-ups, not current results.
+
+| Incomplete condition | Current boundary | Planned follow-up |
+|---|---|---|
+| Full agent-view single-factor study for π0/π0.5 | Only masking entered the later500-state study; agent-only freezing is absent and black uses earlier100-state runs | Add agent-only freezing and blackout matched to the main-study scale, keeping the wrist live |
+| Single-camera noise | Existing noise affects both cameras together | Add separate agent-only and wrist-only noise for applicable dual-view policies |
+| π0.5 both-camera masking | Normal, wrist mask and agent mask exist; both-mask is absent | Add both-mask to complete the four camera-availability conditions |
+| SmolVLA masking and wrist-only freezing | Current evidence is early blackout and both-camera noise/freezing | Verify interface and slot semantics, then add applicable single-camera masks and wrist-only freezing |
+| Other OpenVLA single-view interventions | Only blackout of its sole agent view is tested; freezing/noise are absent | Add first-frame freezing and noise for the sole view, and verify mask-interface applicability |
+
+OpenVLA has no wrist input; wrist conditions are inapplicable rather than missing or pending results. Each follow-up will first fix its checkpoint, matched normal group, tasks/states, intervention and episode count. Results will be added after execution and acceptance. These plans do not establish a started run.
