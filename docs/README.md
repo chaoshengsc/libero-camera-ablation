@@ -6,6 +6,7 @@ The README presents the key findings. This guide connects the full study, reprod
 
 | Goal | Document | Contents |
 |---|---|---|
+| Inspect the frozen version | [Freeze scope & evidence map](FREEZE.md) | Camera-ablation scope, key numbers, limitations and hash manifest |
 | Understand the study | [Experiments & results](EXPERIMENTS.md) | Interventions, full tables, repeated runs, and interpretation limits |
 | Audit the protocol | [Steps & audit scope](EXPERIMENTS.md#3-evaluation-protocols-and-audit-scope) | Control budgets, replanning, stopping rules and record gaps |
 | Inspect recovered evidence | [Original records & checkpoint identity](../dashboard/data/protocol_audit/) | 95-run provenance, 13150 recorded lengths and identity checks, without model execution |

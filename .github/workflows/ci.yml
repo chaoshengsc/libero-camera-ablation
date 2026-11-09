@@ -24,6 +24,8 @@ jobs:
         run: python scripts/checks/repository_check.py
       - name: Frozen protocol evidence, deadline counts and A0 metadata
         run: python scripts/analysis/summarize_protocol_audit.py
+      - name: Camera-ablation frozen evidence
+        run: python scripts/checks/freeze_check.py
       - name: Dashboard data and figures are up to date
         run: |
           python dashboard/build.py

@@ -4,6 +4,8 @@
 
 这里保存可重算的结果表；方法、比较范围与判读见[实验说明](../docs/EXPERIMENTS_CN.md)，原始评测在 [dashboard/data/](../dashboard/data/)。
 
+[2026-11-09 冻结说明](../docs/FREEZE_CN.md) · [证据 SHA-256 清单](freeze_20261109.sha256)。在仓库根目录运行 `python scripts/checks/freeze_check.py`，只读核对公开证据文件。
+
 ## 按实验找结果
 
 | 文件 | 内容 |

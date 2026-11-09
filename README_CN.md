@@ -10,7 +10,7 @@ Camera ablations of four robot policies on LIBERO-Spatial
 
 [English](README.md) · **中文**
 
-[主要发现](#1-相机消融) · [复现结果](#2-公开权重的复现) · [快速开始](#快速开始) · [数据](results/README_CN.md) · [文档导航](docs/README_CN.md)
+[冻结快照](docs/FREEZE_CN.md) · [主要发现](#1-相机消融) · [复现结果](#2-公开权重的复现) · [快速开始](#快速开始) · [数据](results/README_CN.md) · [文档导航](docs/README_CN.md)
 
 </div>
 
@@ -30,6 +30,18 @@ Camera ablations of four robot policies on LIBERO-Spatial
 | 核对数字 | [结果表](results/README_CN.md) → [原始评测](dashboard/data/) → [实验日志与更正](docs/NOTES_CN.md) |
 
 [文档导航](docs/README_CN.md) · [交互结果页](https://chaoshengsc.github.io/libero-camera-ablation/dashboard/?lang=zh) · [仓库结构](#仓库结构) · [局限](#局限)
+
+## 冻结快照 · v1.5.1
+
+**相机消融研究已冻结于 2026-11-09。** 本版固定已有结果、协议核验与解释边界；没有新增模型运行。
+
+| 已完成 | 证据 | 说明 |
+|---|---|---|
+| **相机输入干预** | 全黑、噪声、首帧冻结、单路相机 | 四种公开策略；逐条件保留重复与分母 |
+| **机制边界对照** | 官方 π0、P1 状态冻结、P2 固定动作回放 | 区分观察到的敏感性与尚未识别的内部机制 |
+| **协议与来源核验** | 220 步截止重计、权重身份与加载记录 | 基于既有工件；不等于新评测或同权重管线对照 |
+
+[**冻结说明与证据地图 →**](docs/FREEZE_CN.md) · [SHA-256 清单](results/freeze_20261109.sha256) · [交互结果页](https://chaoshengsc.github.io/libero-camera-ablation/dashboard/?lang=zh)
 
 ## 1. 相机消融
 
@@ -161,11 +173,11 @@ OpenPI原版π0使用`gs://openpi-assets/checkpoints/pi0_libero`；[OpenPI指南
   author  = {ShengChao},
   title   = {libero-camera-ablation: Camera-input ablations of four robot policies on LIBERO-Spatial},
   year    = {2026},
-  version = {1.5.0},
+  version = {1.5.1},
   url     = {https://github.com/chaoshengsc/libero-camera-ablation}
 }
 ```
 
 同样的条目也在 [`CITATION.cff`](CITATION.cff) 里，GitHub 页面上的 “Cite this repository” 按钮读的就是它。
 
-v1.5标签包含P1/P2结果、对应公开数据与复现指南；较早的v1.4标签保留单相机实验快照。引用v1.5之后的改动时，应同时记录实际使用的提交。
+v1.5.1标签是相机消融的证据冻结版，冻结范围与核验方法见[冻结说明](docs/FREEZE_CN.md)。v1.5标签包含P1/P2结果、对应公开数据与复现指南；较早的v1.4标签保留单相机实验快照。引用v1.5之后的改动时，应同时记录实际使用的提交。

@@ -4,6 +4,8 @@
 
 Recomputable tables live here. Read the [experiments](../docs/EXPERIMENTS.md) for methods and comparison scope. Raw evaluations are under [dashboard/data/](../dashboard/data/).
 
+[2026-11-09 freeze scope](../docs/FREEZE.md) · [Evidence SHA-256 manifest](freeze_20261109.sha256). From the repository root, run `python scripts/checks/freeze_check.py` to verify the public evidence files without writing them.
+
 ## Find a result
 
 | File | Contents |

@@ -10,7 +10,7 @@ Camera ablations of four robot policies on LIBERO-Spatial
 
 **English** · [中文](README_CN.md)
 
-[Findings](#1-camera-ablations) · [Reproduction](#2-reproduction-of-the-public-checkpoints) · [Quick start](#quick-start) · [Data](results/README.md) · [Docs](docs/README.md)
+[Frozen snapshot](docs/FREEZE.md) · [Findings](#1-camera-ablations) · [Reproduction](#2-reproduction-of-the-public-checkpoints) · [Quick start](#quick-start) · [Data](results/README.md) · [Docs](docs/README.md)
 
 </div>
 
@@ -30,6 +30,18 @@ Camera ablations of four robot policies on LIBERO-Spatial
 | Verify a number | [Result tables](results/README.md) → [Raw evaluations](dashboard/data/) → [Notes & corrections](docs/NOTES.md) |
 
 [Docs & data guide](docs/README.md) · [Interactive results](https://chaoshengsc.github.io/libero-camera-ablation/dashboard/?lang=en) · [Repository layout](#repository-layout) · [Limitations](#limitations)
+
+## Frozen snapshot · v1.5.1
+
+**Camera-ablation evidence frozen on 2026-11-09.** This version fixes the existing results, protocol audits and interpretation limits; no new model runs were performed.
+
+| Completed | Evidence | Scope |
+|---|---|---|
+| **Camera-input interventions** | Blackout, noise, frozen first frame, single camera | Four public policies; repeats and denominators remain separate |
+| **Interpretation controls** | Official π0, P1 state freezing, P2 fixed-action replay | Observed sensitivity is distinguished from unidentified internal mechanisms |
+| **Protocol & provenance audits** | 220-step recount, checkpoint identity and loading records | Existing artifacts; no new evaluation or same-weight pipeline control |
+
+[**Freeze scope & evidence map →**](docs/FREEZE.md) · [SHA-256 manifest](results/freeze_20261109.sha256) · [Interactive results](https://chaoshengsc.github.io/libero-camera-ablation/dashboard/?lang=en)
 
 ## 1. Camera ablations
 
@@ -165,11 +177,11 @@ If you use these results or scripts, please cite:
   author  = {ShengChao},
   title   = {libero-camera-ablation: Camera-input ablations of four robot policies on LIBERO-Spatial},
   year    = {2026},
-  version = {1.5.0},
+  version = {1.5.1},
   url     = {https://github.com/chaoshengsc/libero-camera-ablation}
 }
 ```
 
 The same entry is in [`CITATION.cff`](CITATION.cff), which GitHub's "Cite this repository" button reads.
 
-The v1.5 tag includes P1/P2 results, their public data and reproduction guides. The earlier v1.4 tag records the single-camera snapshot. For changes after v1.5, also record the commit used.
+The v1.5.1 tag freezes the camera-ablation evidence; see the [freeze scope and verification](docs/FREEZE.md). The v1.5 tag includes P1/P2 results, their public data and reproduction guides. The earlier v1.4 tag records the single-camera snapshot. For changes after v1.5, also record the commit used.
