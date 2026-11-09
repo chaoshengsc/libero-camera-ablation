@@ -171,8 +171,9 @@ These interventions are not interchangeable. See the [experiment report](../docs
 | Compare video frames | [compare_videos.py](analysis/compare_videos.py) | Videos from corresponding runs |
 | Metric implementations | [metrics.py](analysis/metrics.py) | CI, two-proportion tests, DTW, grasp point; checked by [tests/](../tests/) |
 
-To add a result, place its `eval_info.json` under `dashboard/data/<run>/`, register the run in `dashboard/build.py`, and run the commands below. Specialized comparisons also need their paired outcomes and hash records; a success rate alone is insufficient.
+The three commands below regenerate already registered historical data; they do not automatically integrate a new camera study. Registrations in `dashboard/build.py` differ from the fixed `SC_RUNS` in `make_figures.py`, which also reads separate `first_frame_hash.json` files. The probe stores hashes in the `h0` array of `traj.npz` and does not automatically export that JSON.
 
+For a new study, preserve normal/intervention outcomes and artifacts in separate directories; export `h0` in batch-one task/episode order and verify ten-task coverage, per-task counts, total length and matching against the new normal run. Register the new normal mapping and separate analysis outputs, then accept them independently. Copying JSON or editing `build.py` alone is insufficient. Current generators have no automatic new-study registration interface; do not replace frozen evidence or old `SC_RUNS` mappings.
 ```bash
 python3 dashboard/build.py
 python3 scripts/analysis/make_figures.py

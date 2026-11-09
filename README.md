@@ -93,7 +93,7 @@ This supplementary control changes only the agent-view treatment; the wrist and 
 | Agent-view treatment (wrist live) | π0.5 v044 | π0 v044 |
 |---|---|---|
 | Live | 492/500 · 98.4% | 360/500 · 72.0% |
-| Original-slot mask false | **277/500 · 55.4%** | **371/500 · 74.2%** |
+| Agent-view input masked in its original slot | **277/500 · 55.4%** | **371/500 · 74.2%** |
 
 Agent-only blackout also has earlier 100-episode results. Agent-only freezing remains unrun and is included in the follow-up plan below.
 
@@ -197,7 +197,7 @@ Each checkpoint has 500 episodes. The project uses overlap between its 95% inter
 
 ## Version and evidence
 
-**v1.5.5 · 2026-11-09**: the wrist main study, supplementary agent mask and public-evidence checks are complete. The follow-up experiments above have not started. Evaluation evidence remains fixed at v1.5.3. Device-preparation instructions and per-run recipes are available; target-device runtime acceptance remains pending. Earlier tags are unchanged.
+**v1.5.6 · 2026-11-09**: the wrist main study, supplementary agent mask and public-evidence checks are complete. The follow-up experiments above have not started. Evaluation evidence remains fixed at v1.5.3. Device-preparation instructions and per-run recipes are available; target-device runtime acceptance remains pending. Earlier tags are unchanged.
 
 [Study structure and coverage](docs/STUDY_MAP.md) · [Freeze scope](docs/FREEZE.md) · [Public evidence SHA-256](results/freeze_20261109_v1.5.3.sha256)
 
@@ -290,7 +290,7 @@ If you use these results or scripts, please cite:
   author  = {ShengChao},
   title   = {libero-camera-ablation: Camera-input ablations of four robot policies on LIBERO-Spatial},
   year    = {2026},
-  version = {1.5.5},
+  version = {1.5.6},
   url     = {https://github.com/chaoshengsc/libero-camera-ablation}
 }
 ```

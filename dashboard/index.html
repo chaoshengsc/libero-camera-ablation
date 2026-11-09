@@ -70,7 +70,7 @@
     <p class="note">后续将补齐主视角单独冻结、与主实验匹配规模的主视角黑图、单路噪声及π0.5双路mask。SmolVLA和OpenVLA的扩展先核接口；OpenVLA腕部不适用。上述内容是待执行计划，不计入当前结果。</p>
     <p class="intro"><a href="#state-feedback">状态输入更新（P1）</a> · <a href="#open-loop">选择外固定动作回放（P2）</a></p>
     <details class="evidence"><summary>评测协议与输入结构保留完整说明</summary>
-    <p class="intro">相机消融只改变画面输入；OpenVLA只接收主视角和指令，其余三个检查点还接收腕部画面与状态。</p>
+    <p class="intro">相机消融改变指定相机的图像或视觉掩码；OpenVLA只接收主视角和指令，其余三个检查点还接收腕部画面与状态。</p>
     <p class="intro">早期相机消融每次100回合，按相同初始状态比较。区间取决于配对与重复结构，不设统一的13点阈值；π0早期同条件重复最多相差18点。</p>
     <p class="intro"><span>OpenVLA为220控制步，其他LIBERO模型客户端为280步，均另有10步等待。对已有回合统一220步截止计分后，首页全黑对照数字不变；这仍不是完整同协议排名。</span> <a data-doc="docs/EXPERIMENTS" data-anchor-zh="3-评测协议与验收范围" data-anchor-en="3-evaluation-protocols-and-audit-scope" href="https://github.com/chaoshengsc/libero-camera-ablation/blob/main/docs/EXPERIMENTS_CN.md#3-评测协议与验收范围">协议与验收范围</a></p>
     <p class="intro">早期π0相机实验使用LeRobot v044，一组500回合正常评测为73%。官方π0/OpenPI的全黑对照为0/100（1.5节）；结果限于各自所测检查点、管线和干预，不能推广到所有π0。</p>
@@ -248,7 +248,7 @@
 </div>
 <script src="results.js?v=interview-4"></script>
 <script src="followup.js?v=p1p2-1"></script>
-<script src="app.js?v=continuation-5"></script>
+<script src="app.js?v=review-6"></script>
 <noscript><p class="no-script">交互图表需要 JavaScript。<a href="https://github.com/chaoshengsc/libero-camera-ablation">Read the results on GitHub</a>.</p></noscript>
 </body>
 </html>

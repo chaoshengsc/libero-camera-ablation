@@ -72,8 +72,14 @@ Generate a new normal control with `s500/pi05_none` before choosing an intervent
 | Repository checks | Fixed Git commit, [207-file evidence check](../scripts/checks/freeze_check.py), settings consistent with public sources | Repository checks are available |
 | Local preparation | Selected source/package versions, checkpoint/processors, effective cache paths, tasks/states/assets and unused outputs | Pending device selection |
 | Runtime engineering check | Normal/intervention each ten episodes, exit zero, all ten tasks, finite actions, effective intervention and start matching | No new-device acceptance yet |
-| Formal experiment | Predeclared controls, intervention, tasks/states, seeds, denominator, stop conditions and complete new records | Separately executed for the selected study |
+| Formal experiment | Predeclared controls, intervention, tasks/states, seeds, denominator, stop conditions and complete new records | Not started on a new device; to be scoped separately |
 
 `torch_check.py` performs CUDA work; `egl_smoke.py` simulates ALOHA and writes an image; `codec_check.py` writes temporary video. They are not read-only LIBERO checks. GPU, rendering, inference and closed-loop acceptance need separate target-device records. A ten-episode engineering pass is not full success-rate reproduction.
 
-Retain actual commands/environment variables, source/package versions, checkpoint revision/processors, asset/state inventories, task/start indices, normal-control mapping, exit status, per-episode success and termination reasons, first-frame matching evidence and run artifacts. Keep failed outputs and use a fresh run name for diagnosis. See the [script index](../scripts/README.md#existing-data-analysis-and-figures) for result registration and regeneration.
+Retain actual commands/environment variables, source/package versions, checkpoint revision/processors, asset/state inventories, task/start indices, normal-control mapping, exit status, per-episode success, first-frame matching evidence and run artifacts. Keep failed outputs and use a fresh run name for diagnosis. See the [script index](../scripts/README.md#existing-data-analysis-and-figures) for result registration and regeneration.
+
+The current probe stores first-frame hashes in the `h0` array of `traj.npz`; it does not automatically export `first_frame_hash.json`, stepwise terminal flags or a unique stop reason. Behavioral audits requiring these fields need recording changes and acceptance first; the current command cannot establish a unique termination cause for every episode.
+
+[Result integration](../scripts/README.md#existing-data-analysis-and-figures) separates historical regeneration from registering a new study. Record new normal/intervention mappings and initial-state matching, use separate outputs, and preserve frozen mappings. A new success rate alone is insufficient.
+
+Installation examples have not been fully validated with spaces in working paths; use an `EMB_ROOT` without spaces for initial installation. Quoting checks in the command helper and environment template do not establish third-party installer acceptance.

@@ -178,8 +178,9 @@ python scripts/analysis/replay_holdout.py \
 | 逐帧比较视频 | [compare_videos.py](analysis/compare_videos.py) | 对应运行的录像 |
 | 指标实现 | [metrics.py](analysis/metrics.py) | CI、两比例检验、DTW 与抓取点；由 [tests/](../tests/) 核验 |
 
-相机评测新结果接入：把评测输出中的 `eval_info.json` 放到 `dashboard/data/<run>/`，在 `dashboard/build.py` 注册对应运行，再依次执行下列命令。官方对照等专题汇总还需提供对应的配对/哈希记录，不能只填一个成功率。
+下面三条命令只重建已经收录的历史数据，不会自动接入新相机研究。`dashboard/build.py`的运行注册与`make_figures.py`的固定`SC_RUNS`是不同入口；后者还读取独立的`first_frame_hash.json`。`probe`把hash保存在`traj.npz`的`h0`数组中，并不自动导出该JSON。
 
+新研究应先在独立目录保存正常／干预运行的`eval_info.json`及工件，从`h0`按batch1任务／回合顺序导出hash，核对十任务、每任务回合数、总数与正常组逐项匹配；登记新的正常组映射及独立分析输出，并另行验收。仅复制JSON或修改`build.py`不能完成这一步。现有生成器没有新研究自动登记接口，不得替换旧`SC_RUNS`或冻结证据来接入新结果。
 ```bash
 python3 dashboard/build.py
 python3 scripts/analysis/make_figures.py

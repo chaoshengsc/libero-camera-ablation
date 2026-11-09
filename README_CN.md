@@ -93,7 +93,7 @@
 | 主视角处理（腕部正常） | π0.5 v044 | π0 v044 |
 |---|---|---|
 | 正常更新 | 492/500 · 98.4% | 360/500 · 72.0% |
-| 原槽位mask为0 | **277/500 · 55.4%** | **371/500 · 74.2%** |
+| 屏蔽主视角输入（原槽位mask＝0） | **277/500 · 55.4%** | **371/500 · 74.2%** |
 
 主视角单独涂黑另有早期100回合结果；主视角单独冻结尚未完成，已列入下方补做计划。
 
@@ -197,7 +197,7 @@ OpenVLA没有腕部输入，腕部条件不适用，不作为缺失实验或待�
 
 ## 版本与证据
 
-**v1.5.5 · 2026-11-09**：已完成腕部主实验、主视角mask附加对照与公开证据验收；上述补做实验尚未启动。评测证据沿用v1.5.3。迁移准备与逐组运行配方已整理，新设备运行尚未验收；旧冻结标签保持不动。
+**v1.5.6 · 2026-11-09**：已完成腕部主实验、主视角mask附加对照与公开证据验收；上述补做实验尚未启动。评测证据沿用v1.5.3。迁移准备与逐组运行配方已整理，新设备运行尚未验收；旧冻结标签保持不动。
 
 [研究结构与覆盖范围](docs/STUDY_MAP_CN.md) · [冻结说明](docs/FREEZE_CN.md) · [公开证据SHA-256](results/freeze_20261109_v1.5.3.sha256)
 
@@ -292,7 +292,7 @@ OpenPI原版π0使用`gs://openpi-assets/checkpoints/pi0_libero`；[OpenPI指南
   author  = {ShengChao},
   title   = {libero-camera-ablation: Camera-input ablations of four robot policies on LIBERO-Spatial},
   year    = {2026},
-  version = {1.5.5},
+  version = {1.5.6},
   url     = {https://github.com/chaoshengsc/libero-camera-ablation}
 }
 ```

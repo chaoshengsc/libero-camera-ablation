@@ -102,3 +102,17 @@ def test_printed_environment_cannot_inherit_openpi_bridge_or_delta_diagnostics(t
     environment = dict(os.environ, POLICY_SERVER="dummy-inherited-server", OPENPI_AUTHKEY="dummy-key", DELTA_REF="step")
     result = subprocess.run([*prefix, sys.executable, "-c", probe], env=environment, capture_output=True, text=True, check=True, timeout=10)
     assert json.loads(result.stdout) == [None, None, "chunk"]
+
+
+def test_environment_template_initializes_conda_from_a_path_with_spaces(tmp_path):
+    work = tmp_path / "prepared workspace with spaces"
+    conda = work / "miniforge3/etc/profile.d/conda.sh"
+    conda.parent.mkdir(parents=True)
+    conda.write_text("export CAMERA_TEST_CONDA_LOADED=ready\n")
+    probe = 'source "$1"; [ "${CAMERA_TEST_CONDA_LOADED:-}" = ready ]'
+    result = subprocess.run(
+        ["bash", "-c", probe, "camera-env-check", str(ROOT / "env/env.sh.example")],
+        env=dict(os.environ, EMB_ROOT=str(work), EMB_STRICT="0"), capture_output=True, text=True, timeout=10,
+    )
+    assert result.returncode == 0, result.stderr
+    assert result.stderr == ""
