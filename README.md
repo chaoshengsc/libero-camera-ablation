@@ -2,99 +2,153 @@
 
 # Do robot policies actually use their cameras?
 
-Camera ablations of four robot policies on LIBERO-Spatial
+**Visual dependence in robot policies · LIBERO-Spatial simulation**
+
+**English** · [中文](README_CN.md) · [Open interactive results](https://chaoshengsc.github.io/libero-camera-ablation/dashboard/?lang=en)
 
 [![CI](https://github.com/chaoshengsc/libero-camera-ablation/actions/workflows/ci.yml/badge.svg)](https://github.com/chaoshengsc/libero-camera-ablation/actions/workflows/ci.yml)
 [![Release](https://img.shields.io/github/v/release/chaoshengsc/libero-camera-ablation?color=2563eb)](https://github.com/chaoshengsc/libero-camera-ablation/releases)
 [![License: MIT](https://img.shields.io/badge/license-MIT-lightgrey)](LICENSE)
 
-**English** · [中文](README_CN.md)
-
-[Frozen snapshot](docs/FREEZE.md) · [Findings](#1-camera-ablations) · [Reproduction](#2-reproduction-of-the-public-checkpoints) · [Quick start](#quick-start) · [Data](results/README.md) · [Docs](docs/README.md)
-
 </div>
 
-**Does completing a simulated task mean a robot uses its cameras?** We ablate camera inputs for public π0, π0.5, OpenVLA, and SmolVLA checkpoints, then use an official π0 control, fixed-action replay and state-input checks to bound the interpretation. Evaluation of five public checkpoints against published references provides the engineering foundation.
+**Does completing a simulated task establish that a robot uses its cameras?** This project intervenes on visual inputs to public policy checkpoints and tracks success, trajectories and preprocessing. Four-policy exploration leads to a focused two-policy wrist-treatment study, with separate controls bounding the interpretation.
 
-**In the tested all-black episodes, the π0.5, OpenVLA and SmolVLA checkpoints score 0%. LeRobot π0 v044 scores 53–56% across five runs; official π0 in OpenPI scores 0/100.**
+## Project contributions
 
-<p align="center">
-  <img src="media/blackout_demo.gif" width="720" height="300" alt="Same LIBERO task: π0.5 succeeds with normal vision and fails with black input; LeRobot π0 still succeeds with black input">
-  <br><sub>Same task and initial state. The two right-hand policies receive black images; the videos show their actual actions in the simulator.</sub>
-</p>
-
-| Your goal | Start here |
-|---|---|
-| Understand the findings | [Key findings](#1-camera-ablations) → [Full experiments & figures](docs/EXPERIMENTS.md) |
-| Reproduce an experiment | [Install](docs/INSTALL.md) → [Script index](scripts/README.md) → [Troubleshoot](docs/TROUBLESHOOTING.md) |
-| Verify a number | [Result tables](results/README.md) → [Raw evaluations](dashboard/data/) → [Notes & corrections](docs/NOTES.md) |
-
-[Docs & data guide](docs/README.md) · [Interactive results](https://chaoshengsc.github.io/libero-camera-ablation/dashboard/?lang=en) · [Repository layout](#repository-layout) · [Limitations](#limitations)
-
-## Frozen snapshot · v1.5.1
-
-**Camera-ablation evidence frozen on 2026-11-09.** This version fixes the existing results, protocol audits and interpretation limits; no new model runs were performed.
-
-| Completed | Evidence | Scope |
+| Work | Concrete output | Evidence |
 |---|---|---|
-| **Camera-input interventions** | Blackout, noise, frozen first frame, single camera | Four public policies; repeats and denominators remain separate |
-| **Interpretation controls** | Official π0, P1 state freezing, P2 fixed-action replay | Observed sensitivity is distinguished from unidentified internal mechanisms |
-| **Protocol & provenance audits** | 220-step recount, checkpoint identity and loading records | Existing artifacts; no new evaluation or same-weight pipeline control |
+| **Multi-policy evaluation and interventions** | π0, π0.5, OpenVLA and SmolVLA; blackout, original-slot masks, frozen first frames | [Execution entries](scripts/README.md) · [Pinned environments](env/README.md) |
+| **Controlled follow-up to anomalous results** | Two-policy wrist study; supplementary agent masking; official π0, state-update and fixed-action checks | Figures below · [Full study structure](docs/STUDY_MAP.md) |
+| **Upstream camera-slot bug report and fix PR** | Identified silent image shifting when an earlier camera is missing; fix covers six policies | [Issue #5118](https://github.com/huggingface/lerobot/issues/5118) · [PR #5129](https://github.com/huggingface/lerobot/pull/5129) |
 
-[**Freeze scope & evidence map →**](docs/FREEZE.md) · [SHA-256 manifest](results/freeze_20261109.sha256) · [Interactive results](https://chaoshengsc.github.io/libero-camera-ablation/dashboard/?lang=en)
+**Scope: four checkpoints in all-black exploration, three dual-view checkpoints in early perturbations, π0/π0.5 in the wrist follow-up.** Coverage differs by stage; this is not a full intervention suite for every model. The study evaluates public checkpoints.
 
-## 1. Camera ablations
+<a id="1-camera-ablations"></a>
 
-### All cameras black
+## 1. Four-policy overview: what happens with all-black visual inputs?
 
-| Policy | Normal vision | All cameras black |
+![Four-policy normal-versus-black overview, representative 100-episode runs](media/blackout_overview.svg)
+
+**The tested π0.5, OpenVLA and SmolVLA checkpoints have no all-black successes; LeRobot π0 v044 retains some.** Each plotted condition is a representative 100-episode result. π0 scores 53–56% across five runs reusing the same 100 states, not 500 independent states. OpenVLA has only an agent-view camera; the others have agent and wrist views.
+
+[Per-task counts](results/blackout_per_task.csv) · [Repeats and protocol](docs/EXPERIMENTS.md#11-all-cameras-black)
+
+<details>
+<summary>Expand the four-policy figure's values</summary>
+
+| Policy | Normal vision | All visual inputs black |
 |---|---|---|
 | π0.5 | 99% | 0% |
 | OpenVLA | 81% | 0% |
 | SmolVLA | 83% | 0% |
-| **π0 · LeRobot v044** | 76% | **56%** |
+| π0 · LeRobot v044 | 76% | 56% |
 
-These are representative 100-episode runs. Normal vision uses the first 10 episodes per task of each 500-episode evaluation. The first three policies also score 0% in a repeat.
+</details>
 
-π0 scores **53–56%** across five all-black runs. They use the same 100 initial states, so they are not 500 independent states.
+## 2. Focused study: change the wrist treatment, keep the agent view live
 
-<a id="15-official-π0-control"></a>
+This later study covers **LeRobot π0/π0.5 v044 only**. π0.5 previously approached zero success with wrist-black input: does this persist with original-slot masking or first-frame freezing? π0 v044 provides a contrasting response.
 
-### Official π0 control
+The table first shows the two policies’ common new500-state conditions; the figure separately labels historical wrist-black evidence and the supplementary condition.
 
-![Official π0 and LeRobot π0 camera-ablation comparison](media/official_pi0.svg)
+| Wrist condition (agent view always live) | π0.5 v044 | π0 v044 |
+|---|---|---|
+| Live | **492/500 · 98.4%** | 360/500 · 72.0% |
+| Original-slot mask false | **23/500 · 4.6%** | 356/500 · 71.2% |
+| First wrist frame frozen | **0/500 · 0.0%** | 364/500 · 72.8% |
 
-With normal vision, official π0 in OpenPI scores **96.4%** and LeRobot π0 v044 in LeRobot scores **72.0%** (500 episodes each). With all cameras black, they score **0/100** and **53–56%** across five LeRobot runs, respectively.
+![Two-policy wrist study with supplementary agent masking in a separate group](media/single_camera.svg)
 
-**In these all-black comparisons, LeRobot π0 v044 with its pipeline retains successful episodes; official π0/OpenPI has none.**
+**π0.5 is highly sensitive to the tested wrist interventions; π0 v044 does not show the same decrease.** These observations concern the tested checkpoints and protocols. Freezing also changes image–state synchronization; it does not uniquely identify an internal mechanism.
 
-Both the weights and the inference pipeline differ between the two sides; the difference cannot be attributed to the weights alone.
+**Keep two evidence types separate:** π0.5 wrist black borrows five historical 100-state repeats, all 0/100, not a paired arm over the same 500 states. Agent masking is supplementary: π0.5 277/500 = 55.4%, π0 371/500 = 74.2%. Agent-only freezing and single-camera noise were not run; π0.5 both-camera masking is also untested.
 
-A re-run of official π0 at 360 rendering still scores 0/100 with black input; this resolution change did not restore success. Further checks add context:
+[Design and missing conditions](docs/STUDY_MAP.md#2-main-experiment-change-the-wrist-treatment-keep-the-agent-view-live) · [Paired differences and 95% intervals](results/single_camera_summary.csv)
 
-- **Image-freezing sensitivity.** The tested π0.5 and SmolVLA checkpoints score 0% with frozen first frames in both runs. Masking the wrist camera in its original slot brings π0.5 from 98.4% to 4.6% (500 episodes per condition). Freezing changes both visual updates and image–state synchronization; their effects remain unseparated.
-- **Fixed actions also succeed.** P2 replays one preselected official π0 sequence per task on states excluded from action selection: **262/400 = 65.5%**, with a **61.0–69.8%** stratified-bootstrap interval and **10/10** self-replay checks. This strengthens the baseline without identifying the LeRobot π0 mechanism. [Protocol, earlier replay and limits](docs/EXPERIMENTS.md#16-fixed-action-replay) · [Data](results/replay_holdout_summary.csv).
-- **State-input freezing sensitivity.** In P1, LeRobot π0 v044 averages **73.3% / 55.3%** with normal/black images across three repeats; both score **0%** when the model receives its frozen first state. This measures update sensitivity without separating correction, phase cues and input mismatch. [Paired statistics](docs/EXPERIMENTS.md#17-state-input-update-sensitivity) · [Data](results/state_feedback_comparisons.csv).
+## 3. Why does π0 retain all-black successes? Bound the interpretation
 
-See the [full experiments](docs/EXPERIMENTS.md) for designs, repeated runs, per-task results, and statistical scope. The [notes](docs/NOTES.md) retain chronological records and corrections.
+| Additional check | Key observation | Interpretation limit |
+|---|---|---|
+| **Official π0/OpenPI** | Matched100 states: official normal 93/100, black 0/100; LeRobot normal 65/100, black 53–56/100 across five runs | Weights and pipelines both change; conversion or training cannot be uniquely blamed |
+| **P1: state-input updates** | LeRobot π0 three-run means: normal 73.3%, black 55.3%; frozen first model state gives 0% in both | State-update sensitivity, without separating online correction, phase cues and input mismatch |
+| **P2: fixed-action replay** | Preselected official π0 actions succeed on 262/400 selection-excluded states = 65.5%; 95% interval 61.0–69.8% | Fixed actions can succeed; this does not establish internal replay or permit subtraction from P1 |
 
-Budgets differ by path: OpenVLA allows 220 control steps; the other LIBERO model clients allow 280, each with ten additional settling steps. Recounting retained artifacts at 220 steps preserves the headline blackout table; official π0's 500 normal episodes give 481/500. This is not a complete common-protocol reproduction or model ranking; see [the deadline check](docs/EXPERIMENTS.md#34-existing-episodes-at-the-same-220-step-deadline).
+These **bound the anomalous π0 result**; they do not causally validate the wrist experiment. P1 uses its own paired normal runs; P2 makes no policy calls. Their rates should not be combined as one normal/intervention experiment.
 
-## 2. Reproduction of the public checkpoints
+<details>
+<summary>Expand technical control figures and complete statistics</summary>
 
-| Model | Task | This repo (500 episodes) | Reference | Repo criterion |
-|---|---|---|---|---|
-| ACT | ALOHA Transfer Cube | **83.2%** | 83.0% (Hugging Face repo) | ✅ |
-| OpenVLA | LIBERO-Spatial | **86.2%** | 84.7 ± 0.9% (official README) | ✅ |
-| SmolVLA | LIBERO-Spatial | **85.4%** | 90% (paper, 100 episodes) | ✅ |
-| π0.5 | LIBERO-Spatial | **98.0%** | 98.8% (OpenPI), 97.0% (LeRobot) | ✅ |
-| Diffusion Policy | PushT (2-D, not MuJoCo) | **63.0%** | 65.4% (LeRobot model card) | ✅ |
+![Official and LeRobot π0: matched100 points, with repeats shown separately](media/official_pi0.svg)
 
-This repository compares its 95% confidence interval with a reference range: a reported ± value, an interval estimated from an available episode count, or a single point when no range is available. Overlap meets this repository's “reproduction” criterion. This is a reference-comparison convention, not a performance-equivalence test or a claim to reproduce identical training configurations. Each evaluation has 500 episodes, giving this repository's interval of about ±1–4 points.
+All points use 100 episodes; 500-episode runs contribute only their first ten initial states per task. Separate full500 references: official 482/500 = 96.4%, LeRobot 360/500 = 72.0%. Repeated states receive no pooled Wilson interval. Matching task/init indices does not establish bitwise-matched policy noise or complete states.
 
-SmolVLA uses `lerobot/smolvla_libero` with `n_action_steps=10`, trained on LIBERO-Spatial only. The paper trains on four suites; its 100-episode reference has an interval of about ±6 points.
+![P1 state-update sensitivity](media/state_feedback.svg)
 
-See [reproduction details](docs/EXPERIMENTS.md#2-reproduction-of-the-public-checkpoints) for the full reference context.
+![P2 selection-excluded fixed-action replay](media/replay_holdout.svg)
+
+[Matched100 records](results/official_pi0_matched100.csv) · [Full official-control table](results/official_pi0_summary.csv) · [P1 paired statistics](results/state_feedback_comparisons.csv) · [P2 task statistics](results/replay_holdout_summary.csv)
+
+</details>
+
+## 4. Engineering contribution: prevent camera shifts from confounding ablations
+
+While building the ablations, this project identified a LeRobot behavior: missing an earlier camera packs subsequent images into earlier slots. **A wrist image can silently enter the agent-view slot.** The resulting intervention changes image layout as well as camera availability.
+
+The study masks cameras in their original slots. The upstream fix PR covers **six policies**. Before submission, new regression cases scored **21 failed / 6 passed on the old implementation → 27/27 passed with the fix**. These establish reproduction and regression coverage. A submitted PR is not a claim of merge or adoption.
+
+[Issue and reproduction](https://github.com/huggingface/lerobot/issues/5118) · [Fix and test evidence](https://github.com/huggingface/lerobot/pull/5129)
+
+## Experiment coverage at a glance
+
+| Policy / workstream | Completed | Untested / inapplicable |
+|---|---|---|
+| π0 / π0.5 v044 | Single/all black, both-camera noise/freezing; wrist follow-up; supplementary agent mask | Agent-only freezing, single-camera noise; π0.5 both-mask untested |
+| SmolVLA | Single/all black, both-camera noise/freezing | Original-slot masks and wrist-only freezing untested |
+| OpenVLA | Blackout of its sole agent-view input | Wrist inapplicable; masks/freezing/noise untested |
+| Official π0/OpenPI | Additional checkpoint/pipeline control; selected render checks | Not a same-weight pipeline comparison |
+| Engineering references | ACT, OpenVLA, SmolVLA, π0.5, Diffusion Policy; 500 episodes each | Different membership from the four-policy camera study; no common-protocol ranking |
+
+[Full coverage map](docs/STUDY_MAP.md) · [All experiments and limits](docs/EXPERIMENTS.md) · [Public source records](dashboard/data/) · [Interactive results](https://chaoshengsc.github.io/libero-camera-ablation/dashboard/?lang=en)
+
+<details>
+<summary>Expand task demos (selected two-policy examples, not a four-policy overview)</summary>
+
+![Selected π0.5 and π0 runs for the same task and initial state](media/blackout_demo.gif)
+
+Same task and initial state. The two right-hand runs receive black images; videos show simulator actions. These selected episodes illustrate the phenomenon; aggregate results support the findings.
+
+</details>
+
+<a id="2-reproduction-of-the-public-checkpoints"></a>
+
+<details>
+<summary>Expand engineering reference comparisons for five public checkpoints</summary>
+
+![Five public checkpoints compared with source references](media/reproduction.svg)
+
+Each checkpoint has 500 episodes. The project uses overlap between its 95% interval and each source's reference range as an engineering convention, not an equivalence test or identical-protocol reproduction. ACT and PushT are outside the LIBERO camera study; π0 is not one of these five reference entries.
+
+| Checkpoint | This repo (500 episodes) |
+|---|---|
+| ACT | 83.2% |
+| OpenVLA | 86.2% |
+| SmolVLA | 85.4% |
+| π0.5 | 98.0% |
+| Diffusion Policy | 63.0% |
+
+[Numbers and sources](results/reproduction.csv) · [Criteria and configuration differences](docs/EXPERIMENTS.md#2-reproduction-of-the-public-checkpoints)
+
+</details>
+
+## Version and evidence
+
+**v1.5.2 · 2026-11-09:** the overview, figures and data navigation now distinguish four-policy exploration from two-policy follow-up. Matched100 normal controls are explicit; repeated states receive no pooled independent-sample interval. Original records are unchanged, and no missing condition was rerun. The v1.5.1 tag stays fixed. The separate fine-tuning project is excluded.
+
+[Study structure and audit findings](docs/STUDY_MAP.md) · [Freeze scope](docs/FREEZE.md) · [Public evidence SHA-256](results/freeze_20261109_v1.5.2.sha256)
+
+<details>
+<summary>Reproduction, installation, repository layout and full limitations</summary>
 
 ## Quick start
 
@@ -142,6 +196,9 @@ libero-camera-ablation/
 - [Replay](docs/EXPERIMENTS.md#16-fixed-action-replay) concerns the selected sequences and states. P2 targets were excluded from action selection but had appeared in earlier evaluations; they are not a hidden test set. P1/P2 use different checkpoint/state protocols and cannot be subtracted to assign mechanism contributions. P1 lacks stepwise terminal flags and full images; state freezing does not identify a unique mechanism. Full NPZ audit artifacts remain outside Git; published records reproduce rates and intervals.
 - Diffusion Policy was evaluated on PushT (2-D physics), not in MuJoCo.
 
+
+</details>
+
 ## Acknowledgements and licenses
 
 Code is [MIT licensed](LICENSE). Upstream projects, checkpoints, and tokenizers retain their own terms. Model weights and tokenizer files are not included.
@@ -153,7 +210,7 @@ This repository contains no model weights and no upstream source code. It builds
 
 | Project | Used for | License |
 |---|---|---|
-| [LeRobot](https://github.com/huggingface/lerobot) v0.6.1 | ACT, Diffusion Policy, SmolVLA, π0, π0.5 evaluation and π0 fine-tuning | Apache-2.0 |
+| [LeRobot](https://github.com/huggingface/lerobot) v0.6.1 | ACT, Diffusion Policy, SmolVLA, π0, π0.5 evaluation | Apache-2.0 |
 | [OpenVLA](https://github.com/openvla/openvla) | OpenVLA evaluation | MIT |
 | [OpenPI](https://github.com/Physical-Intelligence/openpi) | Native π0 inference and π0 / π0.5 reference numbers | Apache-2.0 |
 | [LIBERO](https://github.com/Lifelong-Robot-Learning/LIBERO) | benchmark | MIT |
@@ -177,11 +234,11 @@ If you use these results or scripts, please cite:
   author  = {ShengChao},
   title   = {libero-camera-ablation: Camera-input ablations of four robot policies on LIBERO-Spatial},
   year    = {2026},
-  version = {1.5.1},
+  version = {1.5.2},
   url     = {https://github.com/chaoshengsc/libero-camera-ablation}
 }
 ```
 
 The same entry is in [`CITATION.cff`](CITATION.cff), which GitHub's "Cite this repository" button reads.
 
-The v1.5.1 tag freezes the camera-ablation evidence; see the [freeze scope and verification](docs/FREEZE.md). The v1.5 tag includes P1/P2 results, their public data and reproduction guides. The earlier v1.4 tag records the single-camera snapshot. For changes after v1.5, also record the commit used.
+The v1.5.2 tag freezes the camera-ablation evidence; see the [freeze scope and verification](docs/FREEZE.md). The v1.5 tag includes P1/P2 results, their public data and reproduction guides. The earlier v1.4 tag records the single-camera snapshot. For changes after v1.5, also record the commit used.

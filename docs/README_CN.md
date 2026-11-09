@@ -6,6 +6,7 @@ README 给出主要结论；这里按阅读、复现与核查组织完整材料�
 
 | 目的 | 文档 | 内容 |
 |---|---|---|
+| 先看研究结构 | [模型与实验覆盖](STUDY_MAP_CN.md) | 四模型探索、双模型深入、附加条件与未测项 |
 | 查看冻结版本 | [冻结说明与证据地图](FREEZE_CN.md) | 相机消融的最终公开范围、主要数字、边界与哈希清单 |
 | 理解实验 | [实验设计与完整结果](EXPERIMENTS_CN.md) | 干预定义、全部表格、重复运行与解释边界 |
 | 核对协议 | [步数与验收范围](EXPERIMENTS_CN.md#3-评测协议与验收范围) | 控制预算、重推理间隔、停止规则与记录缺口 |
@@ -28,7 +29,7 @@ README 给出主要结论；这里按阅读、复现与核查组织完整材料�
 | 实验说明 | 结果表 | 原始证据入口 |
 |---|---|---|
 | [全涂黑](EXPERIMENTS_CN.md#11-所有相机涂黑) | [blackout_per_task.csv](../results/blackout_per_task.csv) | [原始记录](../dashboard/data/) |
-| [噪声与冻结](EXPERIMENTS_CN.md#12-单路相机噪声冻结画面) | [perturbations.csv](../results/perturbations.csv) | [原始记录](../dashboard/data/run2/) |
+| [噪声与冻结](EXPERIMENTS_CN.md#12-单路相机噪声冻结画面) | [perturbations.csv](../results/perturbations.csv) | [第一轮](../dashboard/data/)／[第二轮](../dashboard/data/run2/) |
 | [轨迹比较](EXPERIMENTS_CN.md#13-看不见的-π0-在成功的任务上走的是同一条路线) | [trajectory.csv](../results/trajectory.csv) | [原始记录](../dashboard/data/traj_analyze.json) |
 | [单路相机](EXPERIMENTS_CN.md#14-只去掉腕部相机500-回合) | [single_camera_summary.csv](../results/single_camera_summary.csv) | [原始记录](../dashboard/data/s500/) |
 | [官方 π0](EXPERIMENTS_CN.md#15-官方-π0-对照) | [official_pi0_summary.csv](../results/official_pi0_summary.csv) | [原始记录](../dashboard/data/official_pi0/) |

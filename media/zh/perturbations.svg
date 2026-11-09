@@ -2,11 +2,11 @@
 <rect width="760" height="350" rx="8" fill="#ffffff"/>
 <text x="20" y="28" font-size="16" font-weight="600">扰动相机输入后的成功率（柱 = 平均，圆点 = 两次运行，各 100 回合）</text>
 <rect x="20" y="42" width="12" height="12" rx="2" fill="#9ca3af"/><text x="37" y="53" fill="#6b7280">正常</text>
-<rect x="81" y="42" width="12" height="12" rx="2" fill="#86efac"/><text x="98" y="53" fill="#6b7280">加高斯噪声</text>
-<rect x="181" y="42" width="12" height="12" rx="2" fill="#14b8a6"/><text x="198" y="53" fill="#6b7280">冻结首帧</text>
-<rect x="268" y="42" width="12" height="12" rx="2" fill="#60a5fa"/><text x="285" y="53" fill="#6b7280">只涂主视角</text>
-<rect x="368" y="42" width="12" height="12" rx="2" fill="#f59e0b"/><text x="385" y="53" fill="#6b7280">只涂腕部</text>
-<rect x="455" y="42" width="12" height="12" rx="2" fill="#111827"/><text x="472" y="53" fill="#6b7280">全涂黑</text>
+<rect x="81" y="42" width="12" height="12" rx="2" fill="#86efac"/><text x="98" y="53" fill="#6b7280">双路加噪声</text>
+<rect x="181" y="42" width="12" height="12" rx="2" fill="#14b8a6"/><text x="198" y="53" fill="#6b7280">双路冻结首帧</text>
+<rect x="294" y="42" width="12" height="12" rx="2" fill="#60a5fa"/><text x="311" y="53" fill="#6b7280">只涂主视角</text>
+<rect x="394" y="42" width="12" height="12" rx="2" fill="#f59e0b"/><text x="411" y="53" fill="#6b7280">只涂腕部</text>
+<rect x="481" y="42" width="12" height="12" rx="2" fill="#111827"/><text x="498" y="53" fill="#6b7280">全涂黑</text>
 <line x1="56" y1="306.0" x2="730" y2="306.0" stroke="#e5e7eb"/>
 <text x="48" y="310.0" text-anchor="end" fill="#6b7280">0%</text>
 <line x1="56" y1="252.5" x2="730" y2="252.5" stroke="#e5e7eb"/>

@@ -6,6 +6,36 @@ const sum = (a) => a.reduce((p, q) => p + q, 0);
 // ---- 语言：默认跟随浏览器，？lang=zh|en 或右上角按钮切换。英文版在渲染后按词典替换文本（整句在前，短词在后）。
 const LANG = new URLSearchParams(location.search).get("lang") || ((navigator.language || "").toLowerCase().startsWith("zh") ? "zh" : "en");
 const DICT = [
+  ["有录像时，每个任务至多展示一段成功和一段失败选例。录像缺失不代表没做实验；全黑录像展示真实环境，策略收到的是黑图。", "When available, each task shows at most one success and one failure example. Missing video does not mean a missing experiment. All-black videos show the real environment; the policy received black images."],
+  ["输入与操作示意不代表每个模型都完成了所有干预；实际范围见上方覆盖表。", "The input/operation diagram does not establish that every policy received every intervention. See the coverage table above."],
+
+  ["三模型探索：单路黑图与双路噪声／冻结", "Three-policy exploration: single-camera black and both-camera noise/freezing"],
+  ["两模型腕部主实验；主视角mask为附加条件", "Two-policy wrist study; agent masking is supplementary"],
+  ["π0与π0.5腕部主实验及分区的主视角附加条件", "π0 and π0.5 wrist study, with supplementary agent masking separated"],
+  ["额外检查点对照：官方 π0 / OpenPI", "Additional checkpoint control: official π0 / OpenPI"],
+  ["官方π0与LeRobotπ0：每点同100初态，重复逐次展示", "Official and LeRobot π0: same100 states per point, repeats shown individually"],
+  ["查看参考复现中的三个LIBERO检查点", "Inspect the three LIBERO checkpoints in the reference comparisons"],
+  ["参考复现中的三个LIBERO检查点：逐任务结果", "Three LIBERO checkpoints in the reference comparisons: per-task results"],
+  ["两个模型的选例演示，不是四模型总览。同任务同初态，右侧两次策略收到黑图。", "Selected two-policy demos, not a four-policy overview. Same task/state; the two right-hand policies receive black images."],
+  ["腕部主实验只覆盖π0／π0.5，主视角保持正常。正常、腕部mask和腕部冻结各500初态；π0.5腕部黑图借用同100初态的5次重复。主视角mask为附加条件，不是完整主视角实验；主视角单独冻结与单路噪声未测。", "The wrist study covers π0/π0.5 only, with the agent view live. Normal, wrist mask and wrist freeze use500 states each; π0.5 wrist black borrows five repeats of100 states. Agent masking is supplementary, not a full agent-view experiment. Agent-only freezing and single-camera noise are untested."],
+  ["图中每点取同100初态，正常为官方93/100、LeRobot65/100；500回合运行只取每任务前10初态。LeRobot重复逐次展示，不合并Wilson区间。完整500正常96.4%／72.0%另列参考；权重与推理管线同时不同，不作单因素归因。", "Each point uses the same100 states: normal93/100 official and65/100 LeRobot. Full500 runs contribute the first10 states per task. LeRobot repeats remain separate, without pooled Wilson intervals. Full500 normal96.4%/72.0% are separate references. Weights and pipelines both differ; no single-factor causal attribution."],
+  ["实验范围：4 → 3 → 2", "Experiment scope: 4 → 3 → 2"],
+  ["范围", "Scope"],
+  ["已完成的实验", "Completed experiments"],
+  ["没有覆盖的部分", "Outside coverage"],
+  ["四模型", "Four policies"],
+  ["全黑探索", "All-black exploration"],
+  ["不是四模型都完成全部干预", "Not every intervention for every policy"],
+  ["三个双视角模型", "Three dual-view policies"],
+  ["单路黑图、双路噪声和双路冻结", "Single-camera black, both-camera noise/freezing"],
+  ["OpenVLA仅主视角，不在此组", "OpenVLA is agent-only, outside this group"],
+  ["腕部单因素主实验；主视角mask附加条件", "Wrist-treatment study; supplementary agent mask"],
+  ["主视角单独冻结、单路噪声未测", "Agent-only freezing and single-camera noise untested"],
+  ["官方π0为额外检查点与管线对照；P1/P2界定π0异常结果的解释，不是腕部因果验证。五项工程参考对照是另一组模型。", "Official π0 adds a checkpoint/pipeline control; P1/P2 bound the anomalous π0 result, not wrist causality. Five engineering references form a separate policy set."],
+  ["双路加高斯噪声", "Both-camera Gaussian noise"],
+  ["双路冻结首帧", "Both first frames frozen"],
+  ["完整模型与实验覆盖", "Full policy and experiment coverage"],
+
   ["状态输入更新（P1）", "State-input updates (P1)"],
   ["选择外固定动作回放（P2）", "Selection-external replay (P2)"],
   ["补充结果数据加载中；可直接查看下方CSV和原始记录。", "Follow-up data is loading; CSVs and raw records are linked below."],
@@ -31,7 +61,7 @@ const DICT = [
   ["同一任务、同一初始状态。右侧两次运行中，策略收到的是黑图。", "Same task and initial state. In the two right-hand runs, the policy receives black images."],
   ["开环回放：固定动作能完成多少任务", "Open-loop replay: how far fixed actions go"],
   ["动作来自官方π0正常运行。每任务事后挑出的最好一套为77.8%，存在选择偏差，不能当作无偏基线。固定的是高层动作，底层控制器仍有反馈；回放不识别LeRobot π0全黑成功的内部机制。", "Actions come from official π0 with normal vision. The post-hoc best sequence per task scores 77.8%, with selection bias rather than an unbiased baseline. High-level actions are fixed; the low-level controller retains feedback. Replay does not identify the mechanism of LeRobot π0 all-black success."],
-  ["公开权重对照中的本仓库区间使用正态近似；官方π0对照使用Wilson区间。参考范围定义、配对与重复限制见实验说明。", "This repo's public-checkpoint intervals use the normal approximation; the official π0 control uses Wilson intervals. See the experiment report for reference ranges, pairing and repeat limitations."],
+  ["公开权重对照中的本仓库区间使用正态近似；官方图按匹配100初态逐次展示。参考范围定义、配对与重复限制见实验说明。", "This repo's public-checkpoint intervals use the normal approximation; the official π0 figure shows matched100 runs separately. See the experiment report for reference ranges, pairing and repeat limitations."],
   ["查看两次运行的轨迹明细", "Inspect both trajectory runs"],
   ["选择模型查看评测与基准来源", "Select a model to inspect evaluation and reference sources"],
   ["点击模型行查看来源；键盘可用上下方向键切换。", "Select a model row for sources. Use the up and down arrow keys to move between models."],
@@ -129,7 +159,7 @@ $("langBtn").onclick = () => { location.search = "?lang=" + (LANG === "en" ? "zh
 // README 用的两张图：线上在仓库的 media/ 下；本地没有这些文件时整块隐藏
 for (const [id, name] of [["figInputs", "inputs"], ["figTraj", "trajectory"], ["figSingle", "single_camera"], ["figOfficial", "official_pi0"], ["figReplay", "open_loop_replay"]]) {
   $(id).onerror = () => $(id).closest(".fig").classList.add("hidden");
-  $(id).src = `../media/${LANG === "en" ? "" : "zh/"}${name}.svg?v=claims-1`;
+  $(id).src = `../media/${LANG === "en" ? "" : "zh/"}${name}.svg?v=structure-2`;
 }
 $("figInputsMobile").srcset = `../media/${LANG === "en" ? "" : "zh/"}inputs-mobile.svg?v=claims-1`;
 if (LANG === "en") {
@@ -306,7 +336,7 @@ function drawBlackout() {
 // ---- 1.2 扰动矩阵、1.3 分任务路线差异
 function drawFollowup() {
   const PT = Object.fromEntries((FU.perturb || []).map(r => [r.model, r]));
-  const cols = [["normal", "正常"], ["noise", "加高斯噪声"], ["freeze", "冻结首帧"], ["agent_black", "只涂主视角"], ["wrist_black", "只涂腕部"], ["all_black", "全涂黑"]];
+  const cols = [["normal", "正常"], ["noise", "双路加高斯噪声"], ["freeze", "双路冻结首帧"], ["agent_black", "只涂主视角"], ["wrist_black", "只涂腕部"], ["all_black", "全涂黑"]];
   let h = `<thead><tr><th></th>${cols.map(c => `<th>${c[1]}</th>`).join("")}</tr></thead><tbody>`;
   const P2 = Object.fromEntries((FU.perturb2 || []).map(r => [r.model, r]));
   for (const c of FU.cam || []) {

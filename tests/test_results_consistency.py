@@ -74,7 +74,7 @@ def test_readme_blackout_overview_matches_result_table():
             if len(cells) != 3:
                 continue
             model = cells[0].split(" · ")[0]
-            if (model, "normal") in expected:
+            if (model, "normal") in expected and all(re.fullmatch(r"[0-9.]+%", c) for c in cells[1:]):
                 found[model] = tuple(float(c.rstrip("%")) for c in cells[1:])
         assert set(found) == {model for model, _ in expected}
         for model, (normal, black) in found.items():
@@ -265,3 +265,29 @@ def test_dashboard_replay_summary_matches_raw_pairs():
     own = [v for task in raw["tasks"] for v in task["self"].values()]
     cross = [v for task in raw["tasks"] for source in task["cross"].values() for v in source.values()]
     assert actual == {"self_ok": sum(own), "self_n": len(own), "cross_ok": sum(cross), "cross_n": len(cross)}
+
+
+def test_matched100_control_uses_ten_states_from_every_task():
+    """A 500-state baseline must not be compared as if it were the matched100 control."""
+    entries = rows("official_pi0_matched100.csv")
+    normal = {entry["side"]: entry for entry in entries if entry["condition"] == "both"}
+    assert {side: int(entry["successes"]) for side, entry in normal.items()} == {"official": 93, "lerobot": 65}
+    for entry in entries:
+        raw = json.loads((DATA / entry["raw_run"] / "eval_info.json").read_text())
+        tasks = sorted(raw["per_task"], key=lambda task: task["task_id"])
+        expected = sum(bool(value) for task in tasks for value in task["metrics"]["successes"][:10])
+        assert len(tasks) == 10 and int(entry["episodes"]) == 100
+        assert entry["subset"] == "first10_per_task"
+        assert int(entry["successes"]) == expected
+        assert int(entry["source_episodes"]) == sum(len(task["metrics"]["successes"]) for task in tasks)
+
+
+def test_reused_states_are_not_given_a_pooled_independent_sample_interval():
+    """Five blackout runs and two freezing runs reuse100 states; retain each run."""
+    aggregate = {(entry["side"], entry["condition"]): entry for entry in rows("official_pi0_summary.csv")}
+    matched = rows("official_pi0_matched100.csv")
+    for condition, expected in [("all_black", [56, 54, 56, 54, 53]), ("both_frozen", [71, 80])]:
+        assert aggregate["lerobot", condition]["wilson_lo"] == ""
+        assert aggregate["lerobot", condition]["wilson_hi"] == ""
+        actual = [int(entry["successes"]) for entry in matched if entry["side"] == "lerobot" and entry["condition"] == condition]
+        assert actual == expected

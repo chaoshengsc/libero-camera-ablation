@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 342" width="900" height="342" font-family="-apple-system,'Segoe UI','PingFang SC','Microsoft YaHei','Noto Sans CJK SC',sans-serif" font-size="13" fill="#1f2933">
+<rect width="900" height="342" rx="8" fill="#ffffff"/>
+<text x="20" y="28" font-size="16" font-weight="600">四模型探索：正常画面与全部视觉输入涂黑</text>
+<text x="20" y="50" font-size="12" fill="#6b7280">各100回合代表性运行；正常取每任务前10初态。OpenVLA仅有主视角，其余为双视角。</text>
+<line x1="210.0" x2="210.0" y1="80" y2="290" stroke="#e5e7eb"/>
+<text x="210.0" y="310" text-anchor="middle">0%</text>
+<line x1="355.0" x2="355.0" y1="80" y2="290" stroke="#e5e7eb"/>
+<text x="355.0" y="310" text-anchor="middle">25%</text>
+<line x1="500.0" x2="500.0" y1="80" y2="290" stroke="#e5e7eb"/>
+<text x="500.0" y="310" text-anchor="middle">50%</text>
+<line x1="645.0" x2="645.0" y1="80" y2="290" stroke="#e5e7eb"/>
+<text x="645.0" y="310" text-anchor="middle">75%</text>
+<line x1="790.0" x2="790.0" y1="80" y2="290" stroke="#e5e7eb"/>
+<text x="790.0" y="310" text-anchor="middle">100%</text>
+<text x="20" y="109">LeRobot π0.5 v044</text>
+<line x1="210.0" x2="784.2" y1="105" y2="105" stroke="#aeb8c5" stroke-width="2"/>
+<circle cx="784.2" cy="105" r="5" fill="#2563eb"/>
+<text x="784.2" y="95" text-anchor="middle" fill="#2563eb">99</text>
+<circle cx="210.0" cy="105" r="5" fill="#ea580c"/>
+<text x="210.0" y="123" text-anchor="middle" fill="#ea580c">0</text>
+<text x="20" y="161">OpenVLA</text>
+<line x1="210.0" x2="679.8" y1="157" y2="157" stroke="#aeb8c5" stroke-width="2"/>
+<circle cx="679.8" cy="157" r="5" fill="#2563eb"/>
+<text x="679.8" y="147" text-anchor="middle" fill="#2563eb">81</text>
+<circle cx="210.0" cy="157" r="5" fill="#ea580c"/>
+<text x="210.0" y="175" text-anchor="middle" fill="#ea580c">0</text>
+<text x="20" y="213">SmolVLA</text>
+<line x1="210.0" x2="691.4" y1="209" y2="209" stroke="#aeb8c5" stroke-width="2"/>
+<circle cx="691.4" cy="209" r="5" fill="#2563eb"/>
+<text x="691.4" y="199" text-anchor="middle" fill="#2563eb">83</text>
+<circle cx="210.0" cy="209" r="5" fill="#ea580c"/>
+<text x="210.0" y="227" text-anchor="middle" fill="#ea580c">0</text>
+<text x="20" y="265">LeRobot π0 v044</text>
+<line x1="534.8" x2="650.8" y1="261" y2="261" stroke="#aeb8c5" stroke-width="2"/>
+<circle cx="650.8" cy="261" r="5" fill="#2563eb"/>
+<text x="650.8" y="251" text-anchor="middle" fill="#2563eb">76</text>
+<circle cx="534.8" cy="261" r="5" fill="#ea580c"/>
+<text x="534.8" y="279" text-anchor="middle" fill="#ea580c">56</text>
+<text x="20" y="334" font-size="12" fill="#6b7280">蓝：正常　橙：全黑　｜　π0全黑重复范围53–56%；重复不是新增初态。</text>
+</svg>

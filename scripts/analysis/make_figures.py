@@ -21,7 +21,7 @@ TXT = {
         "rep_title": "Public checkpoints: success rate in this repo vs. reference",
         "rep_ours": "This repo (500 episodes, 95% CI)", "rep_ref": "Reference", "rep_fail": "Repo criterion not met",
         "pert_title": "Success rate under camera perturbations (bar = mean, dots = two runs of 100 episodes)",
-        "conds": ["Normal", "Gaussian noise", "Frozen first frame", "Agent-view black", "Wrist black", "All black"],
+        "conds": ["Normal", "Both noise", "Both frozen", "Agent-view black", "Wrist black", "All black"],
         "traj_title": "π0 end-effector paths, top view: 10 episodes per task, identical initial states",
         "traj_a": "Normal vs. normal re-run", "traj_b": "Normal vs. all cameras black",
         "traj_row": "Task {i}: bowl {name}. Blind π0 succeeds in {k} of 10 episodes.",
@@ -33,10 +33,10 @@ TXT = {
         "in_policy": "Policy", "in_action": "Action",
         "in_img_note": "black / noise / frozen", "in_state_note": "unchanged",
         "in_lang_note": "unchanged", "in_sub_state": "end-effector pose and gripper opening", "in_sub_lang": "“pick up the black bowl …”",
-        "sc_title": "One camera removed at test time (500 episodes per bar, 95% Wilson interval)",
+        "sc_title": "Wrist-treatment study (π0 / π0.5 v044); agent masking is supplementary",
         "sc_conds": ["Both cameras", "Wrist black", "Wrist dropped", "Wrist frozen at frame 1", "Agent view dropped"],
         "sc_note": "π0.5 wrist black: same 100 initial states run 5 times, 0/500",
-        "op_title": "Official π0 vs. LeRobot π0 with cameras removed (95% Wilson interval)",
+        "op_title": "Official π0 control: same 100 initial states per point; repeats shown separately",
         "op_models": {"official": "Official π0 (OpenPI pipeline)", "lerobot": "LeRobot π0 v044"},
         "op_conds": ["Both cameras", "All black", "Both slots masked", "Both frozen at frame 1", "Wrist masked", "Agent view masked"],
         "op_n": "{k}/{n}",
@@ -52,7 +52,7 @@ TXT = {
         "rep_title": "公开权重对照：本机成功率 vs 参考值",
         "rep_ours": "本机（500 回合，95% 置信区间）", "rep_ref": "参考值", "rep_fail": "未达本项目判据（范围不重叠）",
         "pert_title": "扰动相机输入后的成功率（柱 = 平均，圆点 = 两次运行，各 100 回合）",
-        "conds": ["正常", "加高斯噪声", "冻结首帧", "只涂主视角", "只涂腕部", "全涂黑"],
+        "conds": ["正常", "双路加噪声", "双路冻结首帧", "只涂主视角", "只涂腕部", "全涂黑"],
         "traj_title": "π0 末端执行器路线（俯视）：每个任务 10 个回合，初始状态相同",
         "traj_a": "正常 vs 正常重跑", "traj_b": "正常 vs 相机全涂黑",
         "traj_row": "任务 {i}：碗在{name}。全涂黑时 10 回合成功 {k} 次。",
@@ -64,10 +64,10 @@ TXT = {
         "in_policy": "策略", "in_action": "动作",
         "in_img_note": "涂黑 / 加噪声 / 冻结", "in_state_note": "不改",
         "in_lang_note": "不改", "in_sub_state": "末端位姿与夹爪开合", "in_sub_lang": "“把黑碗拿起来放到……”",
-        "sc_title": "测试时去掉一路相机（每根柱 500 回合，误差线为 Wilson 95% 区间）",
+        "sc_title": "腕部单因素主实验（π0／π0.5 v044）；主视角屏蔽单列为附加条件",
         "sc_conds": ["两路都给", "腕部涂黑", "去掉腕部", "腕部冻结在第 1 帧", "去掉主视角"],
         "sc_note": "π0.5 腕部涂黑：同一批 100 个初始状态跑 5 次，0/500",
-        "op_title": "官方 π0 与 LeRobot π0 去掉相机后的成功率（误差线为 Wilson 95% 区间）",
+        "op_title": "官方 π0 对照：每个点为同100初态；重复逐次展示，不合并区间",
         "op_models": {"official": "官方 π0（OpenPI 管线）", "lerobot": "LeRobot π0 v044"},
         "op_conds": ["两路都给", "全涂黑", "两路槽位都屏蔽", "两路冻结在第 1 帧", "只屏蔽腕部", "只屏蔽主视角"],
         "op_n": "{k}/{n}",
@@ -87,7 +87,7 @@ SC_RUNS = {"π0.5": {"both": "pi05_none", "wrist_dropped": "pi05_drop_wrist", "w
            "π0": {"both": "pi0_none", "both_rerun": "pi0_none_r2", "wrist_black": "pi0_wrist", "wrist_dropped": "pi0_drop_wrist",
                   "wrist_dropped_rerun": "pi0_drop_wrist_r2", "wrist_frozen": "pi0_freeze_wrist", "agent_dropped": "pi0_drop_agent"}}
 SC_BARS = ["both", "wrist_black", "wrist_dropped", "wrist_frozen", "agent_dropped"]
-SC_COL = ["#9ca3af", "#f59e0b", "#2563eb", "#14b8a6", "#7c3aed"]
+SC_COL = ["#9ca3af", "#3c73ac", "#3c73ac", "#3c73ac", "#7d8da1"]
 # 官方 π0 对照（docs/NOTES.md 2026-10-28/29 的预先登记与结果）：路径相对 dashboard/data/，列表为多次运行合计
 OP_RUNS = {"official": {"both": ["official_pi0/ojx_none"], "all_black": ["official_pi0/ojx_all"], "both_masked": ["official_pi0/ojx_drop_all"],
                         "both_frozen": ["official_pi0/ojx_freeze"], "wrist_masked": ["official_pi0/ojx_drop_wrist"],
@@ -166,20 +166,27 @@ def single_camera_summary(sc):
 def fig_single_camera(summary, t):
     w, left, top, bh, gap = 760, 150, 70, 22, 6
     models = list(SC_RUNS)
-    gh = len(SC_BARS) * (bh + gap) + 34
+    gh = len(SC_BARS) * (bh + gap) + 64
     h = top + gh * len(models) + 30
     pw = w - left - 70
     x = lambda v: left + pw * v / 100
     by = {(r[0], r[1]): r for r in summary}
     out = [title(t["sc_title"])]
+    note = ("Agent view live in main conditions; new runs500 each; bars: Wilson95%; historical wrist-black noted separately."
+            if t is TXT["en"] else "主实验中主视角正常；新运行每条件500回合，横线为Wilson95%区间；历史腕部黑图单独注记。")
+    out.append(f'<text x="20" y="45" font-size="11" fill="{MUTED}">{note}</text>')
     for v in range(0, 101, 25):
         out.append(f'<line x1="{x(v):.1f}" y1="{top - 8}" x2="{x(v):.1f}" y2="{h - 30}" stroke="{GRID}"/>')
         out.append(f'<text x="{x(v):.1f}" y="{h - 12}" text-anchor="middle" fill="{MUTED}">{v}%</text>')
     for g, model in enumerate(models):
         y0 = top + g * gh
-        out.append(f'<text x="20" y="{y0 + 6}" font-size="14" font-weight="600">{model}</text>')
+        out.append(f'<text x="20" y="{y0 + 6}" font-size="14" font-weight="600">LeRobot {model} v044</text>')
         for i, (cond, col, lab) in enumerate(zip(SC_BARS, SC_COL, t["sc_conds"], strict=True)):
-            y = y0 + 16 + i * (bh + gap)
+            y = y0 + 16 + i * (bh + gap) + (26 if cond == "agent_dropped" else 0)
+            if cond == "agent_dropped":
+                label = "Supplementary: wrist remains live" if t is TXT["en"] else "附加条件：腕部正常更新"
+                out.append(f'<line x1="20" x2="{w-20}" y1="{y-20}" y2="{y-20}" stroke="{GRID}" stroke-dasharray="4 4"/>')
+                out.append(f'<text x="20" y="{y-5}" font-size="11" fill="{MUTED}">{label}</text>')
             out.append(f'<text x="{left - 10}" y="{y + bh / 2 + 4:.1f}" text-anchor="end">{lab}</text>')
             r = by.get((model, cond))
             if r is None:  # π0.5 腕部涂黑没有在这一轮重跑
@@ -208,14 +215,15 @@ def official_pi0_summary():
         for cond, runs in conds.items():
             succ = [x for r in runs for x in _succ(r)]
             n, k = len(succ), sum(succ)
-            lo, hi = wilson(k, n)
+            # Repeated executions reuse the same initial states; do not treat them as independent Bernoulli samples.
+            lo, hi = wilson(k, n) if len(runs) == 1 else (None, None)
             eef = ""
             if side.startswith("official"):
                 e = json.loads((data / runs[0] / "first_eef.json").read_text())
                 per = len(e) // 10  # 每任务回合数；参照每任务 50 回合，取前 per 个
                 assert per * 10 == len(e) and len(ref) == 500
                 eef = round(100 * max(abs(a - b) for i, p in enumerate(e) for a, b in zip(p, ref[i // per * 50 + i % per], strict=True)), 4)
-            rows.append([side, cond, len(runs), n, k, round(100 * k / n, 1), round(max(lo, 0.0), 1), round(hi, 1), eef])
+            rows.append([side, cond, len(runs), n, k, round(100 * k / n, 1), round(max(lo, 0.0), 1) if lo is not None else "", round(hi, 1) if hi is not None else "", eef])
     return rows
 
 
@@ -283,30 +291,83 @@ def fig_replay(rows, t):
     return svg(w, h, out)
 
 
+def matched100_rows():
+    """Each run independently: first ten initial states of every task, never the first 100 global rows."""
+    rows = []
+    for side in ("official", "lerobot"):
+        for condition, runs in OP_RUNS[side].items():
+            for repeat, run in enumerate(runs, 1):
+                per = sorted(json.loads((ROOT / "dashboard/data" / run / "eval_info.json").read_text())["per_task"], key=lambda task: task["task_id"])
+                if len(per) != 10 or any(len(task["metrics"]["successes"]) < 10 for task in per):
+                    raise ValueError(f"missing matched100 states: {run}")
+                success = sum(bool(value) for task in per for value in task["metrics"]["successes"][:10])
+                source_episodes = sum(len(task["metrics"]["successes"]) for task in per)
+                rows.append([side, condition, repeat, run, source_episodes, "first10_per_task", 100, success, float(success)])
+    return rows
+
+
 def fig_official_pi0(summary, t):
-    w, left, top, bh, gap = 760, 160, 70, 20, 5
-    gh = len(OP_BARS) * (bh + gap) + 34
-    h = top + gh * 2 + 30
-    pw = w - left - 90
-    x = lambda v: left + pw * v / 100
-    by = {(r[0], r[1]): r for r in summary}
+    # Full500 rates stay in the historical CSV; display matched100 points only.
+    rows = matched100_rows()
+    conditions = OP_BARS + ["wrist_frozen"]
+    labels = t["op_conds"] + (["Wrist frozen"] if t is TXT["en"] else ["只冻结腕部"])
+    w, left, top, step, h = 900, 190, 106, 56, 580
+    x = lambda pc: left + 620 * pc / 100
     out = [title(t["op_title"])]
+    colors = {"official": BLUE, "lerobot": ORANGE}
+    for i, side in enumerate(colors):
+        out.append(f'<circle cx="{left+i*320}" cy="56" r="4" fill="{colors[side]}"/>')
+        out.append(f'<text x="{left+12+i*320}" y="60">{t["op_models"][side]}</text>')
     for v in range(0, 101, 25):
-        out.append(f'<line x1="{x(v):.1f}" y1="{top - 8}" x2="{x(v):.1f}" y2="{h - 30}" stroke="{GRID}"/>')
-        out.append(f'<text x="{x(v):.1f}" y="{h - 12}" text-anchor="middle" fill="{MUTED}">{v}%</text>')
-    for g, side in enumerate(("official", "lerobot")):
-        y0 = top + g * gh
-        out.append(f'<text x="20" y="{y0 + 6}" font-size="14" font-weight="600">{t["op_models"][side]}</text>')
-        for i, (cond, col, lab) in enumerate(zip(OP_BARS, OP_COL, t["op_conds"], strict=True)):
-            y = y0 + 16 + i * (bh + gap)
-            _, _, _, n, k, pc, lo, hi, _ = by[side, cond]
-            out.append(f'<text x="{left - 10}" y="{y + bh / 2 + 4:.1f}" text-anchor="end">{lab}</text>')
-            out.append(f'<rect x="{x(0):.1f}" y="{y}" width="{max(x(pc) - x(0), 1.5):.1f}" height="{bh}" rx="2" fill="{col}"/>')
-            out.append(f'<line x1="{x(lo):.1f}" y1="{y + bh / 2}" x2="{x(hi):.1f}" y2="{y + bh / 2}" stroke="{INK}" stroke-width="1.4"/>')
-            for e in (lo, hi):
-                out.append(f'<line x1="{x(e):.1f}" y1="{y + 5}" x2="{x(e):.1f}" y2="{y + bh - 5}" stroke="{INK}" stroke-width="1.4"/>')
-            out.append(f'<text x="{x(hi) + 6:.1f}" y="{y + bh / 2 + 4:.1f}" font-size="12"><tspan font-weight="600">{pc:.1f}</tspan>'
-                       f'<tspan fill="{MUTED}"> ({t["op_n"].format(k=k, n=n)})</tspan></text>')
+        out.append(f'<line x1="{x(v):.1f}" x2="{x(v):.1f}" y1="{top-15}" y2="{top+len(conditions)*step-15}" stroke="{GRID}"/>')
+        out.append(f'<text x="{x(v):.1f}" y="{h-50}" text-anchor="middle">{v}%</text>')
+    for i, (condition, label) in enumerate(zip(conditions, labels, strict=True)):
+        y = top + i * step
+        out.append(f'<text x="{left-14}" y="{y+7}" text-anchor="end">{label}</text>')
+        for side, offset in (("official", -6), ("lerobot", 11)):
+            values = [row[-1] for row in rows if row[0] == side and row[1] == condition]
+            cy = y + offset
+            for j, value in enumerate(values):
+                jitter = (j-(len(values)-1)/2)*4
+                out.append(f'<circle cx="{x(value):.1f}" cy="{cy+jitter:.1f}" r="3.2" fill="{colors[side]}"/>')
+            label_value = "/".join(str(int(v)) for v in values)
+            out.append(f'<text x="{x(max(values))+10:.1f}" y="{cy+4}" font-size="11" fill="{colors[side]}">{label_value}</text>')
+    note = (
+        "Full500 normal references: official 482/500; LeRobot 360/500. Weights and pipelines both differ."
+        if t is TXT["en"] else "完整500正常另列参考：官方482/500；LeRobot360/500。两边权重与管线均不同，不能唯一归因。"
+    )
+    out.append(f'<text x="20" y="{h-15}" font-size="11" fill="{MUTED}">{note}</text>')
+    return svg(w, h, out)
+
+
+def fig_blackout_overview(summary, t):
+    cn = t is TXT["zh"]
+    w, h, left, top = 900, 342, 210, 105
+    x = lambda pc: left + 580 * pc / 100
+    heading = "四模型探索：正常画面与全部视觉输入涂黑" if cn else "Four-policy exploration: normal vision vs. all-black input"
+    out = [title(heading)]
+    note = (
+        "各100回合代表性运行；正常取每任务前10初态。OpenVLA仅有主视角，其余为双视角。"
+        if cn else "Representative 100-episode runs; first10 states/task. OpenVLA: agent only; others: two cameras."
+    )
+    out.append(f'<text x="20" y="50" font-size="12" fill="{MUTED}">{note}</text>')
+    for v in range(0, 101, 25):
+        out.append(f'<line x1="{x(v):.1f}" x2="{x(v):.1f}" y1="80" y2="290" stroke="{GRID}"/>')
+        out.append(f'<text x="{x(v):.1f}" y="310" text-anchor="middle">{v}%</text>')
+    names = {"pi0": "LeRobot π0 v044", "pi0.5": "LeRobot π0.5 v044", "SmolVLA": "SmolVLA", "OpenVLA": "OpenVLA"}
+    by = {row["model"]: row for row in summary}
+    for i, key in enumerate(["pi0.5", "OpenVLA", "SmolVLA", "pi0"]):
+        row = by[key]; normal, black = sum(row["normal"]), sum(row["black"]); y = top+i*52
+        out.append(f'<text x="20" y="{y+4}">{names[key]}</text>')
+        out.append(f'<line x1="{x(black):.1f}" x2="{x(normal):.1f}" y1="{y}" y2="{y}" stroke="#aeb8c5" stroke-width="2"/>')
+        for pc, color, dy in [(normal, BLUE, -10), (black, ORANGE, 18)]:
+            out.append(f'<circle cx="{x(pc):.1f}" cy="{y}" r="5" fill="{color}"/>')
+            out.append(f'<text x="{x(pc):.1f}" y="{y+dy}" text-anchor="middle" fill="{color}">{pc}</text>')
+    legend = (
+        "蓝：正常　橙：全黑　｜　π0全黑重复范围53–56%；重复不是新增初态。"
+        if cn else "Blue: normal; orange: black. π0 black repeats:53–56%; repeats are not new initial states."
+    )
+    out.append(f'<text x="20" y="334" font-size="12" fill="{MUTED}">{legend}</text>')
     return svg(w, h, out)
 
 
@@ -317,7 +378,7 @@ def load_dashboard():
 
 def write_csv(name, header, rows):
     with open(RES / name, "w", newline="") as f:
-        w = csv.writer(f)
+        w = csv.writer(f, lineterminator="\n" if name in {"official_pi0_matched100.csv", "official_pi0_summary.csv"} else "\r\n")
         w.writerow(header)
         w.writerows(rows)
 
@@ -548,6 +609,7 @@ if __name__ == "__main__":
     op_sum = official_pi0_summary()
     write_csv("official_pi0_summary.csv", ["side", "condition", "runs", "episodes", "successes", "success_pc", "wilson_lo", "wilson_hi",
                                            "first_eef_max_diff_cm"], op_sum)
+    write_csv("official_pi0_matched100.csv", ["side", "condition", "repeat", "raw_run", "source_episodes", "subset", "episodes", "successes", "success_pc"], matched100_rows())
     rp_sum = replay_summary()
     write_csv("open_loop_replay.csv", ["task", "source_successes", "self_successes", "self_replays", "cross_successes", "cross_replays",
                                        "best_source", "best_successes", "best_replays", "object_max_span_cm",
@@ -555,6 +617,7 @@ if __name__ == "__main__":
     traj = [json.loads((RES / f"trajectories_task{i}.json").read_text()) for i in TRAJ_TASKS]
     for lang, out in (("en", MEDIA), ("zh", MEDIA / "zh")):
         t = TXT[lang]
+        (out / "blackout_overview.svg").write_text(fig_blackout_overview(d["BLACKOUT"]["summary"], t))
         (out / "reproduction.svg").write_text(fig_reproduction(runs, t))
         (out / "perturbations.svg").write_text(fig_perturbations(pert, t))
         (out / "trajectory.svg").write_text(fig_trajectory(traj, t))
@@ -563,4 +626,4 @@ if __name__ == "__main__":
         (out / "single_camera.svg").write_text(fig_single_camera(sc_sum, t))
         (out / "official_pi0.svg").write_text(fig_official_pi0(op_sum, t))
         (out / "open_loop_replay.svg").write_text(fig_replay(rp_sum, t))
-    print(f"wrote {len(list(RES.glob('*.csv')))} csv -> results/, 8 svg -> media/ and media/zh/")
+    print(f"wrote {len(list(RES.glob('*.csv')))} csv -> results/, 9 svg -> media/ and media/zh/")

@@ -2,93 +2,153 @@
 
 # Do robot policies actually use their cameras?
 
-Camera ablations of four robot policies on LIBERO-Spatial
+**机器人策略的视觉依赖研究 · LIBERO-Spatial 仿真实验**
+
+[English](README.md) · **中文** · [直接打开交互结果页](https://chaoshengsc.github.io/libero-camera-ablation/dashboard/?lang=zh)
 
 [![CI](https://github.com/chaoshengsc/libero-camera-ablation/actions/workflows/ci.yml/badge.svg)](https://github.com/chaoshengsc/libero-camera-ablation/actions/workflows/ci.yml)
 [![Release](https://img.shields.io/github/v/release/chaoshengsc/libero-camera-ablation?color=2563eb)](https://github.com/chaoshengsc/libero-camera-ablation/releases)
 [![License: MIT](https://img.shields.io/badge/license-MIT-lightgrey)](LICENSE)
 
-[English](README.md) · **中文**
-
-[冻结快照](docs/FREEZE_CN.md) · [主要发现](#1-相机消融) · [复现结果](#2-公开权重的复现) · [快速开始](#快速开始) · [数据](results/README_CN.md) · [文档导航](docs/README_CN.md)
-
 </div>
 
-**机器人在仿真里完成了任务，是否就说明它在用相机？** 我们对 π0、π0.5、OpenVLA、SmolVLA 的公开检查点做相机输入消融，并用官方 π0 对照、固定动作回放和状态输入检查界定结果的含义。五个公开权重的评测与参考对照是工程基础。
+**完成仿真任务，是否就说明机器人在使用相机？** 本项目用公开策略检查点，固定检查点与处理规则，只干预指定相机（其余画面与状态实时更新），并追踪成功率、轨迹和输入处理。工作从四模型探索收敛到两个模型的腕部单因素实验，再用补充对照界定结论。
 
-**在所测全黑回合中，π0.5、OpenVLA 和 SmolVLA 检查点均为 0%；LeRobot π0 v044 五次为 53–56%，官方 π0 在 OpenPI 中为 0/100。**
+## 项目做了什么
 
-<p align="center">
-  <img src="media/zh/blackout_demo.gif" width="720" height="300" alt="同一个 LIBERO 任务：π0.5 正常成功、相机涂黑失败，LeRobot π0 涂黑仍成功">
-  <br><sub>同一任务、同一初始状态。右边两次运行中，模型收到的是全黑图像；视频展示仿真器里的实际动作。</sub>
-</p>
-
-| 你想做什么 | 从这里进入 |
-|---|---|
-| 看结论 | [主要发现](#1-相机消融) → [完整实验与图表](docs/EXPERIMENTS_CN.md) |
-| 复现实验 | [安装](docs/INSTALL_CN.md) → [脚本索引](scripts/README_CN.md) → [排错](docs/TROUBLESHOOTING_CN.md) |
-| 核对数字 | [结果表](results/README_CN.md) → [原始评测](dashboard/data/) → [实验日志与更正](docs/NOTES_CN.md) |
-
-[文档导航](docs/README_CN.md) · [交互结果页](https://chaoshengsc.github.io/libero-camera-ablation/dashboard/?lang=zh) · [仓库结构](#仓库结构) · [局限](#局限)
-
-## 冻结快照 · v1.5.1
-
-**相机消融研究已冻结于 2026-11-09。** 本版固定已有结果、协议核验与解释边界；没有新增模型运行。
-
-| 已完成 | 证据 | 说明 |
+| 工作 | 具体产物 | 可核验证据 |
 |---|---|---|
-| **相机输入干预** | 全黑、噪声、首帧冻结、单路相机 | 四种公开策略；逐条件保留重复与分母 |
-| **机制边界对照** | 官方 π0、P1 状态冻结、P2 固定动作回放 | 区分观察到的敏感性与尚未识别的内部机制 |
-| **协议与来源核验** | 220 步截止重计、权重身份与加载记录 | 基于既有工件；不等于新评测或同权重管线对照 |
+| **搭建多策略评测与干预管线** | π0、π0.5、OpenVLA、SmolVLA；黑图、原槽位mask、首帧冻结等 | [执行入口](scripts/README_CN.md) · [环境与版本](env/README_CN.md) |
+| **把异常现象拆成有边界的对照** | 两模型腕部主实验、主视角附加条件；官方π0、状态更新与固定动作检查 | 下方图表 · [完整实验结构](docs/STUDY_MAP_CN.md) |
+| **定位并提交上游缺相机槽位修复** | 发现缺失前置相机时，后续相机图像会挪位；修复覆盖6个策略 | [问题 #5118](https://github.com/huggingface/lerobot/issues/5118) · [修复 PR #5129](https://github.com/huggingface/lerobot/pull/5129) |
 
-[**冻结说明与证据地图 →**](docs/FREEZE_CN.md) · [SHA-256 清单](results/freeze_20261109.sha256) · [交互结果页](https://chaoshengsc.github.io/libero-camera-ablation/dashboard/?lang=zh)
+**研究范围：4个检查点做全黑探索，3个双视角检查点做早期扰动，π0／π0.5做腕部深入。** 各阶段覆盖不同，不是四模型都跑满同一套实验。评测对象是公开检查点。
 
-## 1. 相机消融
+<a id="1-相机消融"></a>
 
-### 所有相机涂黑
+## 1. 四模型总览：所有视觉输入变黑后，会怎样？
 
-| 模型 | 正常画面 | 所有相机涂黑 |
+![四模型正常与全部视觉输入涂黑的100回合代表性结果](media/zh/blackout_overview.svg)
+
+**π0.5、OpenVLA、SmolVLA在所测全黑回合中均为0%；LeRobot π0 v044仍有成功。** 图中每个条件是100回合代表性结果；π0全黑五次为53–56%，复用相同100初态，不是500独立初态。OpenVLA只有主视角，其余三个有主视角与腕部输入。
+
+[逐任务结果](results/blackout_per_task.csv) · [重复与协议](docs/EXPERIMENTS_CN.md#11-所有相机涂黑)
+
+<details>
+<summary>展开四模型图中数值</summary>
+
+| 模型 | 正常画面 | 全部视觉输入涂黑 |
 |---|---|---|
 | π0.5 | 99% | 0% |
 | OpenVLA | 81% | 0% |
 | SmolVLA | 83% | 0% |
-| **π0 · LeRobot v044** | 76% | **56%** |
+| π0 · LeRobot v044 | 76% | 56% |
 
-表中是各 100 回合的一组结果；正常条件取 500 回合评测中每任务的前 10 回合。前三个模型全涂黑后各重跑一次仍为 0%。π0 全涂黑五次为 **53–56%**，五次使用同一批 100 个初始状态，不能当成 500 个独立状态。
+</details>
 
-<a id="15-官方-π0-对照"></a>
+## 2. 核心深入：只改变腕部，主视角保持正常
 
-### 官方 π0 对照
+后期主实验只覆盖 **LeRobot π0／π0.5 v044**。问题是：π0.5先前在腕部黑图下接近零，换成槽位屏蔽或首帧冻结是否仍如此？同时用π0 v044观察另一种响应。
 
-![官方 π0 与 LeRobot π0 的相机消融对照](media/zh/official_pi0.svg)
+下面先列两模型共同的新500初态条件；图中另注黑图历史复核与附加条件。
 
-官方 π0 在 OpenPI 中正常为 **96.4%**，LeRobot π0 v044 在 LeRobot 中为 **72.0%**（各 500 回合）；相机全涂黑后，前者为 **0/100**，后者五次为 **53–56%**。
+| 腕部条件（主视角始终正常） | π0.5 v044 | π0 v044 |
+|---|---|---|
+| 正常更新 | **492/500 · 98.4%** | 360/500 · 72.0% |
+| 原槽位mask为0 | **23/500 · 4.6%** | 356/500 · 71.2% |
+| 固定本回合腕部首帧 | **0/500 · 0.0%** | 364/500 · 72.8% |
 
-**这些全黑对照中，LeRobot π0 v044 及其管线仍有成功回合，官方 π0/OpenPI 未观察到成功。** 两边同时改变了权重与推理管线，差别不能单独归因到权重；官方 π0 改用 360 渲染后全黑仍为 0/100，这次分辨率变更未恢复成功。
+![两模型腕部单因素主实验；主视角mask作为分区的附加条件](media/zh/single_camera.svg)
 
-其他检查补全了这幅图景：
+**π0.5对所测腕部干预高度敏感；π0 v044没有呈现相同的降幅。** 这限定于对应检查点和协议。首帧冻结也改变图像—状态同步，不能据此唯一识别模型内部机制。
 
-- **画面冻结敏感性。** 所测 π0.5 和 SmolVLA 检查点冻结首帧后，两次运行都为 0%；屏蔽原槽位的腕部相机时，π0.5 从 98.4% 降到 4.6%（各 500 回合）。冻结同时改变视觉内容更新与图像—状态同步，尚不能分离两者的作用。
-- **固定动作也能成功。** P2 将每任务预先选定的一套官方 π0 动作原样回放，在未参与动作选择的状态上成功 **262/400 = 65.5%**（95% 分层 bootstrap 区间 **61.0–69.8%**），自回放 **10/10**。这补强固定动作基线，不能识别 LeRobot π0 的内部机制。[协议、历史回放与边界](docs/EXPERIMENTS_CN.md#16-固定动作回放) · [数据](results/replay_holdout_summary.csv)。
-- **状态输入冻结敏感性。** P1 中 LeRobot π0 v044 正常画面/全黑画面下的三轮均值为 **73.3% / 55.3%**；冻结模型接收的首状态后两者均为 **0%**。这说明状态更新敏感性，尚不能区分在线纠偏、动作阶段线索与输入失配。[配对统计](docs/EXPERIMENTS_CN.md#17-状态输入更新敏感性) · [数据](results/state_feedback_comparisons.csv)。
+**两类证据单独列明：** π0.5腕部黑图借用历史5×100，均0/100，不是上表同500初态配对臂；主视角mask是附加对照，π0.5为277/500＝55.4%，π0为371/500＝74.2%。没有补齐主视角单独冻结、单路噪声，π0.5也未测双路mask。
 
-完整设计、重复运行、逐任务结果与统计口径见[实验说明](docs/EXPERIMENTS_CN.md)；原始记录与更正见[实验日志](docs/NOTES_CN.md)。
+[主实验、附加条件与未测项](docs/STUDY_MAP_CN.md#2-主实验只改变腕部主视角始终正常) · [配对差值与95%区间](results/single_camera_summary.csv)
 
-评测预算因路径而异：OpenVLA为220控制步，其他LIBERO模型客户端为280步，均另有10步稳定等待。按已有工件统一220步截止计分后，首页全黑对照数字不变；官方π0正常500回合为481/500。这个补充检查不等于完整同协议复现或模型排名，详见[同一截止下的结果](docs/EXPERIMENTS_CN.md#34-同一220步截止下的已有回合)。
+## 3. π0全黑仍成功：怎样避免过度解释？
 
-## 2. 公开权重的复现
+| 补充检查 | 关键观察 | 结论边界 |
+|---|---|---|
+| **官方π0/OpenPI对照** | 同100初态：官方正常93/100、全黑0/100；LeRobot正常65/100、全黑五次53–56/100 | 权重和管线同时变化，不能唯一归因于转换或训练 |
+| **P1：状态输入更新** | LeRobot π0三轮均值：正常73.3%、全黑55.3%；冻结模型首状态后均0% | 支持状态更新敏感性，未分开在线纠偏、阶段线索和输入失配 |
+| **P2：固定动作回放** | 预先选定的官方π0动作在选择外状态成功262/400＝65.5%，95%区间61.0–69.8% | 固定动作也能成功，不证明LeRobot内部就是回放；不能与P1相减归因 |
 
-| 模型 | 任务 | 本仓库（500 回合） | 基准 | 本项目判据 |
-|---|---|---|---|---|
-| ACT | ALOHA Transfer Cube | **83.2%** | 83.0%（Hugging Face 仓库） | ✅ |
-| OpenVLA | LIBERO-Spatial | **86.2%** | 84.7 ± 0.9%（官方 README） | ✅ |
-| SmolVLA | LIBERO-Spatial | **85.4%** | 90%（论文，100 回合） | ✅ |
-| π0.5 | LIBERO-Spatial | **98.0%** | 98.8%（OpenPI），97.0%（LeRobot） | ✅ |
-| Diffusion Policy | PushT（2D，非 MuJoCo） | **63.0%** | 65.4%（LeRobot 模型卡） | ✅ |
+这些是 **π0异常结果的解释边界**，不是腕部单因素实验的额外因果验证。P1有自己的配对正常组；P2不调用策略模型。它们不能拼进同一组正常／干预柱图。
 
-本项目将本仓库的 95% 置信区间与参考范围比较：来源报告的 ± 值、可按回合数估计的区间，或未给范围时的单点；有重叠记为达到本项目的“复现”判据。这是参考对照约定，不是性能等效检验，也不表示严格复现了相同训练配置。各模型评测 500 回合，本仓库区间约 ±1–4 个百分点。
+<details>
+<summary>展开技术对照图与完整统计</summary>
 
-SmolVLA 使用 `lerobot/smolvla_libero`，`n_action_steps=10`，只在 LIBERO-Spatial 上训练；论文基准来自四套件训练，100 回合的区间约 ±6 个百分点。完整出处见[复现说明](docs/EXPERIMENTS_CN.md#2-公开权重的复现)。
+![官方π0与LeRobotπ0：每点匹配100初态，重复逐次呈现](media/zh/official_pi0.svg)
+
+图中所有条件每点100回合，500回合运行只取每任务前10初态。完整正常500回合另列参考：官方482/500＝96.4%，LeRobot360/500＝72.0%。同100初态重复不画合并Wilson区间。 按task/init索引匹配，不代表策略噪声或完整状态逐位相同。
+
+![P1状态更新敏感性](media/zh/state_feedback.svg)
+
+![P2选择外固定动作回放](media/zh/replay_holdout.svg)
+
+[匹配100回合记录](results/official_pi0_matched100.csv) · [官方对照完整表](results/official_pi0_summary.csv) · [P1配对统计](results/state_feedback_comparisons.csv) · [P2逐任务统计](results/replay_holdout_summary.csv)
+
+</details>
+
+## 4. 工程贡献：避免把“相机挪位”测成“相机缺失”
+
+在搭建消融时发现：LeRobot缺失排在前面的相机键后，会将仍在场的图像向前排列。**腕部图像可能进入主视角槽位，而程序不报错。** 这会让相机消融测到错误的输入布局。
+
+本项目的正式mask干预保持相机原槽位；上游修复PR覆盖 **6个策略**。提交前新增测试在旧实现上 **21失败／6通过**，修复后 **27/27通过**。这说明错误已被回归用例复现和覆盖；PR链接代表已提交贡献，不表示已合并。
+
+[原始问题与复现](https://github.com/huggingface/lerobot/issues/5118) · [修复代码与测试说明](https://github.com/huggingface/lerobot/pull/5129)
+
+## 实验范围，一页看清
+
+| 模型／工作线 | 已做 | 未做或不适用 |
+|---|---|---|
+| π0、π0.5 v044 | 单路/全黑、双路噪声/冻结；腕部深入、主视角mask附加条件 | 主视角单独冻结、单路噪声；π0.5双路mask未测 |
+| SmolVLA | 单路/全黑、双路噪声/冻结 | 原槽位mask、腕部单独冻结未测 |
+| OpenVLA | 唯一主视角的黑图干预 | 腕部不适用；mask/冻结/噪声未测 |
+| 官方π0/OpenPI | 额外检查点与管线对照、部分渲染复测 | 不是同权重管线对照 |
+| 工程参考对照 | ACT、OpenVLA、SmolVLA、π0.5、Diffusion Policy，各500回合 | 与四模型相机研究不是同一组模型；不作统一排名 |
+
+[完整模型×干预覆盖](docs/STUDY_MAP_CN.md) · [全部实验与限制](docs/EXPERIMENTS_CN.md) · [原始公开记录](dashboard/data/) · [交互结果页](https://chaoshengsc.github.io/libero-camera-ablation/dashboard/?lang=zh)
+
+<details>
+<summary>展开任务演示（两个模型的选例，不是四模型总览）</summary>
+
+![同任务同初态的π0.5与π0选例](media/zh/blackout_demo.gif)
+
+同一任务、同一初始状态。右侧两次策略接收黑图；视频展示实际仿真动作。选例用于说明现象，完整结论以统计结果为准。
+
+</details>
+
+<a id="2-公开权重的复现"></a>
+
+<details>
+<summary>展开五个公开检查点的工程参考对照</summary>
+
+![五个公开检查点与来源参考的对照](media/zh/reproduction.svg)
+
+每个检查点500回合。项目以本仓库95%区间与来源参考范围是否重叠作工程判据，不是性能等效检验或严格同协议复现。ACT和PushT不属于LIBERO相机消融；π0不在这五项参考表中。
+
+| 检查点 | 本仓库（500回合） |
+|---|---|
+| ACT | 83.2% |
+| OpenVLA | 86.2% |
+| SmolVLA | 85.4% |
+| π0.5 | 98.0% |
+| Diffusion Policy | 63.0% |
+
+[逐项数字与来源](results/reproduction.csv) · [判据和配置差异](docs/EXPERIMENTS_CN.md#2-公开权重的复现)
+
+</details>
+
+## 版本与证据
+
+**v1.5.2 · 2026-11-09**：按四模型探索／双模型深入重整首页、图表和数据导航；匹配100初态的正常组单列，重复区间不再按独立样本合并。原始实验记录不变，没有补跑缺项。旧v1.5.1标签保留，独立微调项目不在本次范围。
+
+[研究结构与本次核查问题](docs/STUDY_MAP_CN.md) · [冻结说明](docs/FREEZE_CN.md) · [公开证据SHA-256](results/freeze_20261109_v1.5.2.sha256)
+
+<details>
+<summary>复现、安装、仓库结构与完整局限（无需阅读这些也可理解上方结果）</summary>
 
 ## 快速开始
 
@@ -138,6 +198,9 @@ libero-camera-ablation/
 - [回放](docs/EXPERIMENTS_CN.md#16-固定动作回放)只覆盖所选动作与状态；P2目标未参与动作选择，但此前已用于其他评测，不是隐藏测试集。它与P1的模型/状态协议不同，不能相减计算机制贡献。P1未保存逐步终止标记和完整图像，冻结状态仍无法唯一识别机制。完整NPZ审计工件留在Git外；公开数据可独立重算成功率与区间。
 - Diffusion Policy 评测的是 PushT（2D 物理），不在 MuJoCo 里。
 
+
+</details>
+
 ## 致谢与许可证
 
 代码使用 [MIT 许可证](LICENSE)。模型、分词器与上游项目各自的许可证仍适用；权重和分词器不包含在仓库里。
@@ -149,7 +212,7 @@ libero-camera-ablation/
 
 | 项目 | 用途 | 许可证 |
 |---|---|---|
-| [LeRobot](https://github.com/huggingface/lerobot) v0.6.1 | ACT、Diffusion Policy、SmolVLA、π0、π0.5 的评测与 π0 微调 | Apache-2.0 |
+| [LeRobot](https://github.com/huggingface/lerobot) v0.6.1 | ACT、Diffusion Policy、SmolVLA、π0、π0.5 的评测 | Apache-2.0 |
 | [OpenVLA](https://github.com/openvla/openvla) | OpenVLA 评测 | MIT |
 | [OpenPI](https://github.com/Physical-Intelligence/openpi) | 原生π0推理与π0 / π0.5参考数字 | Apache-2.0 |
 | [LIBERO](https://github.com/Lifelong-Robot-Learning/LIBERO) | 基准 | MIT |
@@ -173,11 +236,11 @@ OpenPI原版π0使用`gs://openpi-assets/checkpoints/pi0_libero`；[OpenPI指南
   author  = {ShengChao},
   title   = {libero-camera-ablation: Camera-input ablations of four robot policies on LIBERO-Spatial},
   year    = {2026},
-  version = {1.5.1},
+  version = {1.5.2},
   url     = {https://github.com/chaoshengsc/libero-camera-ablation}
 }
 ```
 
 同样的条目也在 [`CITATION.cff`](CITATION.cff) 里，GitHub 页面上的 “Cite this repository” 按钮读的就是它。
 
-v1.5.1标签是相机消融的证据冻结版，冻结范围与核验方法见[冻结说明](docs/FREEZE_CN.md)。v1.5标签包含P1/P2结果、对应公开数据与复现指南；较早的v1.4标签保留单相机实验快照。引用v1.5之后的改动时，应同时记录实际使用的提交。
+v1.5.2标签是相机消融的证据冻结版，冻结范围与核验方法见[冻结说明](docs/FREEZE_CN.md)。v1.5标签包含P1/P2结果、对应公开数据与复现指南；较早的v1.4标签保留单相机实验快照。引用v1.5之后的改动时，应同时记录实际使用的提交。

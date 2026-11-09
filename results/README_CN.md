@@ -4,7 +4,7 @@
 
 这里保存可重算的结果表；方法、比较范围与判读见[实验说明](../docs/EXPERIMENTS_CN.md)，原始评测在 [dashboard/data/](../dashboard/data/)。
 
-[2026-11-09 冻结说明](../docs/FREEZE_CN.md) · [证据 SHA-256 清单](freeze_20261109.sha256)。在仓库根目录运行 `python scripts/checks/freeze_check.py`，只读核对公开证据文件。
+[2026-11-09 冻结说明](../docs/FREEZE_CN.md) · [证据 SHA-256 清单](freeze_20261109_v1.5.2.sha256)。在仓库根目录运行 `python scripts/checks/freeze_check.py`，只读核对公开证据文件。
 
 ## 按实验找结果
 
@@ -16,6 +16,7 @@
 | [trajectory.csv](trajectory.csv) | 两次轨迹比较、DTW 与抓取点差异 |
 | [single_camera_summary.csv](single_camera_summary.csv) | 500 回合单路相机汇总与配对统计 |
 | [single_camera.csv](single_camera.csv) | 单路相机逐回合成功标记与首帧哈希 |
+| [official_pi0_matched100.csv](official_pi0_matched100.csv) | 每任务前10初态的100回合子集，保留来源运行和每次重复；官方图使用此表 |
 | [official_pi0_summary.csv](official_pi0_summary.csv) | 官方/OpenPI、LeRobot 与渲染对照 |
 | [open_loop_replay.csv](open_loop_replay.csv) | 自回放、交叉回放与事后挑选偏差 |
 | [state_feedback_episodes.csv](state_feedback_episodes.csv) | P1全部1240回合，明确smoke/正式与状态配对 |
@@ -31,6 +32,8 @@
 从 CSV 中的模型、条件和运行编号，找到[实验说明](../docs/EXPERIMENTS_CN.md)与[实验日志](../docs/NOTES_CN.md)中的对应运行，再核对原始 JSON。公开权重的 revision 同时记录在 `reproduction.csv` 与 [dashboard/build.py](../dashboard/build.py) 的 `RUNS` 中。
 
 重复同一批初始状态不等于增加独立样本；`official_pi0_summary.csv` 中 LeRobot 全涂黑一行合计了五次运行，比较时须遵守实验说明的配对口径。
+
+重复同100初态的LeRobot全黑/双路冻结，原汇总仍保留执行总数与均值，但不再给合并Wilson区间；逐次100回合结果见新增匹配表。
 
 ## 重新生成
 

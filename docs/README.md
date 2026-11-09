@@ -6,6 +6,7 @@ The README presents the key findings. This guide connects the full study, reprod
 
 | Goal | Document | Contents |
 |---|---|---|
+| Understand the study structure | [Model & experiment coverage](STUDY_MAP.md) | Four-policy exploration, two-policy follow-up, supplementary and untested conditions |
 | Inspect the frozen version | [Freeze scope & evidence map](FREEZE.md) | Camera-ablation scope, key numbers, limitations and hash manifest |
 | Understand the study | [Experiments & results](EXPERIMENTS.md) | Interventions, full tables, repeated runs, and interpretation limits |
 | Audit the protocol | [Steps & audit scope](EXPERIMENTS.md#3-evaluation-protocols-and-audit-scope) | Control budgets, replanning, stopping rules and record gaps |
@@ -28,7 +29,7 @@ The README presents the key findings. This guide connects the full study, reprod
 | Experiment | Result tables | Raw-evidence entry |
 |---|---|---|
 | [All black](EXPERIMENTS.md#11-all-cameras-black) | [blackout_per_task.csv](../results/blackout_per_task.csv) | [Raw records](../dashboard/data/) |
-| [Noise & frozen frames](EXPERIMENTS.md#12-one-camera-noise-frozen-image) | [perturbations.csv](../results/perturbations.csv) | [Raw records](../dashboard/data/run2/) |
+| [Noise & frozen frames](EXPERIMENTS.md#12-one-camera-noise-frozen-image) | [perturbations.csv](../results/perturbations.csv) | [First run](../dashboard/data/) / [Second run](../dashboard/data/run2/) |
 | [Trajectories](EXPERIMENTS.md#13-where-blind-π0-succeeds-it-follows-the-sighted-path) | [trajectory.csv](../results/trajectory.csv) | [Raw records](../dashboard/data/traj_analyze.json) |
 | [Single camera](EXPERIMENTS.md#14-wrist-camera-removed-500-episodes) | [single_camera_summary.csv](../results/single_camera_summary.csv) | [Raw records](../dashboard/data/s500/) |
 | [Official π0](EXPERIMENTS.md#15-official-π0-control) | [official_pi0_summary.csv](../results/official_pi0_summary.csv) | [Raw records](../dashboard/data/official_pi0/) |

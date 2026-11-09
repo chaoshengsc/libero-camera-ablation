@@ -8,6 +8,10 @@ Full results for camera ablations, the official π0 control, open-loop replay, a
 
 ---
 
+## Read the study structure first
+
+**Four-policy exploration → π0/π0.5 wrist-treatment follow-up → supplementary agent mask.** Official π0 and P1/P2 are separate interpretation controls. Historical section numbers below do not imply an identical design for every policy. Start with [coverage, missing conditions and matched baselines](STUDY_MAP.md).
+
 ## 1. Camera ablations
 
 π0, π0.5 and SmolVLA receive two images, robot state and an instruction; OpenVLA receives the agent view and instruction only. Sections 1.1–1.5 alter camera inputs, 1.6 provides a fixed-action baseline, and 1.7 separately alters model state input.
@@ -27,13 +31,15 @@ Sections 1.1–1.3 use 100 episodes per run (ten tasks x ten initial states) wit
 
 Three policies did not complete any tested all-black episode, including the repeat. Zero task success does not mean no movement. π0 succeeds in 56% of episodes: 6 to 9 out of 10 on seven tasks, and 0 or 1 out of 10 on the other three. Four more runs gave 54%, 56%, 54% and 53%, and [lerobot#3591](https://github.com/huggingface/lerobot/issues/3591) reports about 60% for the same checkpoint.
 
-### 1.2 One camera, noise, frozen image
+<a id="12-one-camera-noise-frozen-image"></a>
+
+### 1.2 Early three-policy exploration: single black and both-camera noise/freezing
 
 ![Success rate under each perturbation](../media/perturbations.svg)
 
 Success rate (%) in two runs of 100 episodes each, first run / second run. The second run repeats the same scripts with the same seed.
 
-| Model | Normal | Gaussian noise | Frozen first frame | Agent-view black | Wrist black | All black |
+| Model | Normal | Both-camera Gaussian noise | Both first frames frozen | Agent-view black | Wrist black | All black |
 |---|---|---|---|---|---|---|
 | π0 | 76 / 72 | 79 / 67 | 71 / 80 | 78 / 68 | 59 / 77 | 56 / 56 |
 | π0.5 | 99 / 98 | 99 / 97 | 0 / 0 | 51 / 57 | 0 / 0 | 0 / 0 |
@@ -68,7 +74,9 @@ The rerun row excludes tasks with nearly overlapping normal paths: tasks 0–3 i
 
 This does not show whether π0 under black input replays a memorised motion. The trajectory comparison cannot separate bowl tracking from repeating one motion per task; scene-variation summaries and fixed-action replay are in section 1.6. Per-task numbers are in [`results/trajectory.csv`](../results/trajectory.csv) and on the [dashboard](https://chaoshengsc.github.io/libero-camera-ablation/dashboard/).
 
-### 1.4 Wrist camera removed: 500 episodes
+<a id="14-wrist-camera-removed-500-episodes"></a>
+
+### 1.4 Wrist-treatment main study and supplementary agent mask
 
 Section 1.2 leaves two questions open: how to separate the role of wrist vision from input mismatch introduced by black images for π0.5, and how to compare single-camera interventions given π0's variation over 100-episode runs. This section uses three wrist interventions, totaling 500 episodes per condition. New runs use ten tasks × 50 initial states; π0.5 wrist blackout instead combines five repeats of the same 100 states, as the table specifies:
 
@@ -86,7 +94,12 @@ The design, acceptance checks and expected results were written down before the 
 | Black | 0/500 (the same 100 initial states run 5 times: the two runs in section 1.2 and three more) | 70.4% |
 | Dropped | 4.6% | 71.2% (rerun 72.6%) |
 | Frozen at frame 1 | 0.0% | 72.8% |
-| Agent view dropped, wrist only | 55.4% | 74.2% |
+
+**Supplementary condition, separate from the wrist-treatment table.**
+
+| Agent-view treatment (wrist live) | π0.5 | π0 |
+|---|---|---|
+| Original-slot agent mask | 55.4% (277/500) | 74.2% (371/500) |
 
 - **π0.5 is highly sensitive to wrist-input interventions.** All three treatments are near 0%, so unfamiliar black images alone cannot cover the results. Freezing also changes image–state synchronization; current visual content is not uniquely identified. Frozen input scores 0.0%, masked input 4.6%, under their respective protocols.
 - **π0 wrist-intervention differences fall within the advance-recorded ±8-point margin.** Paired by initial state against both cameras, all three treatments have 95% difference intervals inside that margin (McNemar p ≥ 0.58; those p-values alone do not establish equivalence). This bounds the measured success-rate differences under this protocol; it does not show exactly unchanged performance or no camera contribution. The 53–56% all-black results (section 1.1) do not establish that the agent view is sufficient either.
@@ -105,17 +118,19 @@ LeRobot's π0 still scores 53–56% with every camera black. Is that π0 in gene
 - **A loading warning does not imply an entirely unloaded model.** An authorized CPU readback matches all 778 loaded model-state entries to that HF file after target-dtype conversion, while reproducing the warning for six obsolete normalization buffers. This is a current CPU loading check, not historical GPU-state recovery or an inference test; it does not repair the failed native/HF identity premise or isolate the cause of 0/50 ([loading evidence and scope](../dashboard/data/protocol_audit/checkpoint_loading.json)).
 - **Gate and initial states.** Normal, 500 episodes: 482/500 = 96.4%, passing this study's ≥92% gate. Our LeRobot client allows 280 control steps; the pinned upstream OpenPI example allows 220. The earlier README's 96.8% is therefore a reference, not an identical-protocol reproduction. First-step end-effector positions match section 1.4's π0 normal run episode by episode (500/500). This is the recorded matching check, not a bitwise comparison of complete simulation states.
 
+All points in the figure use the first ten states per task, 100 episodes per point; repeats are shown individually without pooled Wilson intervals. [Matched100 records](../results/official_pi0_matched100.csv). Full500 results remain separately available.
+
 ![Official π0 vs. LeRobot π0 with cameras removed](../media/official_pi0.svg)
 
 | Condition | Official π0 (OpenPI, 256 rendering) | LeRobot π0 v044 (LeRobot, 360 rendering) |
 |---|---|---|
-| Both cameras | 96.4% (500 episodes) | 72.0% (500 episodes) |
+| Normal, matched100 states | 93/100 | 65/100 |
 | All black | **0/100** | 53–56% (five runs of 100) |
 | Both slots masked | **0/100** | 35/100 |
 | Both frozen at frame 1 (auxiliary) | 0/100 | 71%, 80% |
-| Wrist masked only | **0/100** | 71.2% (500 episodes) |
-| Main view masked only | **77/100** | 74.2% (500 episodes) |
-| Wrist frozen at frame 1 only (real image) | **0/100** | 72.8% (500 episodes) |
+| Wrist masked only | **0/100** | 69/100 |
+| Main view masked only | **77/100** | 69/100 |
+| Wrist frozen at frame 1 only (real image) | **0/100** | 79/100 |
 
 - **Official π0 completes none of the tested all-black episodes.** Under the rule published in `6c54c5d`, retained all-black success is observed for LeRobot v044 with its pipeline in this comparison, not established for π0 in general. LeRobot slot-masked scores 35%, below the rule's 40%, so this reading rests on all-black comparisons rather than treating distinct interventions as equivalent.
 - **Official π0 is highly sensitive to the tested wrist interventions; main-view masking also reduces success (exploratory).** Wrist masked: 0/100. Main view masked: 77% (interval 68–84%) against 93/100 normally on the same 100 states (paired McNemar p = 0.0025). The 77% misses the advance-recorded 85% criterion; those two thresholds were chosen after observing 0% with both slots masked. Repeating the real first wrist frame with its mask True also scores 0/100 (record pushed before the run, `c7e9023`). Freezing shows the phenomenon is not confined to black images or empty slots, but image–state desynchronization and other input mismatch remain possible; the role of current visual content is not isolated. These are test-time interventions, not single-camera training results.

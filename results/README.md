@@ -4,7 +4,7 @@
 
 Recomputable tables live here. Read the [experiments](../docs/EXPERIMENTS.md) for methods and comparison scope. Raw evaluations are under [dashboard/data/](../dashboard/data/).
 
-[2026-11-09 freeze scope](../docs/FREEZE.md) · [Evidence SHA-256 manifest](freeze_20261109.sha256). From the repository root, run `python scripts/checks/freeze_check.py` to verify the public evidence files without writing them.
+[2026-11-09 freeze scope](../docs/FREEZE.md) · [Evidence SHA-256 manifest](freeze_20261109_v1.5.2.sha256). From the repository root, run `python scripts/checks/freeze_check.py` to verify the public evidence files without writing them.
 
 ## Find a result
 
@@ -16,6 +16,7 @@ Recomputable tables live here. Read the [experiments](../docs/EXPERIMENTS.md) fo
 | [trajectory.csv](trajectory.csv) | Two trajectory comparisons, DTW, and grasp-point differences |
 | [single_camera_summary.csv](single_camera_summary.csv) | 500-episode single-camera summaries and paired statistics |
 | [single_camera.csv](single_camera.csv) | Single-camera episode outcomes and first-frame hashes |
+| [official_pi0_matched100.csv](official_pi0_matched100.csv) | First ten initial states per task, 100 per point, retaining source runs and repeats; used by the official-control figure |
 | [official_pi0_summary.csv](official_pi0_summary.csv) | Official/OpenPI, LeRobot, and rendering controls |
 | [open_loop_replay.csv](open_loop_replay.csv) | Self-replay, cross-replay, and post-hoc selection bias |
 | [state_feedback_episodes.csv](state_feedback_episodes.csv) | All 1240 P1 records, separating smoke/formal and paired states |
@@ -31,6 +32,8 @@ Recomputable tables live here. Read the [experiments](../docs/EXPERIMENTS.md) fo
 Use a CSV's model, condition, and run identifier to find the corresponding [experiment](../docs/EXPERIMENTS.md), [notes](../docs/NOTES.md), and raw JSON. Checkpoint revisions are recorded in `reproduction.csv` and `RUNS` in [dashboard/build.py](../dashboard/build.py).
 
 Repeating the same initial states does not add independent samples. The LeRobot all-black row in `official_pi0_summary.csv` aggregates five runs; use the paired-comparison scope in the experiment report.
+
+The aggregate retains execution counts and means for repeated LeRobot black/frozen runs, but omits pooled Wilson intervals over reused states. The matched100 table preserves each repeat.
 
 ## Regenerate
 

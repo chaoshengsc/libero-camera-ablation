@@ -2,11 +2,11 @@
 <rect width="760" height="350" rx="8" fill="#ffffff"/>
 <text x="20" y="28" font-size="16" font-weight="600">Success rate under camera perturbations (bar = mean, dots = two runs of 100 episodes)</text>
 <rect x="20" y="42" width="12" height="12" rx="2" fill="#9ca3af"/><text x="37" y="53" fill="#6b7280">Normal</text>
-<rect x="99" y="42" width="12" height="12" rx="2" fill="#86efac"/><text x="116" y="53" fill="#6b7280">Gaussian noise</text>
-<rect x="236" y="42" width="12" height="12" rx="2" fill="#14b8a6"/><text x="253" y="53" fill="#6b7280">Frozen first frame</text>
-<rect x="402" y="42" width="12" height="12" rx="2" fill="#60a5fa"/><text x="419" y="53" fill="#6b7280">Agent-view black</text>
-<rect x="553" y="42" width="12" height="12" rx="2" fill="#f59e0b"/><text x="570" y="53" fill="#6b7280">Wrist black</text>
-<rect x="668" y="42" width="12" height="12" rx="2" fill="#111827"/><text x="685" y="53" fill="#6b7280">All black</text>
+<rect x="99" y="42" width="12" height="12" rx="2" fill="#86efac"/><text x="116" y="53" fill="#6b7280">Both noise</text>
+<rect x="206" y="42" width="12" height="12" rx="2" fill="#14b8a6"/><text x="223" y="53" fill="#6b7280">Both frozen</text>
+<rect x="322" y="42" width="12" height="12" rx="2" fill="#60a5fa"/><text x="339" y="53" fill="#6b7280">Agent-view black</text>
+<rect x="473" y="42" width="12" height="12" rx="2" fill="#f59e0b"/><text x="490" y="53" fill="#6b7280">Wrist black</text>
+<rect x="588" y="42" width="12" height="12" rx="2" fill="#111827"/><text x="605" y="53" fill="#6b7280">All black</text>
 <line x1="56" y1="306.0" x2="730" y2="306.0" stroke="#e5e7eb"/>
 <text x="48" y="310.0" text-anchor="end" fill="#6b7280">0%</text>
 <line x1="56" y1="252.5" x2="730" y2="252.5" stroke="#e5e7eb"/>

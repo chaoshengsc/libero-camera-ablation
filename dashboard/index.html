@@ -26,7 +26,7 @@
   <a class="sub" href="#perturbations">噪声与冻结</a>
   <a class="sub" href="#trajectories">轨迹比较</a>
   <a class="sub" href="#single-camera">单路相机</a>
-  <a class="sub" href="#official">官方 π0 对照</a>
+  <a class="sub" href="#official">额外检查点对照：官方 π0 / OpenPI</a>
   <a class="sub" href="#open-loop">开环回放</a>
   <a class="sub" href="#state-feedback">状态输入更新（P1）</a>
   <a href="#repro">复现结果</a>
@@ -44,7 +44,7 @@
       </div>
       <figure class="hero-demo">
         <img src="../media/blackout_demo.gif" width="720" height="300" fetchpriority="high" alt="同一任务：π0.5 正常成功、涂黑失败，LeRobot π0 涂黑仍成功">
-        <figcaption>同一任务、同一初始状态。右侧两次运行中，策略收到的是黑图。</figcaption>
+        <figcaption>两个模型的选例演示，不是四模型总览。同任务同初态，右侧两次策略收到黑图。</figcaption>
       </figure>
     </div>
     <div class="findings" id="keys" aria-label="结果速览"></div>
@@ -52,12 +52,28 @@
 
   <section id="vision">
     <h2>相机消融</h2>
+    <div class="panel" id="study-coverage">
+      <h3>实验范围：4 → 3 → 2</h3>
+      <div class="mx-wrap"><table class="followup-table">
+        <thead><tr><th>范围</th><th>已完成的实验</th><th>没有覆盖的部分</th></tr></thead>
+        <tbody>
+          <tr><th>四模型</th><td>全黑探索</td><td>不是四模型都完成全部干预</td></tr>
+          <tr><th>三个双视角模型</th><td>单路黑图、双路噪声和双路冻结</td><td>OpenVLA仅主视角，不在此组</td></tr>
+          <tr><th>π0／π0.5</th><td>腕部单因素主实验；主视角mask附加条件</td><td>主视角单独冻结、单路噪声未测</td></tr>
+        </tbody>
+      </table></div>
+      <p><a data-doc="docs/STUDY_MAP" href="https://github.com/chaoshengsc/libero-camera-ablation/blob/main/docs/STUDY_MAP_CN.md">完整模型与实验覆盖</a></p>
+      <p class="note">官方π0为额外检查点与管线对照；P1/P2界定π0异常结果的解释，不是腕部因果验证。五项工程参考对照是另一组模型。</p>
+    </div>
+
     <p class="intro"><a href="#state-feedback">状态输入更新（P1）</a> · <a href="#open-loop">选择外固定动作回放（P2）</a></p>
     <p class="intro">相机消融只改变画面输入；OpenVLA只接收主视角和指令，其余三个检查点还接收腕部画面与状态。</p>
     <p class="intro">早期相机消融每次100回合，按相同初始状态比较。区间取决于配对与重复结构，不设统一的13点阈值；π0早期同条件重复最多相差18点。</p>
     <p class="intro"><span>OpenVLA为220控制步，其他LIBERO模型客户端为280步，均另有10步等待。对已有回合统一220步截止计分后，首页全黑对照数字不变；这仍不是完整同协议排名。</span> <a data-doc="docs/EXPERIMENTS" data-anchor-zh="3-评测协议与验收范围" data-anchor-en="3-evaluation-protocols-and-audit-scope" href="https://github.com/chaoshengsc/libero-camera-ablation/blob/main/docs/EXPERIMENTS_CN.md#3-评测协议与验收范围">协议与验收范围</a></p>
     <p class="intro">早期π0相机实验使用LeRobot v044，一组500回合正常评测为73%。官方π0/OpenPI的全黑对照为0/100（1.5节）；结果限于各自所测检查点、管线和干预，不能推广到所有π0。</p>
     <div class="block"><div class="fig"><picture><source id="figInputsMobile" width="420" height="500" srcset="../media/zh/inputs-mobile.svg?v=claims-1" media="(max-width: 600px)"><img id="figInputs" width="880" height="350" src="../media/zh/inputs.svg?v=claims-1" alt="策略的输入，以及各实验改了哪一项"></picture></div></div>
+
+    <p class="note">输入与操作示意不代表每个模型都完成了所有干预；实际范围见上方覆盖表。</p>
 
     <div class="block" id="blackout">
       <h3><span class="n">1.1</span>所有相机涂黑</h3>
@@ -77,7 +93,7 @@
     </div>
 
     <div class="block" id="perturbations">
-      <h3><span class="n">1.2</span>单路相机、噪声、冻结画面</h3>
+      <h3><span class="n">1.2</span>三模型探索：单路黑图与双路噪声／冻结</h3>
       <p class="take">所测π0.5和SmolVLA检查点对首帧冻结敏感；π0本组全黑运行的成功率低于正常运行。</p>
       <div class="panel"><div class="mx-wrap"><table class="mx" id="cammatrix" style="min-width:520px"></table></div></div>
       <div class="figure-tools"><a href="../results/perturbations.csv">结果 CSV</a></div>
@@ -97,19 +113,19 @@
     </div>
 
     <div class="block" id="single-camera">
-      <h3><span class="n">1.4</span>去掉腕部相机：每个条件 500 回合</h3>
+      <h3><span class="n">1.4</span>两模型腕部主实验；主视角mask为附加条件</h3>
       <p class="take">π0.5对所测腕部干预高度敏感；LeRobot π0 v044配对差的95%区间落在事前±8点范围内。</p>
-      <div class="fig"><img loading="lazy" id="figSingle" width="760" height="448" src="../media/zh/single_camera.svg?v=claims-1" alt="测试时去掉一路相机后的成功率"></div>
+      <div class="fig"><img loading="lazy" id="figSingle" width="760" height="508" src="../media/zh/single_camera.svg?v=structure-2" alt="π0与π0.5腕部主实验及分区的主视角附加条件"></div>
       <div class="figure-tools"><a data-figure="single_camera" href="../media/zh/single_camera.svg" target="_blank" rel="noopener">查看原图 SVG</a><a href="../results/single_camera_summary.csv">结果 CSV</a><a href="../results/single_camera.csv">逐回合数据</a></div>
-      <p class="note">每个条件 500 回合（10 个任务 × 50 个初始状态，各条件初始状态相同；π0.5 腕部涂黑一项是同一组 100 个初始状态跑 5 次）。“屏蔽”指在模型内部把这一路相机的槽位换成空相机占位、掩码置 0；“冻结”指整个回合只给第一帧的真实画面。π0 与双相机按初始状态配对，各条件差值的 95% 区间都在预设的 ±8 个百分点以内。逐回合结果见仓库的 results/single_camera.csv。</p>
+      <p class="note">腕部主实验只覆盖π0／π0.5，主视角保持正常。正常、腕部mask和腕部冻结各500初态；π0.5腕部黑图借用同100初态的5次重复。主视角mask为附加条件，不是完整主视角实验；主视角单独冻结与单路噪声未测。</p>
     </div>
 
     <div class="block" id="official">
-      <h3><span class="n">1.5</span>官方 π0 对照</h3>
+      <h3><span class="n">1.5</span>额外检查点对照：官方 π0 / OpenPI</h3>
       <p class="take">官方π0/OpenPI在所测全黑与腕部屏蔽条件下均为0/100，主视角屏蔽为77/100。LeRobot v044全黑仍有成功，但两边权重与管线不同。</p>
-      <div class="fig"><img loading="lazy" id="figOfficial" width="760" height="468" src="../media/zh/official_pi0.svg?v=claims-1" alt="官方 π0 与 LeRobot π0 去掉相机后的成功率"></div>
+      <div class="fig"><img loading="lazy" id="figOfficial" width="900" height="580" src="../media/zh/official_pi0.svg?v=claims-1" alt="官方π0与LeRobotπ0：每点同100初态，重复逐次展示"></div>
       <div class="figure-tools"><a data-figure="official_pi0" href="../media/zh/official_pi0.svg" target="_blank" rel="noopener">查看原图 SVG</a><a href="../results/official_pi0_summary.csv">结果 CSV</a></div>
-      <p class="note">官方π0使用Physical Intelligence的pi0_libero检查点，在OpenPI管线下正常500回合为96.4%（256渲染），初始状态协议与1.4节匹配。各视觉干预100回合；360复测正常99/100，全黑和双槽屏蔽均为0/100。LeRobot侧为360渲染；另行试用的HF检查点冒烟0/50，且未通过同源性核验，不是同权重的管线对照。此对照未隔离权重、转换与其他推理差异。设计记录见仓库docs/NOTES_CN.md，汇总见results/official_pi0_summary.csv。</p>
+      <p class="note">图中每点取同100初态，正常为官方93/100、LeRobot65/100；500回合运行只取每任务前10初态。LeRobot重复逐次展示，不合并Wilson区间。完整500正常96.4%／72.0%另列参考；权重与推理管线同时不同，不作单因素归因。</p>
     </div>
 
     <div class="block" id="open-loop">
@@ -178,8 +194,8 @@
       <p class="note">SmolVLA使用仅在LIBERO-Spatial训练的公开权重，n_action_steps=10，与论文四套件训练配置不同。点击模型行可核对参考出处与原始评测。</p>
     </div>
 
-    <details class="evidence block"><summary>查看 LIBERO-Spatial 各任务成功率</summary>
-      <h3>LIBERO-Spatial 各任务成功率</h3>
+    <details class="evidence block"><summary>查看参考复现中的三个LIBERO检查点</summary>
+      <h3>参考复现中的三个LIBERO检查点：逐任务结果</h3>
       <p class="cap">每格是该任务 50 回合的成功率（%）。列标题是“拿起黑碗并放到盘子上”里碗的初始位置。</p>
       <div class="panel">
         <div class="mx-wrap"><table class="mx" id="matrix"></table></div>
@@ -203,7 +219,7 @@
 
   <section id="replay">
     <h2>本地录像</h2>
-    <p class="intro">每个任务一段成功、一段失败的录像。全涂黑的录像是环境的真实渲染，模型当时收到的是黑图。</p>
+    <p class="intro">有录像时，每个任务至多展示一段成功和一段失败选例。录像缺失不代表没做实验；全黑录像展示真实环境，策略收到的是黑图。</p>
     <div class="block" id="replayBody">
       <div class="filters" id="filters"></div>
       <div id="videos"></div>
@@ -215,7 +231,7 @@
 </div>
 <script src="results.js?v=replay-1"></script>
 <script src="followup.js?v=p1p2-1"></script>
-<script src="app.js?v=loading-1"></script>
+<script src="app.js?v=structure-2"></script>
 <noscript><p class="no-script">交互图表需要 JavaScript。<a href="https://github.com/chaoshengsc/libero-camera-ablation">Read the results on GitHub</a>.</p></noscript>
 </body>
 </html>

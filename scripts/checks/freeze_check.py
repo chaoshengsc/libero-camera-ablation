@@ -12,7 +12,7 @@ import sys
 from pathlib import Path, PurePosixPath
 
 ROOT = Path(__file__).resolve().parents[2]
-MANIFEST = ROOT / "results/freeze_20261109.sha256"
+MANIFEST = ROOT / "results/freeze_20261109_v1.5.2.sha256"
 
 
 def verify(root, manifest):
@@ -28,7 +28,7 @@ def verify(root, manifest):
         relative = PurePosixPath(name)
         if relative.is_absolute() or ".." in relative.parts or str(relative) != name or name in seen:
             raise ValueError(f"invalid or duplicate evidence path: {name}")
-        if not name.startswith(("dashboard/data/", "results/")) or name == "results/freeze_20261109.sha256":
+        if not name.startswith(("dashboard/data/", "results/")) or name == "results/freeze_20261109_v1.5.2.sha256":
             raise ValueError(f"path outside frozen evidence scope: {name}")
         path = root / name
         if path.is_symlink() or not path.resolve().is_relative_to(root.resolve()) or not path.is_file():
@@ -51,7 +51,7 @@ def main():
     except (OSError, ValueError) as error:
         print(f"error: {error}", file=sys.stderr)
         return 1
-    print(f"Verified {count} frozen public evidence files (v1.5.1, 2026-11-09); no model run")
+    print(f"Verified {count} frozen public evidence files (v1.5.2, 2026-11-09); no model run")
     return 0
 
 
